@@ -4,6 +4,7 @@ import hashlib
 import os
 import re
 import unicodedata
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -71,14 +72,14 @@ def tp_sort_key(tp: str):
 
 def main():
     p = argparse.ArgumentParser(description="Analyze parsed cfDNA data and produce tables/plots.")
-    p.add_argument("--parsed", default="cfdna_parsed.csv", help="input parsed CSV from parser")
+    p.add_argument("--parsed", default="outputs/results/cfdna_parsed.csv", help="input parsed CSV from parser")
     p.add_argument("--donors", default="cfDNA_donors.xlsx", help="donors Excel file")
-    p.add_argument("--out_excel", default="cfdna_analysis.xlsx", help="output Excel with Summary+Detailed")
-    p.add_argument("--plot", default="cfDNA_points_comparison_log.jpeg", help="scatter plot image (Control/Diagnosis/TP1)")
-    p.add_argument("--violin", default="cfDNA_violin_log.jpeg", help="violin plot image (Control + all timepoints)")
+    p.add_argument("--out_excel", default="outputs/results/cfdna_analysis.xlsx", help="output Excel with Summary+Detailed")
+    p.add_argument("--plot", default="outputs/results/cfDNA_points_comparison_log.jpeg", help="scatter plot image (Control/Diagnosis/TP1)")
+    p.add_argument("--violin", default="outputs/results/cfDNA_violin_log.jpeg", help="violin plot image (Control + all timepoints)")
     p.add_argument(
         "--violin_subset",
-        default="cfDNA_violin_subset_connected_log.jpeg",
+        default="outputs/results/cfDNA_violin_subset_connected_log.jpeg",
         help="violin plot image (Control + selected patient timepoints; connected per patient)",
     )
     p.add_argument(
@@ -98,7 +99,7 @@ def main():
         choices=["median", "mean", "first"],
         help="when multiple samples exist per patient+timepoint, aggregation for connecting lines",
     )
-    p.add_argument("--violin_total_ng", default="cfDNA_violin_total_ng_log.jpeg",
+    p.add_argument("--violin_total_ng", default="outputs/results/cfDNA_violin_total_ng_log.jpeg",
                    help="violin plot image (patients only; total cfDNA ng by timepoint)")
 
     p.add_argument(
@@ -120,14 +121,14 @@ def main():
     )
     p.add_argument(
         "--pairwise_scale",
-        default="linear",
-        choices=["linear", "log10"],
+        default="log10",
+        choices=["log10"],
         help="run tests on linear values or log10-transformed values",
     )
     p.add_argument(
         "--pairwise_correction",
         default="bh",
-        choices=["none", "bh"],
+        choices=["bh"],
         help="multiple-testing correction across all pairwise comparisons",
     )
 
@@ -144,14 +145,37 @@ def main():
     )
     p.add_argument(
         "--mixed_correction",
-        default="holm",
-        choices=["none", "bh", "holm", "tukey"],
-        help="multiple-comparisons correction for MixedLM contrasts (bh, Holm or Tukey-style)",
+        default="bh",
+        choices=["bh"],
+        help="multiple-comparisons correction for MixedLM contrasts (BH enforced)",
+    )
+
+    p.add_argument(
+        "--test_outputs_dir",
+        default="outputs",
+        help="output root directory. Results are written to <root>/results and diagnostics to <root>/diagnostics",
+    )
+
+    p.add_argument(
+        "--mixed_random_slope_sensitivity",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="run sensitivity MixedLM with random slope over ordered time (patients only)",
+    )
+    p.add_argument(
+        "--mixed_outlier_drop_n",
+        type=int,
+        default=0,
+        help="outlier sensitivity: drop top-N observations by |residual| and refit once (0 disables). Suggested: 1 or 2",
     )
     args = p.parse_args()
 
     # load parsed (must include ALL timepoints already)
-    df = pd.read_csv(args.parsed)
+    parsed_path = Path(args.parsed)
+    if not parsed_path.exists() and parsed_path.name == "cfdna_parsed.csv":
+        # Backward-compatible fallback for old default location
+        parsed_path = Path("cfdna_parsed.csv")
+    df = pd.read_csv(parsed_path)
     required_cols = {"lastname","timepoint","tube","ml_plasma","pct_cfdna","total_ng_dna","ng_per_ml"}
     missing = required_cols - set(df.columns)
     if missing:
@@ -172,6 +196,7 @@ def main():
     )
     summary = summary.sort_values("timepoint", key=lambda s: s.map(tp_sort_key)).round(2)
 
+    os.makedirs(os.path.dirname(os.path.abspath(args.out_excel)), exist_ok=True)
     with pd.ExcelWriter(args.out_excel, engine="openpyxl") as w:
         summary.to_excel(w, sheet_name="Summary", index=False)
         df.to_excel(w, sheet_name="Detailed", index=False)
@@ -237,6 +262,7 @@ def main():
     plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
     plt.gca().yaxis.set_major_formatter(LogFormatter(labelOnlyBase=True))
     plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(args.plot)), exist_ok=True)
     plt.savefig(args.plot, format="jpeg", dpi=600)
     plt.close()
     print(f"scatter saved: {os.path.abspath(args.plot)}")
@@ -343,6 +369,7 @@ def main():
     plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
     plt.minorticks_on()
     plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(args.violin)), exist_ok=True)
     plt.savefig(args.violin, format="jpeg", dpi=600)
     plt.close()
     print(f"violin saved: {os.path.abspath(args.violin)}")
@@ -543,6 +570,7 @@ def main():
     plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
     plt.minorticks_on()
     plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(args.violin_subset)), exist_ok=True)
     plt.savefig(args.violin_subset, format="jpeg", dpi=600)
     plt.close()
     print(f"violin (subset) saved: {os.path.abspath(args.violin_subset)}")
@@ -616,6 +644,7 @@ def main():
     plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
     plt.minorticks_on()
     plt.tight_layout()
+    os.makedirs(os.path.dirname(os.path.abspath(args.violin_total_ng)), exist_ok=True)
     plt.savefig(args.violin_total_ng, format="jpeg", dpi=600)
     plt.close()
     print(f"violin (total ng) saved: {os.path.abspath(args.violin_total_ng)}")
@@ -637,9 +666,32 @@ def main():
         donors=donors,
         bins=bins,
         unit=args.pairwise_unit,
-        scale=args.pairwise_scale,
-        correction=args.pairwise_correction,
+        scale="log10",
+        correction="bh",
     )
+
+    out_root = Path(os.path.abspath(args.test_outputs_dir))
+    results_dir = out_root / "results"
+    diagnostics_dir = out_root / "diagnostics"
+    results_dir.mkdir(parents=True, exist_ok=True)
+    diagnostics_dir.mkdir(parents=True, exist_ok=True)
+
+    # Always save updated pairwise CSV into <out_root>/results/
+    pairwise_csv = str(results_dir / "cfDNA_pairwise_bins_stats_log10_bh.csv")
+    pairwise_df.to_csv(pairwise_csv, index=False)
+    print(f"pairwise stats CSV saved: {pairwise_csv}")
+
+    # Diagnostics for t-test assumptions (per-bin hist + Q-Q on log10)
+    try:
+        stats_reporting.write_pairwise_log10_diagnostics(
+            df_patients=df,
+            donors=donors,
+            bins=bins,
+            out_dir=diagnostics_dir / "pairwise_log10",
+        )
+        print(f"pairwise diagnostics saved under: {diagnostics_dir / 'pairwise_log10'}")
+    except Exception as e:
+        print(f"warning: could not write pairwise diagnostics: {e}")
 
     if args.pairwise_table:
         pairwise_df.to_csv(args.pairwise_table, index=False)
@@ -670,8 +722,15 @@ def main():
             df_patients=df,
             donors=donors,
             timepoints=mixed_tps,
-            correction=args.mixed_correction,
+            correction="bh",
+            diagnostics_dir=diagnostics_dir / "mixedlm",
         )
+
+        # Always save updated mixed contrasts CSV into <out_root>/results/
+        mixed_csv = str(results_dir / "cfDNA_mixedlm_timepoint_contrasts_log10_bh.csv")
+        mixed_df.to_csv(mixed_csv, index=False)
+        print(f"mixedlm contrasts CSV saved: {mixed_csv}")
+
         if args.mixed_table:
             mixed_df.to_csv(args.mixed_table, index=False)
             print(f"mixedlm contrasts saved: {os.path.abspath(args.mixed_table)}")
@@ -681,6 +740,46 @@ def main():
             print(f"mixedlm contrasts added to Excel: {os.path.abspath(args.out_excel)} (sheet MixedContrasts)")
         except Exception as e:
             print(f"warning: could not append mixedlm contrasts to Excel: {e}")
+
+        # --- Sensitivity checks (optional) ---
+        sens_dir = diagnostics_dir / "mixedlm_sensitivity"
+
+        if args.mixed_random_slope_sensitivity:
+            try:
+                rs_df = stats_reporting.mixedlm_random_slope_time_sensitivity(
+                    df_patients=df,
+                    timepoints=mixed_tps,
+                    correction="bh",
+                    diagnostics_dir=sens_dir / "random_slope_time",
+                )
+                rs_csv = str(results_dir / "cfDNA_mixedlm_random_slope_time_contrasts_log10_bh.csv")
+                rs_df.to_csv(rs_csv, index=False)
+                print(f"mixedlm random-slope sensitivity CSV saved: {rs_csv}")
+            except Exception as e:
+                print(f"warning: random-slope sensitivity failed: {e}")
+
+        if args.mixed_outlier_drop_n and args.mixed_outlier_drop_n > 0:
+            try:
+                outlier = stats_reporting.mixedlm_outlier_drop_sensitivity(
+                    df_patients=df,
+                    donors=donors,
+                    timepoints=mixed_tps,
+                    correction="bh",
+                    drop_n=int(args.mixed_outlier_drop_n),
+                )
+
+                removed_csv = str(results_dir / f"cfDNA_mixedlm_outlier_drop{args.mixed_outlier_drop_n}_removed_observations.csv")
+                outlier["removed_observations"].to_csv(removed_csv, index=False)
+
+                refit_csv = str(results_dir / f"cfDNA_mixedlm_outlier_drop{args.mixed_outlier_drop_n}_contrasts_log10_bh.csv")
+                outlier["contrasts_refit"].to_csv(refit_csv, index=False)
+
+                cmp_csv = str(results_dir / f"cfDNA_mixedlm_outlier_drop{args.mixed_outlier_drop_n}_contrasts_vs_base.csv")
+                outlier["contrasts_comparison"].to_csv(cmp_csv, index=False)
+
+                print(f"mixedlm outlier-drop sensitivity saved: {removed_csv}, {refit_csv}, {cmp_csv}")
+            except Exception as e:
+                print(f"warning: outlier-drop sensitivity failed: {e}")
     except Exception as e:
         print(f"warning: mixedlm contrasts failed: {e}")
 

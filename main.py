@@ -14,13 +14,13 @@ def main():
     p = argparse.ArgumentParser(description="cfDNA inventory pipeline: parse → analyze")
     p.add_argument("--input", default="cfDNA_inventaire_2025.xlsx", help="source Excel")
     p.add_argument("--donors", default="cfDNA_donors.xlsx", help="donors Excel")
-    p.add_argument("--parsed_csv", default="cfdna_parsed.csv", help="output from parser")
+    p.add_argument("--parsed_csv", default="outputs/results/cfdna_parsed.csv", help="output from parser")
     p.add_argument("--parsed_parquet", default=None, help="optional Parquet from parser")
-    p.add_argument("--out_excel", default="cfdna_analysis.xlsx", help="analysis workbook (Summary+Detailed)")
-    p.add_argument("--plot", default="cfDNA_points_comparison_log.jpeg", help="analysis plot output")
+    p.add_argument("--out_excel", default="outputs/results/cfdna_analysis.xlsx", help="analysis workbook (Summary+Detailed)")
+    p.add_argument("--plot", default="outputs/results/cfDNA_points_comparison_log.jpeg", help="analysis plot output")
     p.add_argument(
         "--violin_subset",
-        default="cfDNA_violin_subset_connected_log.jpeg",
+        default="outputs/results/cfDNA_violin_subset_connected_log.jpeg",
         help="subset violin plot output (Control + selected timepoints; connected per patient)",
     )
     p.add_argument(
@@ -60,15 +60,15 @@ def main():
     )
     p.add_argument(
         "--pairwise_scale",
-        default="linear",
-        choices=["linear", "log10"],
-        help="run tests on linear values or log10-transformed values",
+        default="log10",
+        choices=["log10"],
+        help="run tests on log10-transformed values (enforced)",
     )
     p.add_argument(
         "--pairwise_correction",
         default="bh",
-        choices=["none", "bh"],
-        help="multiple-testing correction across all pairwise comparisons",
+        choices=["bh"],
+        help="multiple-testing correction across all pairwise comparisons (BH enforced)",
     )
 
     p.add_argument(
@@ -84,9 +84,28 @@ def main():
     )
     p.add_argument(
         "--mixed_correction",
-        default="holm",
-        choices=["none", "bh", "holm", "tukey"],
-        help="multiple-comparisons correction for MixedLM contrasts",
+        default="bh",
+        choices=["bh"],
+        help="multiple-comparisons correction for MixedLM contrasts (BH enforced)",
+    )
+
+    p.add_argument(
+        "--test_outputs_dir",
+        default="outputs",
+        help="output root directory. Results are written to <root>/results and diagnostics to <root>/diagnostics",
+    )
+
+    p.add_argument(
+        "--mixed_random_slope_sensitivity",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="run sensitivity MixedLM with random slope over ordered time (patients only)",
+    )
+    p.add_argument(
+        "--mixed_outlier_drop_n",
+        type=int,
+        default=0,
+        help="outlier sensitivity: drop top-N observations by |residual| and refit once (0 disables). Suggested: 1 or 2",
     )
     p.add_argument("--print-matches", action="store_true", help="parser: print matched headers")
     p.add_argument("--skip-parse", action="store_true", help="skip the parse step")
@@ -134,7 +153,11 @@ def main():
             "--pairwise_correction", args.pairwise_correction,
             "--mixed_bins", args.mixed_bins,
             "--mixed_correction", args.mixed_correction,
+            "--test_outputs_dir", args.test_outputs_dir,
+            "--mixed_outlier_drop_n", str(args.mixed_outlier_drop_n),
         ]
+        if args.mixed_random_slope_sensitivity:
+            cmd += ["--mixed_random_slope_sensitivity"]
         if args.pairwise_table:
             cmd += ["--pairwise_table", args.pairwise_table]
         if args.mixed_table:

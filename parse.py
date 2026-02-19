@@ -104,13 +104,15 @@ def to_numeric_series(s: pd.Series) -> pd.Series:
 def main():
     ap = argparse.ArgumentParser(description="Parse cfDNA Excel into a tidy CSV/Parquet.")
     ap.add_argument("--input", default="cfDNA_inventaire_2025.xlsx", help="source Excel")
-    ap.add_argument("--out_csv", default="cfdna_parsed.csv", help="output CSV path")
+    ap.add_argument("--out_csv", default="outputs/results/cfdna_parsed.csv", help="output CSV path")
     ap.add_argument("--out_parquet", default=None, help="optional Parquet path")
     ap.add_argument("--header_row", type=int, default=None,
                     help="0-based header row override (skip auto-detect)")
     ap.add_argument("--print_matches", action="store_true",
                     help="print matched headers and timepoint parsing stats")
     args = ap.parse_args()
+
+    os.makedirs(os.path.dirname(os.path.abspath(args.out_csv)), exist_ok=True)
 
     # --- detect stacked header rows
     df0 = pd.read_excel(args.input, header=None)
