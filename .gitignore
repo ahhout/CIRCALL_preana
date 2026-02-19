@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Conda / venv artifacts
+.venv/
+
+# Data & outputs (often large / potentially sensitive)
+*.xlsx
+*.csv
+*.parquet
+*.jpeg
+*.jpg
+*.png
+
+# Fonts/binaries
+*.ttf
+
+# OS/editor
+.DS_Store
+.vscode/

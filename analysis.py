@@ -1,0 +1,706 @@
+#!/usr/bin/env python3
+import argparse
+import hashlib
+import os
+import re
+import unicodedata
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import LogFormatter
+from scipy.stats import ttest_ind
+
+import stats_reporting
+
+# ----------------------------- helpers -----------------------------
+
+def _norm(s: str) -> str:
+    s = str(s) if not isinstance(s, str) else s
+    s = s.strip().lower()
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(ch for ch in s if not unicodedata.combining(ch))
+    s = re.sub(r"[^a-z0-9% ]+", " ", s)
+    s = re.sub(r"\s+", " ", s)
+    return s
+
+def find_col(cols, patterns, required=True):
+    ncols = {c: _norm(c) for c in cols}
+
+    def and_match(nc: str, toks):
+        toks = [_norm(t) for t in toks]
+        return all(t in nc for t in toks)
+
+    if isinstance(patterns, str):
+        pattern_sets = [[patterns]]
+    elif isinstance(patterns, (list, tuple)) and all(isinstance(p, str) for p in patterns):
+        pattern_sets = [list(patterns)]
+    else:
+        pattern_sets = patterns
+
+    for c, nc in ncols.items():
+        for toks in pattern_sets:
+            if and_match(nc, toks):
+                return c
+
+    # fallback: best partial score
+    best, best_score = None, -1
+    for c, nc in ncols.items():
+        score = max(sum(_norm(t) in nc for t in toks) for toks in pattern_sets)
+        if score > best_score:
+            best, best_score = c, score
+    if best_score > 0:
+        return best
+
+    if required:
+        raise KeyError("Could not find a matching donors column.")
+    return None
+
+def tp_sort_key(tp: str):
+
+    if tp == "diag": return (0, 0)
+    m = re.match(r"tp(\d+)(?:,(\d))?$", str(tp).lower())
+    if m:
+        whole = int(m.group(1)); frac = int(m.group(2) or 0)
+        return (1, whole * 10 + frac)
+    if str(tp).lower() == "rechute": return (2, 0)
+    if "inotuzumab" in str(tp).lower(): return (3, 0)
+    return (4, str(tp))
+
+# ------------------------------- main ------------------------------
+
+def main():
+    p = argparse.ArgumentParser(description="Analyze parsed cfDNA data and produce tables/plots.")
+    p.add_argument("--parsed", default="cfdna_parsed.csv", help="input parsed CSV from parser")
+    p.add_argument("--donors", default="cfDNA_donors.xlsx", help="donors Excel file")
+    p.add_argument("--out_excel", default="cfdna_analysis.xlsx", help="output Excel with Summary+Detailed")
+    p.add_argument("--plot", default="cfDNA_points_comparison_log.jpeg", help="scatter plot image (Control/Diagnosis/TP1)")
+    p.add_argument("--violin", default="cfDNA_violin_log.jpeg", help="violin plot image (Control + all timepoints)")
+    p.add_argument(
+        "--violin_subset",
+        default="cfDNA_violin_subset_connected_log.jpeg",
+        help="violin plot image (Control + selected patient timepoints; connected per patient)",
+    )
+    p.add_argument(
+        "--violin_subset_timepoints",
+        default="diag;tp0,5;tp1;tp2",
+        help="patient timepoints to include. Prefer ';' as separator (because some timepoints contain ','). Example: 'diag;tp0,5;tp1;tp2'",
+    )
+    p.add_argument(
+        "--violin_subset_connect_lines",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+        help="connect points from the same patient across timepoints",
+    )
+    p.add_argument(
+        "--violin_subset_connect_agg",
+        default="median",
+        choices=["median", "mean", "first"],
+        help="when multiple samples exist per patient+timepoint, aggregation for connecting lines",
+    )
+    p.add_argument("--violin_total_ng", default="cfDNA_violin_total_ng_log.jpeg",
+                   help="violin plot image (patients only; total cfDNA ng by timepoint)")
+
+    p.add_argument(
+        "--pairwise_table",
+        default=None,
+        help="(optional) output CSV with pairwise statistical comparisons between bins; if omitted only Excel sheet is written",
+    )
+    p.add_argument(
+        "--pairwise_bins",
+        default="subset",
+        choices=["subset", "all"],
+        help="which bins to compare: 'subset' uses Control + violin_subset_timepoints; 'all' uses Control + all patient timepoints",
+    )
+    p.add_argument(
+        "--pairwise_unit",
+        default="sample",
+        choices=["sample", "patient_median"],
+        help="statistical unit: raw samples, or per-patient median within each bin",
+    )
+    p.add_argument(
+        "--pairwise_scale",
+        default="linear",
+        choices=["linear", "log10"],
+        help="run tests on linear values or log10-transformed values",
+    )
+    p.add_argument(
+        "--pairwise_correction",
+        default="bh",
+        choices=["none", "bh"],
+        help="multiple-testing correction across all pairwise comparisons",
+    )
+
+    p.add_argument(
+        "--mixed_table",
+        default=None,
+        help="(optional) output CSV with mixed-effects model timepoint contrasts; if omitted only Excel sheet is written",
+    )
+    p.add_argument(
+        "--mixed_bins",
+        default="subset",
+        choices=["subset", "all"],
+        help="which timepoints to include in the MixedLM: 'subset' uses Control + violin_subset_timepoints; 'all' uses Control + all patient timepoints",
+    )
+    p.add_argument(
+        "--mixed_correction",
+        default="holm",
+        choices=["none", "bh", "holm", "tukey"],
+        help="multiple-comparisons correction for MixedLM contrasts (bh, Holm or Tukey-style)",
+    )
+    args = p.parse_args()
+
+    # load parsed (must include ALL timepoints already)
+    df = pd.read_csv(args.parsed)
+    required_cols = {"lastname","timepoint","tube","ml_plasma","pct_cfdna","total_ng_dna","ng_per_ml"}
+    missing = required_cols - set(df.columns)
+    if missing:
+        raise SystemExit(f"parsed file is missing columns: {missing}")
+
+    # -------- Excel: Summary (all timepoints) + Detailed --------
+    summary = (
+        df.groupby("timepoint", dropna=False)
+          .agg(
+              unique_patient_count = ("lastname", lambda x: len(set(x))),
+              mean_ml_plasma       = ("ml_plasma", "mean"),
+              mean_total_ng_DNA    = ("total_ng_dna", "mean"),
+              median_total_ng_DNA  = ("total_ng_dna", "median"),
+              mean_ng_per_ml       = ("ng_per_ml", "mean"),
+              median_ng_per_ml     = ("ng_per_ml", "median"),
+          )
+          .reset_index()
+    )
+    summary = summary.sort_values("timepoint", key=lambda s: s.map(tp_sort_key)).round(2)
+
+    with pd.ExcelWriter(args.out_excel, engine="openpyxl") as w:
+        summary.to_excel(w, sheet_name="Summary", index=False)
+        df.to_excel(w, sheet_name="Detailed", index=False)
+    print(f"excel saved: {os.path.abspath(args.out_excel)}")
+
+    # -------- Donors (find concentration column robustly) --------
+    donors = pd.read_excel(args.donors, decimal=",")
+    donors.columns = [c.strip() for c in donors.columns]
+    conc_col = find_col(
+        donors.columns,
+        [["conc", "ng", "ml"], ["concentration", "ng", "ml"], ["ng", "ml"]]
+    )
+    donors["ng/ml plasma"] = pd.to_numeric(donors[conc_col], errors="coerce")
+    donors["timepoint"] = "Control"
+
+    # --- DEBUG: list any raw rows with ml_plasma > 10 ---
+    prob = df[df["ml_plasma"].astype(float) > 10].copy()
+    if len(prob):
+        prob = prob[["lastname", "timepoint", "ml_plasma"]].sort_values(["lastname", "timepoint"])
+        print("\nSamples with ml_plasma > 10 (patient | timepoint | value):")
+        for _, r in prob.iterrows():
+            print(f"  {r['lastname']} | {r['timepoint']} | {r['ml_plasma']}")
+    else:
+        print("\nNo samples with ml_plasma > 10 found.")
+
+    # ============================================================
+    # Scatter: Control vs Diagnosis vs TP1  (kept as before)
+    # ============================================================
+    df_diag_tp1 = df[df["timepoint"].isin(["diag","tp1"])][["timepoint","ng_per_ml"]].copy()
+    df_diag_tp1 = df_diag_tp1.rename(columns={"ng_per_ml":"ng/ml plasma"})
+
+    df_plot = pd.concat(
+        [donors[["timepoint","ng/ml plasma"]], df_diag_tp1],
+        ignore_index=True
+    )
+    df_plot = df_plot[df_plot["ng/ml plasma"].notna()]
+    df_plot["timepoint"] = pd.Categorical(df_plot["timepoint"], categories=["Control","diag","tp1"], ordered=True)
+
+    counts = df_plot["timepoint"].value_counts().to_dict()
+    label_map = {
+        "Control": f"Control (n={counts.get('Control', 0)})",
+        "diag":    f"Diagnosis (n={counts.get('diag', 0)})",
+        "tp1":     f"TP1 (n={counts.get('tp1', 0)})",
+    }
+
+    plt.figure(figsize=(6.5, 5))
+    xmap = {"Control": 0, "diag": 1, "tp1": 2}
+    for label, x in xmap.items():
+        yvals = df_plot[df_plot["timepoint"] == label]["ng/ml plasma"]
+        plt.scatter([x]*len(yvals), yvals, alpha=0.8)
+
+    plt.xticks([0,1,2], [label_map["Control"], label_map["diag"], label_map["tp1"]])
+    plt.yscale("log")
+    y_scatter = df_plot["ng/ml plasma"].to_numpy(dtype=float)
+    y_scatter = y_scatter[np.isfinite(y_scatter) & (y_scatter > 0)]
+    if y_scatter.size:
+        ymin = float(y_scatter.min()) * 0.9
+        ymax = float(y_scatter.max()) * 1.1
+        ymin = 0.1 if ymin >= 0.1 else ymin
+        plt.ylim(ymin, ymax)
+    plt.ylabel("ng/ml plasma (log scale)")
+    plt.title("cfDNA in patients vs healthy donors (points)")
+    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+    plt.gca().yaxis.set_major_formatter(LogFormatter(labelOnlyBase=True))
+    plt.tight_layout()
+    plt.savefig(args.plot, format="jpeg", dpi=600)
+    plt.close()
+    print(f"scatter saved: {os.path.abspath(args.plot)}")
+
+    def _log10_limits_and_ticks(values: np.ndarray, floor: float | None = None):
+        values = np.asarray(values, dtype=float)
+        values = values[np.isfinite(values) & (values > 0)]
+        if values.size == 0:
+            return (0.0, 1.0), [1.0]
+        ymin = float(values.min()) * 0.9
+        ymax = float(values.max()) * 1.1
+        if floor is not None:
+            ymin = min(ymin, float(floor)) if ymin < float(floor) else float(floor)
+        # decade ticks within bounds
+        pmin = int(np.floor(np.log10(ymin)))
+        pmax = int(np.ceil(np.log10(ymax)))
+        tick_vals = [10 ** p for p in range(pmin, pmax + 1)]
+        tick_vals = [t for t in tick_vals if ymin <= t <= ymax]
+        if not tick_vals:
+            tick_vals = [ymin, ymax]
+        return (ymin, ymax), tick_vals
+
+    # ============================================================
+    # Violin: Control + ALL patient timepoints, with jittered points
+    # ============================================================
+    # build combined df with donors and all timepoints
+    df_all = df.rename(columns={"ng_per_ml":"ng/ml plasma"})[["timepoint","ng/ml plasma"]].copy()
+    df_all = pd.concat([donors[["timepoint","ng/ml plasma"]], df_all], ignore_index=True)
+    df_all = df_all[df_all["ng/ml plasma"].notna()].copy()
+
+    # category order
+    cats_patients = sorted(df["timepoint"].dropna().unique(), key=tp_sort_key)
+    cats = ["Control"] + list(cats_patients)
+    df_all["timepoint"] = pd.Categorical(df_all["timepoint"], categories=cats, ordered=True)
+
+    # list of data arrays per category
+    data = [df_all.loc[df_all["timepoint"] == c, "ng/ml plasma"].astype(float).values for c in cats]
+    data = [y[np.isfinite(y) & (y > 0)] for y in data]
+
+    # IMPORTANT: because we want a log-scaled view, we compute the violin density in log10-space.
+    # If you compute KDE in linear space and then set a log y-axis, the violin shape can look
+    # disconnected from the jittered points.
+    data_log = [np.log10(y) if y.size else np.array([]) for y in data]
+
+    # new style: thin, translucent violins + median line + IQR bar + jittered points
+    plt.figure(figsize=(9.5, 5.5))
+    parts = plt.violinplot(
+        dataset=data_log,
+        positions=range(len(cats)),
+        widths=0.8,
+        showmeans=False,
+        showmedians=False,
+        showextrema=False
+    )
+    # translucency and slimmer outlines without setting explicit colors
+    for b in parts["bodies"]:
+        b.set_alpha(0.25)
+        b.set_linewidth(1.0)
+
+    # overlay median line and IQR bar per category
+    for i, y in enumerate(data):
+        if y.size == 0:
+            continue
+        q1, med, q3 = np.percentile(y, [25, 50, 75])
+        q1l, medl, q3l = np.log10([q1, med, q3])
+        # IQR bar (thin vertical line)
+        plt.vlines(i, q1l, q3l, linewidth=2, zorder=3)
+        # median line (short horizontal bar)
+        plt.hlines(medl, i - 0.18, i + 0.18, linewidth=2, zorder=4)
+        # annotate median value (black)
+        plt.text(
+            i + 0.24,
+            medl,
+            f"{med:.0f}",
+            color="black",
+            fontsize=8,
+            va="center",
+            ha="left",
+            zorder=6,
+        )
+
+    # jittered individual points
+    rng = np.random.default_rng(42)
+    for i, y in enumerate(data):
+        if y.size == 0:
+            continue
+        x = i + rng.uniform(-0.08, 0.08, size=y.size)
+        plt.scatter(x, np.log10(y), s=12, alpha=0.7, linewidths=0.3, zorder=5)
+
+    # axes, labels
+    # y-axis is log10(values) (limits derived from data so nothing is clipped)
+    (ymin, ymax), tick_vals = _log10_limits_and_ticks(np.concatenate(data) if data else np.array([]), floor=0.1)
+    plt.ylim(np.log10(ymin), np.log10(ymax))
+    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
+    counts_all = df_all["timepoint"].value_counts().to_dict()
+    def pretty_label(c):
+        if c == "Control": return f"Control (n={counts_all.get(c,0)})"
+        if c == "diag":    return f"Diagnosis (n={counts_all.get(c,0)})"
+        return f"{c.upper()} (n={counts_all.get(c,0)})"
+
+    plt.xticks(range(len(cats)), [pretty_label(c) for c in cats], rotation=15, ha="right")
+    plt.ylabel("ng/ml plasma (log scale)")
+    plt.title("cfDNA by timepoint vs healthy donors (violin + points)")
+    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+    plt.minorticks_on()
+    plt.tight_layout()
+    plt.savefig(args.violin, format="jpeg", dpi=600)
+    plt.close()
+    print(f"violin saved: {os.path.abspath(args.violin)}")
+
+    # ============================================================
+    # Violin (subset): Control + selected patient timepoints,
+    # with optional per-patient connecting lines
+    # ============================================================
+    def _stable_u01(key: str) -> float:
+        h = hashlib.blake2b(key.encode("utf-8"), digest_size=8).digest()
+        return int.from_bytes(h, "little") / float(2**64 - 1)
+
+    def _stable_jitter(key: str, width: float = 0.08) -> float:
+        u = _stable_u01(key)
+        return (u * 2.0 - 1.0) * width
+
+    cmap_patient = plt.get_cmap("turbo")
+    def _patient_color(patient: str):
+        return cmap_patient(_stable_u01(f"patient|{patient}"))
+
+    def _parse_timepoints_arg(raw: str, available: set[str]) -> list[str]:
+        raw = str(raw)
+        sep = ";" if ";" in raw else ","
+        toks = [t.strip().lower() for t in raw.split(sep) if t.strip()]
+
+        # If user used comma separator, timepoints like 'tp0,5' can be split into ['tp0','5'].
+        # Recombine if the joined candidate exists in the data.
+        if sep == ",":
+            out: list[str] = []
+            i = 0
+            while i < len(toks):
+                cur = toks[i]
+                nxt = toks[i + 1] if i + 1 < len(toks) else None
+                if nxt is not None and re.fullmatch(r"tp\d+", cur) and re.fullmatch(r"\d+", nxt):
+                    cand = f"{cur},{nxt}"
+                    if cand in available:
+                        out.append(cand)
+                        i += 2
+                        continue
+                out.append(cur)
+                i += 1
+            toks = out
+        return toks
+
+    available_tps = set(df["timepoint"].dropna().astype(str).str.strip().str.lower().unique().tolist())
+    subset_tps_norm = _parse_timepoints_arg(args.violin_subset_timepoints, available=available_tps)
+    subset_tps_norm = list(dict.fromkeys(subset_tps_norm))  # de-dup, keep order
+    subset_sorted = sorted(subset_tps_norm, key=tp_sort_key)
+
+    df_pat = df.copy()
+    df_pat["timepoint"] = df_pat["timepoint"].astype(str).str.strip().str.lower()
+    df_pat = df_pat[df_pat["timepoint"].isin(subset_sorted)].copy()
+    df_pat = df_pat.rename(columns={"ng_per_ml": "ng/ml plasma"})
+    df_pat = df_pat[["lastname", "timepoint", "ng/ml plasma"]]
+
+    df_sub_all = pd.concat(
+        [
+            donors[["timepoint", "ng/ml plasma"]].assign(lastname=pd.NA),
+            df_pat,
+        ],
+        ignore_index=True,
+    )
+    df_sub_all = df_sub_all[df_sub_all["ng/ml plasma"].notna()].copy()
+
+    cats_subset = ["Control"] + subset_sorted
+    df_sub_all["timepoint"] = pd.Categorical(df_sub_all["timepoint"], categories=cats_subset, ordered=True)
+
+    data_subset = [
+        df_sub_all.loc[df_sub_all["timepoint"] == c, "ng/ml plasma"].astype(float).values
+        for c in cats_subset
+    ]
+    data_subset = [y[np.isfinite(y) & (y > 0)] for y in data_subset]
+    data_subset_log = [np.log10(y) if y.size else np.array([]) for y in data_subset]
+
+    plt.figure(figsize=(7.5, 5.5))
+
+    # Matplotlib's violin KDE requires >=2 points. Only draw violins where possible.
+    violin_positions: list[int] = []
+    violin_data: list[np.ndarray] = []
+    for i, yl in enumerate(data_subset_log):
+        if isinstance(yl, np.ndarray) and yl.size >= 2:
+            violin_positions.append(i)
+            violin_data.append(yl)
+
+    if violin_data:
+        parts = plt.violinplot(
+            dataset=violin_data,
+            positions=violin_positions,
+            widths=0.8,
+            showmeans=False,
+            showmedians=False,
+            showextrema=False,
+        )
+        for b in parts["bodies"]:
+            b.set_alpha(0.25)
+            b.set_linewidth(1.0)
+
+    # overlay median + IQR for each category
+    for i, y in enumerate(data_subset):
+        if y.size == 0:
+            continue
+        q1, med, q3 = np.percentile(y, [25, 50, 75])
+        q1l, medl, q3l = np.log10([q1, med, q3])
+        plt.vlines(i, q1l, q3l, linewidth=2, zorder=3)
+        plt.hlines(medl, i - 0.18, i + 0.18, linewidth=2, zorder=4)
+        plt.text(
+            i + 0.24,
+            medl,
+            f"{med:.0f}",
+            color="black",
+            fontsize=8,
+            va="center",
+            ha="left",
+            zorder=6,
+        )
+
+    pos = {c: i for i, c in enumerate(cats_subset)}
+
+    # donors: individual points
+    df_don_pts = donors[["timepoint", "ng/ml plasma"]].copy()
+    df_don_pts = df_don_pts[df_don_pts["ng/ml plasma"].notna()].copy()
+    for idx, r in df_don_pts.iterrows():
+        y = float(r["ng/ml plasma"])
+        if not np.isfinite(y) or y <= 0:
+            continue
+        x = pos["Control"] + _stable_jitter(f"Control|{idx}", width=0.08)
+        plt.scatter([x], [np.log10(y)], s=12, alpha=0.7, linewidths=0.3, zorder=5, color="0.6")
+
+    # patients: one aggregated point per patient+timepoint (so lines connect the plotted points)
+    df_pts = df_pat.dropna(subset=["lastname", "ng/ml plasma"]).copy()
+    df_pts = df_pts[df_pts["ng/ml plasma"].astype(float) > 0]
+    if args.violin_subset_connect_agg == "median":
+        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].median()
+    elif args.violin_subset_connect_agg == "mean":
+        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].mean()
+    else:  # first
+        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].first()
+
+    tp_order = {tp: i for i, tp in enumerate(subset_sorted)}
+    df_pts["_tp_order"] = df_pts["timepoint"].map(tp_order)
+    df_pts = df_pts.dropna(subset=["_tp_order"]).copy()
+    df_pts["_x"] = df_pts.apply(
+        lambda rr: pos[rr["timepoint"]] + _stable_jitter(f"{rr['lastname']}|{rr['timepoint']}", width=0.08),
+        axis=1,
+    )
+
+    for _, r in df_pts.iterrows():
+        y = float(r["ng/ml plasma"])
+        if not np.isfinite(y) or y <= 0:
+            continue
+        plt.scatter(
+            [float(r["_x"])],
+            [np.log10(y)],
+            s=12,
+            alpha=0.85,
+            linewidths=0.3,
+            zorder=6,
+            color=_patient_color(str(r["lastname"])),
+        )
+
+    # per-patient connecting lines
+    if args.violin_subset_connect_lines:
+        for _, g in df_pts.sort_values(["lastname", "_tp_order"]).groupby("lastname"):
+            if len(g) < 2:
+                continue
+            xs = g["_x"].to_numpy(dtype=float)
+            ys = g["ng/ml plasma"].to_numpy(dtype=float)
+            mask = np.isfinite(ys) & (ys > 0)
+            xs = xs[mask]
+            ys = ys[mask]
+            if ys.size < 2:
+                continue
+            plt.plot(xs, np.log10(ys), color="black", alpha=0.30, linewidth=0.6, zorder=2)
+
+    (ymin, ymax), tick_vals = _log10_limits_and_ticks(
+        np.concatenate(data_subset) if data_subset else np.array([]),
+        floor=0.1,
+    )
+    plt.ylim(np.log10(ymin), np.log10(ymax))
+    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
+
+    counts_subset = df_sub_all["timepoint"].value_counts().to_dict()
+    def _display_tp(tp: str) -> str:
+        tp = str(tp)
+        if tp.startswith("tp"):
+            return tp.upper().replace(",", ".")
+        return tp
+    def pretty_label_subset(c):
+        if c == "Control":
+            return f"Control (n={counts_subset.get(c, 0)})"
+        if c == "diag":
+            return f"Diagnosis (n={counts_subset.get(c, 0)})"
+        return f"{_display_tp(c)} (n={counts_subset.get(c, 0)})"
+
+    plt.xticks(range(len(cats_subset)), [pretty_label_subset(c) for c in cats_subset], rotation=15, ha="right")
+    plt.ylabel("ng/ml plasma (log scale)")
+    plt.title("cfDNA by timepoint vs healthy donors (subset violin + points)")
+    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+    plt.minorticks_on()
+    plt.tight_layout()
+    plt.savefig(args.violin_subset, format="jpeg", dpi=600)
+    plt.close()
+    print(f"violin (subset) saved: {os.path.abspath(args.violin_subset)}")
+
+    # ============================================================
+    # Violin: PATIENTS ONLY, TOTAL cfDNA ng (total_ng_dna)
+    # (donors don't have a comparable 'total ng' field here)
+    # ============================================================
+    df_total = df[["timepoint", "total_ng_dna"]].rename(columns={"total_ng_dna": "cfDNA total ng"}).copy()
+    df_total = df_total[df_total["cfDNA total ng"].notna()].copy()
+    df_total["timepoint"] = pd.Categorical(
+        df_total["timepoint"],
+        categories=sorted(df["timepoint"].dropna().unique(), key=tp_sort_key),
+        ordered=True,
+    )
+
+    cats_total = list(df_total["timepoint"].cat.categories)
+    data_total = [df_total.loc[df_total["timepoint"] == c, "cfDNA total ng"].astype(float).values for c in cats_total]
+    data_total = [y[np.isfinite(y) & (y > 0)] for y in data_total]
+    data_total_log = [np.log10(y) if y.size else np.array([]) for y in data_total]
+
+    plt.figure(figsize=(9.5, 5.5))
+    parts = plt.violinplot(
+        dataset=data_total_log,
+        positions=range(len(cats_total)),
+        widths=0.8,
+        showmeans=False,
+        showmedians=False,
+        showextrema=False,
+    )
+    for b in parts["bodies"]:
+        b.set_alpha(0.25)
+        b.set_linewidth(1.0)
+
+    for i, y in enumerate(data_total):
+        if y.size == 0:
+            continue
+        q1, med, q3 = np.percentile(y, [25, 50, 75])
+        q1l, medl, q3l = np.log10([q1, med, q3])
+        plt.vlines(i, q1l, q3l, linewidth=2, zorder=3)
+        plt.hlines(medl, i - 0.18, i + 0.18, linewidth=2, zorder=4)
+        plt.text(
+            i + 0.24,
+            medl,
+            f"{med:.0f}",
+            color="black",
+            fontsize=8,
+            va="center",
+            ha="left",
+            zorder=6,
+        )
+
+    rng = np.random.default_rng(42)
+    for i, y in enumerate(data_total):
+        if y.size == 0:
+            continue
+        x = i + rng.uniform(-0.08, 0.08, size=y.size)
+        plt.scatter(x, np.log10(y), s=12, alpha=0.7, linewidths=0.3, zorder=5)
+
+    (ymin, ymax), tick_vals = _log10_limits_and_ticks(np.concatenate(data_total) if data_total else np.array([]), floor=0.1)
+    plt.ylim(np.log10(ymin), np.log10(ymax))
+    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
+    plt.ylabel("cfDNA total ng (log scale)")
+    counts_total = df_total["timepoint"].value_counts().to_dict()
+    def pretty_label_total(c):
+        if c == "diag":
+            return f"Diagnosis (n={counts_total.get(c, 0)})"
+        return f"{str(c).upper()} (n={counts_total.get(c, 0)})"
+    plt.xticks(range(len(cats_total)), [pretty_label_total(c) for c in cats_total], rotation=15, ha="right")
+    plt.title("Total cfDNA (ng) by timepoint (violin + points)")
+    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+    plt.minorticks_on()
+    plt.tight_layout()
+    plt.savefig(args.violin_total_ng, format="jpeg", dpi=600)
+    plt.close()
+    print(f"violin (total ng) saved: {os.path.abspath(args.violin_total_ng)}")
+
+    # ============================================================
+    # Pairwise statistical comparison table between bins
+    # ============================================================
+    if args.pairwise_bins == "subset":
+        bins = ["Control"] + subset_sorted
+    else:
+        all_tps = sorted(
+            df["timepoint"].dropna().astype(str).str.strip().str.lower().unique().tolist(),
+            key=tp_sort_key,
+        )
+        bins = ["Control"] + all_tps
+
+    pairwise_df = stats_reporting.compute_pairwise_bins(
+        df_patients=df,
+        donors=donors,
+        bins=bins,
+        unit=args.pairwise_unit,
+        scale=args.pairwise_scale,
+        correction=args.pairwise_correction,
+    )
+
+    if args.pairwise_table:
+        pairwise_df.to_csv(args.pairwise_table, index=False)
+        print(f"pairwise stats saved: {os.path.abspath(args.pairwise_table)}")
+
+    # append to Excel output as a new sheet (or replace if present)
+    try:
+        with pd.ExcelWriter(args.out_excel, engine="openpyxl", mode="a", if_sheet_exists="replace") as w:
+            pairwise_df.to_excel(w, sheet_name="PairwiseBins", index=False)
+        print(f"pairwise stats added to Excel: {os.path.abspath(args.out_excel)} (sheet PairwiseBins)")
+    except Exception as e:
+        print(f"warning: could not append pairwise stats to Excel: {e}")
+
+    # ============================================================
+    # Mixed-effects model: log10(cfDNA) ~ timepoint + (1|patient)
+    # Then all pairwise timepoint contrasts with fold-change + CI
+    # ============================================================
+    try:
+        if args.mixed_bins == "subset":
+            mixed_tps = subset_sorted
+        else:
+            mixed_tps = sorted(
+                df["timepoint"].dropna().astype(str).str.strip().str.lower().unique().tolist(),
+                key=tp_sort_key,
+            )
+
+        mixed_df = stats_reporting.compute_mixedlm_contrasts(
+            df_patients=df,
+            donors=donors,
+            timepoints=mixed_tps,
+            correction=args.mixed_correction,
+        )
+        if args.mixed_table:
+            mixed_df.to_csv(args.mixed_table, index=False)
+            print(f"mixedlm contrasts saved: {os.path.abspath(args.mixed_table)}")
+        try:
+            with pd.ExcelWriter(args.out_excel, engine="openpyxl", mode="a", if_sheet_exists="replace") as w:
+                mixed_df.to_excel(w, sheet_name="MixedContrasts", index=False)
+            print(f"mixedlm contrasts added to Excel: {os.path.abspath(args.out_excel)} (sheet MixedContrasts)")
+        except Exception as e:
+            print(f"warning: could not append mixedlm contrasts to Excel: {e}")
+    except Exception as e:
+        print(f"warning: mixedlm contrasts failed: {e}")
+
+    # -------- T-tests (kept to the original three pairs) --------
+    print("\n=== T-TEST RESULTS ===")
+    group = {
+        "Control":   df_plot[df_plot["timepoint"]=="Control"]["ng/ml plasma"],
+        "Diagnosis": df_plot[df_plot["timepoint"]=="diag"]["ng/ml plasma"],
+        "TP1":       df_plot[df_plot["timepoint"]=="tp1"]["ng/ml plasma"],
+    }
+    for (a,b) in [("Control","Diagnosis"), ("Control","TP1"), ("Diagnosis","TP1")]:
+        if len(group[a]) > 1 and len(group[b]) > 1:
+            stat, pval = ttest_ind(group[a], group[b], equal_var=False)
+            if pval < 0.001: level = "*** (p < 0.001)"
+            elif pval < 0.01: level = "** (p < 0.01)"
+            elif pval < 0.05: level = "* (p < 0.05)"
+            else: level = "ns (not significant)"
+            print(f"{a} vs {b}: t = {stat:.3f}, p = {pval:.4e} → {level}")
+        else:
+            print(f"{a} vs {b}: insufficient data for t-test")
+
+if __name__ == "__main__":
+    main()
