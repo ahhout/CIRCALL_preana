@@ -83,6 +83,11 @@ def main():
         help="violin plot image (Control + selected patient timepoints; connected per patient)",
     )
     p.add_argument(
+        "--violin_subset_unconnected",
+        default="outputs/results/cfDNA_violin_subset_log.jpeg",
+        help="(optional) second subset violin output without connecting lines (points only). Use 'none' to disable.",
+    )
+    p.add_argument(
         "--violin_subset_timepoints",
         default="diag;tp0,5;tp1;tp2",
         help="patient timepoints to include. Prefer ';' as separator (because some timepoints contain ','). Example: 'diag;tp0,5;tp1;tp2'",
@@ -255,7 +260,7 @@ def main():
     if y_scatter.size:
         ymin = float(y_scatter.min()) * 0.9
         ymax = float(y_scatter.max()) * 1.1
-        ymin = 0.1 if ymin >= 0.1 else ymin
+        ymin = 0.1 if ymin < 0.1 else ymin
         plt.ylim(ymin, ymax)
     plt.ylabel("ng/ml plasma (log scale)")
     plt.title("cfDNA in patients vs healthy donors (points)")
@@ -267,20 +272,60 @@ def main():
     plt.close()
     print(f"scatter saved: {os.path.abspath(args.plot)}")
 
+    def _fmt_tick(v: float) -> str:
+        return f"{float(v):g}"
+
     def _log10_limits_and_ticks(values: np.ndarray, floor: float | None = None):
         values = np.asarray(values, dtype=float)
         values = values[np.isfinite(values) & (values > 0)]
         if values.size == 0:
             return (0.0, 1.0), [1.0]
-        ymin = float(values.min()) * 0.9
-        ymax = float(values.max()) * 1.1
+
+        y_min = float(values.min())
+        y_max = float(values.max())
         if floor is not None:
-            ymin = min(ymin, float(floor)) if ymin < float(floor) else float(floor)
-        # decade ticks within bounds
-        pmin = int(np.floor(np.log10(ymin)))
-        pmax = int(np.ceil(np.log10(ymax)))
-        tick_vals = [10 ** p for p in range(pmin, pmax + 1)]
-        tick_vals = [t for t in tick_vals if ymin <= t <= ymax]
+            y_min = max(y_min, float(floor))
+
+        # Build 'nice' ticks on a log scale: 1-2-5 * 10^k.
+        def _nice_ticks(lo: float, hi: float) -> list[float]:
+            if not (np.isfinite(lo) and np.isfinite(hi) and lo > 0 and hi > 0 and lo <= hi):
+                return []
+            p_lo = int(np.floor(np.log10(lo))) - 1
+            p_hi = int(np.ceil(np.log10(hi))) + 1
+            ticks: list[float] = []
+            for p in range(p_lo, p_hi + 1):
+                base = 10.0 ** p
+                for m in (1.0, 2.0, 5.0):
+                    ticks.append(m * base)
+            ticks = sorted(set(t for t in ticks if lo <= t <= hi))
+            return ticks
+
+        def _nice_floor(v: float) -> float:
+            ticks = _nice_ticks(v / 10.0, v)  # small window to find <= v
+            candidates = [t for t in ticks if t <= v]
+            return max(candidates) if candidates else v
+
+        def _nice_ceil(v: float) -> float:
+            ticks = _nice_ticks(v, v * 10.0)  # small window to find >= v
+            candidates = [t for t in ticks if t >= v]
+            return min(candidates) if candidates else v
+
+        ymin = _nice_floor(y_min)
+        ymax = _nice_ceil(y_max)
+        if floor is not None:
+            ymin = max(ymin, float(floor))
+
+        tick_vals = _nice_ticks(ymin, ymax)
+
+        # If range spans many decades, fall back to decades-only ticks.
+        if tick_vals:
+            decades = int(np.ceil(np.log10(ymax)) - np.floor(np.log10(ymin)))
+            if decades >= 5 or len(tick_vals) > 14:
+                pmin = int(np.floor(np.log10(ymin)))
+                pmax = int(np.ceil(np.log10(ymax)))
+                tick_vals = [10 ** p for p in range(pmin, pmax + 1)]
+                tick_vals = [t for t in tick_vals if ymin <= t <= ymax]
+
         if not tick_vals:
             tick_vals = [ymin, ymax]
         return (ymin, ymax), tick_vals
@@ -356,7 +401,7 @@ def main():
     # y-axis is log10(values) (limits derived from data so nothing is clipped)
     (ymin, ymax), tick_vals = _log10_limits_and_ticks(np.concatenate(data) if data else np.array([]), floor=0.1)
     plt.ylim(np.log10(ymin), np.log10(ymax))
-    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
+    plt.yticks([np.log10(t) for t in tick_vals], [_fmt_tick(t) for t in tick_vals])
     counts_all = df_all["timepoint"].value_counts().to_dict()
     def pretty_label(c):
         if c == "Control": return f"Control (n={counts_all.get(c,0)})"
@@ -423,7 +468,17 @@ def main():
     df_pat["timepoint"] = df_pat["timepoint"].astype(str).str.strip().str.lower()
     df_pat = df_pat[df_pat["timepoint"].isin(subset_sorted)].copy()
     df_pat = df_pat.rename(columns={"ng_per_ml": "ng/ml plasma"})
-    df_pat = df_pat[["lastname", "timepoint", "ng/ml plasma"]]
+    patient_key_col = "patient_key" if "patient_key" in df_pat.columns else "lastname"
+    df_pat["_patient"] = df_pat[patient_key_col].astype(str).str.strip().str.lower()
+
+    has_mrd_status = "MRD_IgTCR_status" in df_pat.columns
+    has_mrd_raw = "MRD_IgTCR" in df_pat.columns
+    keep_cols = ["_patient", "lastname", "timepoint", "ng/ml plasma"]
+    if has_mrd_raw:
+        keep_cols.append("MRD_IgTCR")
+    if has_mrd_status:
+        keep_cols.append("MRD_IgTCR_status")
+    df_pat = df_pat[[c for c in keep_cols if c in df_pat.columns]].copy()
 
     df_sub_all = pd.concat(
         [
@@ -444,112 +499,63 @@ def main():
     data_subset = [y[np.isfinite(y) & (y > 0)] for y in data_subset]
     data_subset_log = [np.log10(y) if y.size else np.array([]) for y in data_subset]
 
-    plt.figure(figsize=(7.5, 5.5))
-
-    # Matplotlib's violin KDE requires >=2 points. Only draw violins where possible.
-    violin_positions: list[int] = []
-    violin_data: list[np.ndarray] = []
-    for i, yl in enumerate(data_subset_log):
-        if isinstance(yl, np.ndarray) and yl.size >= 2:
-            violin_positions.append(i)
-            violin_data.append(yl)
-
-    if violin_data:
-        parts = plt.violinplot(
-            dataset=violin_data,
-            positions=violin_positions,
-            widths=0.8,
-            showmeans=False,
-            showmedians=False,
-            showextrema=False,
-        )
-        for b in parts["bodies"]:
-            b.set_alpha(0.25)
-            b.set_linewidth(1.0)
-
-    # overlay median + IQR for each category
-    for i, y in enumerate(data_subset):
-        if y.size == 0:
-            continue
-        q1, med, q3 = np.percentile(y, [25, 50, 75])
-        q1l, medl, q3l = np.log10([q1, med, q3])
-        plt.vlines(i, q1l, q3l, linewidth=2, zorder=3)
-        plt.hlines(medl, i - 0.18, i + 0.18, linewidth=2, zorder=4)
-        plt.text(
-            i + 0.24,
-            medl,
-            f"{med:.0f}",
-            color="black",
-            fontsize=8,
-            va="center",
-            ha="left",
-            zorder=6,
-        )
-
     pos = {c: i for i, c in enumerate(cats_subset)}
 
-    # donors: individual points
-    df_don_pts = donors[["timepoint", "ng/ml plasma"]].copy()
-    df_don_pts = df_don_pts[df_don_pts["ng/ml plasma"].notna()].copy()
-    for idx, r in df_don_pts.iterrows():
-        y = float(r["ng/ml plasma"])
-        if not np.isfinite(y) or y <= 0:
-            continue
-        x = pos["Control"] + _stable_jitter(f"Control|{idx}", width=0.08)
-        plt.scatter([x], [np.log10(y)], s=12, alpha=0.7, linewidths=0.3, zorder=5, color="0.6")
-
     # patients: one aggregated point per patient+timepoint (so lines connect the plotted points)
-    df_pts = df_pat.dropna(subset=["lastname", "ng/ml plasma"]).copy()
+    df_pts = df_pat.dropna(subset=["_patient", "ng/ml plasma"]).copy()
     df_pts = df_pts[df_pts["ng/ml plasma"].astype(float) > 0]
     if args.violin_subset_connect_agg == "median":
-        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].median()
+        df_pts = df_pts.groupby(["_patient", "timepoint"], as_index=False)["ng/ml plasma"].median()
     elif args.violin_subset_connect_agg == "mean":
-        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].mean()
+        df_pts = df_pts.groupby(["_patient", "timepoint"], as_index=False)["ng/ml plasma"].mean()
     else:  # first
-        df_pts = df_pts.groupby(["lastname", "timepoint"], as_index=False)["ng/ml plasma"].first()
+        df_pts = df_pts.groupby(["_patient", "timepoint"], as_index=False)["ng/ml plasma"].first()
+
+    # MRD status per patient+timepoint (preferred: use parsed MRD_IgTCR_status).
+    status_col = None
+    if has_mrd_status:
+        df_mrd_status = (
+            df_pat.dropna(subset=["_patient", "timepoint"])
+                 .groupby(["_patient", "timepoint"], as_index=False)
+                 .agg(MRD_IgTCR_status=("MRD_IgTCR_status", "first"))
+        )
+        df_pts = df_pts.merge(df_mrd_status, on=["_patient", "timepoint"], how="left")
+        status_col = "MRD_IgTCR_status"
+    elif has_mrd_raw:
+        def _mrd_norm(v) -> str:
+            if pd.isna(v):
+                return ""
+            return str(v).strip().lower()
+
+        # Missing MRD is treated as unknown (not negative). Negative requires at least one recorded entry.
+        mrd_neg_values = {"na", "negative", "neg", "n/a"}
+        missing_values = {"", "nan", "none"}
+
+        df_mrd = df_pat.dropna(subset=["_patient", "timepoint"]).copy()
+        df_mrd["_mrd_norm"] = df_mrd["MRD_IgTCR"].map(_mrd_norm)
+
+        def _status_from_series(s: pd.Series) -> str:
+            s = s.astype(str).str.strip().str.lower().replace({"nan": "", "none": ""})
+            recorded = s[~s.isin(missing_values)]
+            if recorded.empty:
+                return ""
+            if recorded.isin(mrd_neg_values).all():
+                return "neg"
+            return "pos"
+
+        df_mrd_status = df_mrd.groupby(["_patient", "timepoint"], as_index=False).agg(
+            _mrd_status=("_mrd_norm", _status_from_series)
+        )
+        df_pts = df_pts.merge(df_mrd_status, on=["_patient", "timepoint"], how="left")
+        status_col = "_mrd_status"
 
     tp_order = {tp: i for i, tp in enumerate(subset_sorted)}
     df_pts["_tp_order"] = df_pts["timepoint"].map(tp_order)
     df_pts = df_pts.dropna(subset=["_tp_order"]).copy()
     df_pts["_x"] = df_pts.apply(
-        lambda rr: pos[rr["timepoint"]] + _stable_jitter(f"{rr['lastname']}|{rr['timepoint']}", width=0.08),
+        lambda rr: pos[rr["timepoint"]] + _stable_jitter(f"{rr['_patient']}|{rr['timepoint']}", width=0.08),
         axis=1,
     )
-
-    for _, r in df_pts.iterrows():
-        y = float(r["ng/ml plasma"])
-        if not np.isfinite(y) or y <= 0:
-            continue
-        plt.scatter(
-            [float(r["_x"])],
-            [np.log10(y)],
-            s=12,
-            alpha=0.85,
-            linewidths=0.3,
-            zorder=6,
-            color=_patient_color(str(r["lastname"])),
-        )
-
-    # per-patient connecting lines
-    if args.violin_subset_connect_lines:
-        for _, g in df_pts.sort_values(["lastname", "_tp_order"]).groupby("lastname"):
-            if len(g) < 2:
-                continue
-            xs = g["_x"].to_numpy(dtype=float)
-            ys = g["ng/ml plasma"].to_numpy(dtype=float)
-            mask = np.isfinite(ys) & (ys > 0)
-            xs = xs[mask]
-            ys = ys[mask]
-            if ys.size < 2:
-                continue
-            plt.plot(xs, np.log10(ys), color="black", alpha=0.30, linewidth=0.6, zorder=2)
-
-    (ymin, ymax), tick_vals = _log10_limits_and_ticks(
-        np.concatenate(data_subset) if data_subset else np.array([]),
-        floor=0.1,
-    )
-    plt.ylim(np.log10(ymin), np.log10(ymax))
-    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
 
     counts_subset = df_sub_all["timepoint"].value_counts().to_dict()
     def _display_tp(tp: str) -> str:
@@ -564,16 +570,128 @@ def main():
             return f"Diagnosis (n={counts_subset.get(c, 0)})"
         return f"{_display_tp(c)} (n={counts_subset.get(c, 0)})"
 
-    plt.xticks(range(len(cats_subset)), [pretty_label_subset(c) for c in cats_subset], rotation=15, ha="right")
-    plt.ylabel("ng/ml plasma (log scale)")
-    plt.title("cfDNA by timepoint vs healthy donors (subset violin + points)")
-    plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
-    plt.minorticks_on()
-    plt.tight_layout()
-    os.makedirs(os.path.dirname(os.path.abspath(args.violin_subset)), exist_ok=True)
-    plt.savefig(args.violin_subset, format="jpeg", dpi=600)
-    plt.close()
-    print(f"violin (subset) saved: {os.path.abspath(args.violin_subset)}")
+    def _save_subset_violin(out_path: str, connect_lines: bool) -> None:
+        plt.figure(figsize=(7.5, 5.5))
+
+        # Matplotlib's violin KDE requires >=2 points. Only draw violins where possible.
+        violin_positions: list[int] = []
+        violin_data: list[np.ndarray] = []
+        for i, yl in enumerate(data_subset_log):
+            if isinstance(yl, np.ndarray) and yl.size >= 2:
+                violin_positions.append(i)
+                violin_data.append(yl)
+
+        if violin_data:
+            parts = plt.violinplot(
+                dataset=violin_data,
+                positions=violin_positions,
+                widths=0.8,
+                showmeans=False,
+                showmedians=False,
+                showextrema=False,
+            )
+            for b in parts["bodies"]:
+                b.set_alpha(0.25)
+                b.set_linewidth(1.0)
+
+        # overlay median + IQR for each category
+        for i, y in enumerate(data_subset):
+            if y.size == 0:
+                continue
+            q1, med, q3 = np.percentile(y, [25, 50, 75])
+            q1l, medl, q3l = np.log10([q1, med, q3])
+            plt.vlines(i, q1l, q3l, linewidth=2, zorder=3)
+            plt.hlines(medl, i - 0.18, i + 0.18, linewidth=2, zorder=4)
+            plt.text(
+                i + 0.24,
+                medl,
+                f"{med:.0f}",
+                color="black",
+                fontsize=8,
+                va="center",
+                ha="left",
+                zorder=6,
+            )
+
+        # donors: individual points
+        df_don_pts = donors[["timepoint", "ng/ml plasma"]].copy()
+        df_don_pts = df_don_pts[df_don_pts["ng/ml plasma"].notna()].copy()
+        for idx, r in df_don_pts.iterrows():
+            y = float(r["ng/ml plasma"])
+            if not np.isfinite(y) or y <= 0:
+                continue
+            x = pos["Control"] + _stable_jitter(f"Control|{idx}", width=0.08)
+            plt.scatter(
+                [x],
+                [np.log10(y)],
+                s=18,
+                alpha=0.85,
+                linewidths=0.9,
+                zorder=6,
+                color="0.6",
+                marker="x",
+            )
+
+        # patient points
+        for _, r in df_pts.iterrows():
+            y = float(r["ng/ml plasma"])
+            if not np.isfinite(y) or y <= 0:
+                continue
+
+            is_post_diagnosis_tp = str(r["timepoint"]).lower() not in {"diag", "control"}
+            mrd_status = str(r.get(status_col, "")).lower() if status_col is not None else ""
+            marker = "x" if (is_post_diagnosis_tp and mrd_status == "neg") else "o"
+            size = 18 if marker == "x" else 12
+            plt.scatter(
+                [float(r["_x"])],
+                [np.log10(y)],
+                s=size,
+                alpha=0.85,
+                linewidths=0.9 if marker == "x" else 0.3,
+                zorder=6,
+                color=_patient_color(str(r["_patient"])),
+                marker=marker,
+            )
+
+        # per-patient connecting lines
+        if connect_lines:
+            for _, g in df_pts.sort_values(["_patient", "_tp_order"]).groupby("_patient"):
+                if len(g) < 2:
+                    continue
+                xs = g["_x"].to_numpy(dtype=float)
+                ys = g["ng/ml plasma"].to_numpy(dtype=float)
+                mask = np.isfinite(ys) & (ys > 0)
+                xs = xs[mask]
+                ys = ys[mask]
+                if ys.size < 2:
+                    continue
+                plt.plot(xs, np.log10(ys), color="black", alpha=0.30, linewidth=0.6, zorder=2)
+
+        (ymin, ymax), tick_vals = _log10_limits_and_ticks(
+            np.concatenate(data_subset) if data_subset else np.array([]),
+            floor=0.1,
+        )
+        plt.ylim(np.log10(ymin), np.log10(ymax))
+        plt.yticks([np.log10(t) for t in tick_vals], [_fmt_tick(t) for t in tick_vals])
+        plt.xticks(range(len(cats_subset)), [pretty_label_subset(c) for c in cats_subset], rotation=15, ha="right")
+        plt.ylabel("ng/ml plasma (log scale)")
+        plt.title("cfDNA by timepoint vs healthy donors (subset violin + points)")
+        plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
+        plt.minorticks_on()
+        plt.tight_layout()
+        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+        plt.savefig(out_path, format="jpeg", dpi=600)
+        plt.close()
+        print(f"violin (subset) saved: {os.path.abspath(out_path)}")
+
+    _save_subset_violin(args.violin_subset, connect_lines=bool(args.violin_subset_connect_lines))
+
+    raw_alt = str(args.violin_subset_unconnected).strip() if args.violin_subset_unconnected is not None else ""
+    if raw_alt and raw_alt.lower() not in {"none", "null"}:
+        if os.path.abspath(raw_alt) == os.path.abspath(args.violin_subset):
+            print("note: violin_subset_unconnected points to the same path as violin_subset; skipping second write")
+        else:
+            _save_subset_violin(raw_alt, connect_lines=False)
 
     # ============================================================
     # Violin: PATIENTS ONLY, TOTAL cfDNA ng (total_ng_dna)
@@ -632,7 +750,7 @@ def main():
 
     (ymin, ymax), tick_vals = _log10_limits_and_ticks(np.concatenate(data_total) if data_total else np.array([]), floor=0.1)
     plt.ylim(np.log10(ymin), np.log10(ymax))
-    plt.yticks([np.log10(t) for t in tick_vals], [str(int(t)) if t >= 1 else str(t) for t in tick_vals])
+    plt.yticks([np.log10(t) for t in tick_vals], [_fmt_tick(t) for t in tick_vals])
     plt.ylabel("cfDNA total ng (log scale)")
     counts_total = df_total["timepoint"].value_counts().to_dict()
     def pretty_label_total(c):

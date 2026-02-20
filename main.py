@@ -24,6 +24,11 @@ def main():
         help="subset violin plot output (Control + selected timepoints; connected per patient)",
     )
     p.add_argument(
+        "--violin_subset_unconnected",
+        default="outputs/results/cfDNA_violin_subset_log.jpeg",
+        help="subset violin plot output without connecting lines (Control + selected timepoints; points only). Use 'none' to disable.",
+    )
+    p.add_argument(
         "--violin_subset_timepoints",
         default="diag;tp0,5;tp1;tp2",
         help="patient timepoints for subset violin. Prefer ';' as separator (because some timepoints contain ','). Example: 'diag;tp0,5;tp1;tp2'",
@@ -145,6 +150,7 @@ def main():
             "--out_excel", args.out_excel,
             "--plot", args.plot,
             "--violin_subset", args.violin_subset,
+            "--violin_subset_unconnected", args.violin_subset_unconnected,
             "--violin_subset_timepoints", args.violin_subset_timepoints,
             "--violin_subset_connect_agg", args.violin_subset_connect_agg,
             "--pairwise_bins", args.pairwise_bins,
