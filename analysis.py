@@ -79,12 +79,12 @@ def main():
     p.add_argument("--violin", default="outputs/results/cfDNA_violin_log.jpeg", help="violin plot image (Control + all timepoints)")
     p.add_argument(
         "--violin_subset",
-        default="outputs/results/cfDNA_violin_subset_connected_log.jpeg",
+        default="outputs/results/cfDNA_violin_subset_connected_log_excl_tp0p5.jpeg",
         help="violin plot image (Control + selected patient timepoints; connected per patient)",
     )
     p.add_argument(
         "--violin_subset_unconnected",
-        default="outputs/results/cfDNA_violin_subset_log.jpeg",
+        default="outputs/results/cfDNA_violin_subset_log_excl_tp0p5.jpeg",
         help="(optional) second subset violin output without connecting lines (points only). Use 'none' to disable.",
     )
     p.add_argument(
@@ -463,10 +463,11 @@ def main():
     subset_tps_norm = _parse_timepoints_arg(args.violin_subset_timepoints, available=available_tps)
     subset_tps_norm = list(dict.fromkeys(subset_tps_norm))  # de-dup, keep order
     subset_sorted = sorted(subset_tps_norm, key=tp_sort_key)
+    subset_plot_sorted = [tp for tp in subset_sorted if str(tp).strip().lower() != "tp0,5"]
 
     df_pat = df.copy()
     df_pat["timepoint"] = df_pat["timepoint"].astype(str).str.strip().str.lower()
-    df_pat = df_pat[df_pat["timepoint"].isin(subset_sorted)].copy()
+    df_pat = df_pat[df_pat["timepoint"].isin(subset_plot_sorted)].copy()
     df_pat = df_pat.rename(columns={"ng_per_ml": "ng/ml plasma"})
     patient_key_col = "patient_key" if "patient_key" in df_pat.columns else "lastname"
     df_pat["_patient"] = df_pat[patient_key_col].astype(str).str.strip().str.lower()
@@ -489,7 +490,7 @@ def main():
     )
     df_sub_all = df_sub_all[df_sub_all["ng/ml plasma"].notna()].copy()
 
-    cats_subset = ["Control"] + subset_sorted
+    cats_subset = ["Control"] + subset_plot_sorted
     df_sub_all["timepoint"] = pd.Categorical(df_sub_all["timepoint"], categories=cats_subset, ordered=True)
 
     data_subset = [
@@ -549,7 +550,7 @@ def main():
         df_pts = df_pts.merge(df_mrd_status, on=["_patient", "timepoint"], how="left")
         status_col = "_mrd_status"
 
-    tp_order = {tp: i for i, tp in enumerate(subset_sorted)}
+    tp_order = {tp: i for i, tp in enumerate(subset_plot_sorted)}
     df_pts["_tp_order"] = df_pts["timepoint"].map(tp_order)
     df_pts = df_pts.dropna(subset=["_tp_order"]).copy()
     df_pts["_x"] = df_pts.apply(
