@@ -7,14 +7,25 @@ __pycache__/
 
 # Conda / venv artifacts
 .venv/
+.micromamba-root/
 
 # Data & outputs (often large / potentially sensitive)
+raw_data/
+runs/
+scratch/
+data/
+output/
+outputs/
+results/
 *.xlsx
 *.csv
 *.parquet
 *.jpeg
 *.jpg
 *.png
+*.pdf
+*_report.json
+~$*.xlsx
 
 # Fonts/binaries
 *.ttf
@@ -22,3 +33,11 @@ __pycache__/
 # OS/editor
 .DS_Store
 .vscode/
+
+# Sensitive / local files
+.env
+.env.*
+*.secrets
+*.secret
+logs/
+*.log
