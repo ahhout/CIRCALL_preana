@@ -182,6 +182,19 @@ def main() -> None:
         correction="bh",
     )
 
+    # ---- Mann–Whitney (nonparametric) sensitivity check (patient medians; log10; BH) ----
+    mannwhitney_patient_median = stats_reporting.compute_mannwhitney_bins(
+        df_patients=df_patients,
+        donors=donors,
+        bins=bins,
+        unit="patient_median",
+        scale="log10",
+        correction="bh",
+        alternative="two-sided",
+        method="auto",
+        report_effect_size=True,
+    )
+
     # ---- Paired-patient counts (patients only; no Control) ----
     paired = paired_patient_counts(df_patients, timepoints)
 
@@ -277,6 +290,7 @@ def main() -> None:
         mixed2.sort_values("p_adj").to_excel(w, sheet_name="AllMixed", index=False)
         pairwise_sample.sort_values("p_adj_bh").to_excel(w, sheet_name="PairwiseSample", index=False)
         pairwise_patient_median.sort_values("p_adj_bh").to_excel(w, sheet_name="PairwisePatientMedian", index=False)
+        mannwhitney_patient_median.sort_values("p_adj_bh").to_excel(w, sheet_name="MannWhitneyPatientMedian", index=False)
         paired.sort_values("paired_patients", ascending=False).to_excel(w, sheet_name="PairedCounts", index=False)
         counts.to_excel(w, sheet_name="TimepointCounts", index=False)
 

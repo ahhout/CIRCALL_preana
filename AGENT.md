@@ -1,5 +1,12 @@
 # Copilot repository instructions (bioinformatics)
 
+## General behavior
+- For simple questions, answer in 1–3 sentences.
+- For medium questions, give me 4–6 sentences.
+- For complex questions, give me one summary paragraph followed by up to 5 bullet points.
+- Start directly with the answer.
+- Stop after the last relevant fact.
+
 ## Environment
 - Use conda exclusively.
 - Do NOT create or reference virtualenv/venv or `.venv`.
@@ -9,6 +16,7 @@
 ## Parameter & decision handling
 - Treat biological thresholds and pipeline settings as experimental design choices.
 - Do NOT silently choose filtering thresholds, annotation rules, genome builds, or database versions.
+- Confirm any analysis thresholds with the user.
 - Expose parameters via CLI/config instead of hardcoding.
 - Clearly state assumptions and request confirmation for decisions affecting interpretation or reproducibility.
 

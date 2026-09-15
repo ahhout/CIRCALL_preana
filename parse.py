@@ -110,6 +110,16 @@ def main():
                     help="0-based header row override (skip auto-detect)")
     ap.add_argument("--print_matches", action="store_true",
                     help="print matched headers and timepoint parsing stats")
+    ap.add_argument(
+        "--mrd_col",
+        default=None,
+        help="(optional) exact header name for the MRD Ig/TCR column to use; if omitted, the parser auto-selects among MRD-like columns",
+    )
+    ap.add_argument(
+        "--mrd_negative_tokens",
+        default="na,negative,neg,n/a",
+        help="comma-separated tokens considered MRD-negative after lowercasing/stripping (default: 'na,negative,neg,n/a')",
+    )
     args = ap.parse_args()
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out_csv)), exist_ok=True)
@@ -185,6 +195,82 @@ def main():
     ng_col     = find_col(df.columns, [["ADN", "total", "ng"],
                                        ["cfdna", "total", "ng"],
                                        ["cfdna", "total"]])
+    dosage_col = find_col(
+        df.columns,
+        [["tapestation", "ng", "ul"]],
+        required=False,
+    )
+
+    # Optional identifiers
+    sample_id_col = find_col(df.columns, [["sample", "id"], ["sample_id"], ["id", "sample"]], required=False)
+    anon_col = find_col(
+        df.columns,
+        [["anonymisation"], ["anonymization"], ["anonym", "id"], ["anonym", "code"], ["code", "anonym"]],
+        required=False,
+    )
+    genetic_subtype_col = find_col(
+        df.columns,
+        [["genetic", "subtype"], ["subtype", "genetic"], ["sous", "type", "genet"]],
+        required=False,
+    )
+    tissue_col = find_col(
+        df.columns,
+        [["tissue"], ["tissu"], ["type", "tissu"], ["sample", "type"]],
+        required=False,
+    )
+
+    # Optional MRD column (auto-select the most informative candidate unless user overrides)
+    def _choose_mrd_col(cols: list[str], df_for_scoring: pd.DataFrame) -> str | None:
+        if args.mrd_col is not None:
+            if args.mrd_col not in cols:
+                raise KeyError(
+                    "--mrd_col was provided but not found. Available columns include:\n" +
+                    "\n".join(f"- {c}" for c in cols)
+                )
+            return args.mrd_col
+
+        # Strong preference: if the sheet already has an explicit MRD_IgTCR column, use it.
+        # (This matches the downstream expectation and avoids accidentally selecting IgTCR capture metadata.)
+        for c in cols:
+            if str(c).strip() == "MRD_IgTCR" or _norm(c) == _norm("MRD_IgTCR"):
+                return c
+
+        candidates: list[str] = []
+        for c in cols:
+            nc = _norm(c)
+            if "mrd" in nc or "igtcr" in nc or ("ig" in nc and "tcr" in nc):
+                candidates.append(c)
+
+        # de-dup keep order
+        candidates = list(dict.fromkeys(candidates))
+        if not candidates:
+            return None
+
+        neg_tokens = {t.strip().lower() for t in str(args.mrd_negative_tokens).split(",") if t.strip()}
+        missing_tokens = {"", "nan", "none"}
+
+        def score(c: str) -> tuple[int, int, int, int]:
+            # Higher is better.
+            # 1) non_neg: values that are present and not in negative tokens
+            # 2) non_missing: present values (any token)
+            # 3) uniq: number of unique present tokens
+            # 4) name_bonus: prefer columns that explicitly mention Ig/TCR
+            s = df_for_scoring[c].astype(str).str.strip().str.lower()
+            s = s.replace({"nan": "", "none": ""})
+            present = s[~s.isin(missing_tokens)]
+            non_neg = present[~present.isin(neg_tokens)]
+            nc = _norm(c)
+            name_bonus = 0
+            if "mrd" in nc:
+                name_bonus += 2
+            if "igtcr" in nc or ("ig" in nc and "tcr" in nc):
+                name_bonus += 1
+            return (int(non_neg.shape[0]), int(present.shape[0]), int(present.nunique()), name_bonus)
+
+        ranked = sorted(((score(c), c) for c in candidates), reverse=True)
+        return ranked[0][1]
+
+    mrd_col = _choose_mrd_col(list(df.columns), df)
 
     if args.print_matches:
         print("matched columns:")
@@ -195,9 +281,22 @@ def main():
         print(f"  volume_col = {volume_col}")
         print(f"  cf_col     = {cf_col}")
         print(f"  ng_col     = {ng_col}")
+        print(f"  dosage_col = {dosage_col}")
+        print(f"  mrd_col    = {mrd_col}")
+        print(f"  sample_id_col = {sample_id_col}")
+        print(f"  anon_col      = {anon_col}")
+        print(f"  genetic_subtype_col = {genetic_subtype_col}")
+        print(f"  tissue_col    = {tissue_col}")
 
     # --- filter rows to cfDNA and compute fields
     df_f = df[df[adn_col].astype(str).str.contains("cfdna", case=False, na=False)].copy()
+    excluded_lcr_rows = 0
+    if tissue_col is not None and tissue_col in df_f.columns:
+        tissue_norm = df_f[tissue_col].map(_norm)
+        is_lcr = tissue_norm == "lcr"
+        excluded_lcr_rows = int(is_lcr.sum())
+        if excluded_lcr_rows:
+            df_f = df_f.loc[~is_lcr].copy()
 
     # Normalize and parse timepoints
     df_f[name_col] = df_f[name_col].astype(str).str.lower()
@@ -209,6 +308,11 @@ def main():
     # Numeric columns (robust parsing)
     df_f["ml_plasma"] = to_numeric_series(df_f[volume_col])
     df_f["total_ng_dna"] = to_numeric_series(df_f[ng_col])
+    df_f["dosage_ng_per_uL"] = (
+        to_numeric_series(df_f[dosage_col])
+        if dosage_col is not None and dosage_col in df_f.columns
+        else np.nan
+    )
 
     # % cfDNA: accept fraction (≤1) or percent (>1), and strings like "12%"
     if cf_col is not None and cf_col in df_f.columns:
@@ -226,10 +330,58 @@ def main():
     )
 
     # Build tidy output
+    # Compute per-patient+timepoint MRD status across ALL rows (not only cfDNA), because the MRD
+    # result may be recorded on any sample row at that timepoint.
+    # IMPORTANT: the 'anonymization' column in this sheet is sample-level (often includes TP and sample_id),
+    # so it is NOT a stable patient identifier. We therefore use a stable patient_key derived from names.
+    df_all = df.copy()
+    df_all[name_col] = df_all[name_col].astype(str).str.lower()
+    df_all["timepoint"] = df_all[ttt_col].apply(extract_timepoint)
+    df_all = df_all[df_all["timepoint"].notna()].copy()
+    if tissue_col is not None and tissue_col in df_all.columns:
+        df_all = df_all.loc[df_all[tissue_col].map(_norm) != "lcr"].copy()
+
+    df_all["patient_key"] = df_all[name_col].astype(str).str.strip().str.lower()
+
+    mrd_status_map = None
+    if mrd_col is not None and mrd_col in df_all.columns:
+        neg_tokens = {t.strip().lower() for t in str(args.mrd_negative_tokens).split(",") if t.strip()}
+        missing_tokens = {"", "nan", "none"}
+
+        mrd_raw = df_all[mrd_col].astype(str).str.strip().str.lower().replace({"nan": "", "none": ""})
+        df_all["MRD_IgTCR"] = mrd_raw
+
+        def _status_from_values(s: pd.Series) -> str:
+            s = s.astype(str).str.strip().str.lower()
+            s = s.replace({"nan": "", "none": ""})
+            recorded = s[~s.isin(missing_tokens)]
+            if recorded.empty:
+                return ""
+            if recorded.isin(neg_tokens).all():
+                return "neg"
+            return "pos"
+
+        mrd_status_map = df_all.groupby(["patient_key", "timepoint"], as_index=False).agg(
+            MRD_IgTCR_status=("MRD_IgTCR", _status_from_values)
+        )
+
     out = df_f.assign(
         lastname=df_f[name_col],
+        patient_key=df_f[name_col].astype(str).str.strip().str.lower(),
+        anonymization=(df_f[anon_col] if anon_col is not None and anon_col in df_f.columns else pd.NA),
+        genetic_subtype=(
+            df_f[genetic_subtype_col]
+            if genetic_subtype_col is not None and genetic_subtype_col in df_f.columns
+            else pd.NA
+        ),
+        sample_id=(df_f[sample_id_col] if sample_id_col is not None and sample_id_col in df_f.columns else pd.NA),
         tube=df_f[tube_col] if tube_col is not None and tube_col in df_f.columns else np.nan,
-    )[["lastname", "timepoint", "tube", "ml_plasma", "pct_cfdna", "total_ng_dna", "ng_per_ml"]]
+        MRD_IgTCR=(df_f[mrd_col] if mrd_col is not None and mrd_col in df_f.columns else pd.NA),
+    )[["lastname", "patient_key", "anonymization", "genetic_subtype", "sample_id", "timepoint", "tube", "ml_plasma", "pct_cfdna", "dosage_ng_per_uL", "total_ng_dna", "ng_per_ml", "MRD_IgTCR"]]
+
+    # Merge MRD status computed across all rows.
+    if mrd_status_map is not None and len(mrd_status_map):
+        out = out.merge(mrd_status_map, on=["patient_key", "timepoint"], how="left")
 
     out = out.sort_values(["lastname", "timepoint"], key=lambda s: s.astype(str))
 
@@ -249,6 +401,7 @@ def main():
         out.to_parquet(args.out_parquet, index=False)
 
     print(f"\nrows written: {len(out)}")
+    print(f"excluded rows where tissue == LCR: {excluded_lcr_rows}")
     print(f"saved: {os.path.abspath(args.out_csv)}")
     if args.out_parquet:
         print(f"saved: {os.path.abspath(args.out_parquet)}")

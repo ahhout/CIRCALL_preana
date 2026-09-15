@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm, probplot, ttest_ind
+from scipy.stats import mannwhitneyu, norm, probplot, ttest_ind
 
 
 def stars(p: float) -> str:
@@ -157,6 +157,141 @@ def compute_pairwise_bins(
     out["p_adj_bh"] = bh_adjust(out["p_value"].to_numpy(dtype=float))
     out["signif"] = out["p_adj_bh"].map(stars)
 
+    return out
+
+
+def cliffs_delta(a: np.ndarray, b: np.ndarray) -> float:
+    """Cliff's delta effect size.
+
+    Returns a value in [-1, 1], where +1 means all a > b, -1 means all a < b.
+    """
+
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    a = a[np.isfinite(a)]
+    b = b[np.isfinite(b)]
+    if a.size == 0 or b.size == 0:
+        return np.nan
+
+    # O(n*m) but n,m are small here (patient-median bins).
+    gt = (a[:, None] > b[None, :]).sum()
+    lt = (a[:, None] < b[None, :]).sum()
+    denom = a.size * b.size
+    if denom == 0:
+        return np.nan
+    return float((gt - lt) / denom)
+
+
+def compute_mannwhitney_bins(
+    *,
+    df_patients: pd.DataFrame,
+    donors: pd.DataFrame,
+    bins: list[str],
+    unit: str,
+    scale: str,
+    correction: str,
+    alternative: str = "two-sided",
+    method: str = "auto",
+    report_effect_size: bool = True,
+) -> pd.DataFrame:
+    """Pairwise Mann–Whitney U tests between bins (nonparametric sensitivity check).
+
+    Settings are intentionally aligned with the main workflow:
+    - scale: log10 (enforced)
+    - unit: patient_median (enforced; avoids pseudo-replication)
+    - correction: BH (enforced)
+    - alternative: two-sided
+    - method: auto
+    """
+
+    def bin_values(tp: str) -> pd.DataFrame:
+        if tp == "Control":
+            out = donors[["ng/ml plasma"]].copy()
+            out["lastname"] = pd.NA
+            out = out.rename(columns={"ng/ml plasma": "value"})
+            return out
+        tmp = df_patients[["lastname", "timepoint", "ng_per_ml"]].copy()
+        tmp["timepoint"] = tmp["timepoint"].astype(str).str.strip().str.lower()
+        tmp = tmp[tmp["timepoint"] == str(tp).lower()].copy()
+        tmp = tmp.rename(columns={"ng_per_ml": "value"})
+        return tmp[["lastname", "value"]]
+
+    if scale != "log10":
+        raise ValueError("Mann–Whitney tests must use log10 scale (enforced).")
+    if unit != "patient_median":
+        raise ValueError("Mann–Whitney tests must use patient_median unit (enforced).")
+    if correction != "bh":
+        raise ValueError("Mann–Whitney tests must use BH correction (enforced).")
+    if alternative not in {"two-sided", "less", "greater"}:
+        raise ValueError(f"Invalid alternative: {alternative}")
+    if method not in {"auto", "exact", "asymptotic"}:
+        raise ValueError(f"Invalid method: {method}")
+
+    bin_frames: dict[str, pd.DataFrame] = {}
+    for b in bins:
+        bdf = bin_values(b)
+        bdf["value"] = pd.to_numeric(bdf["value"], errors="coerce")
+        bdf = bdf[np.isfinite(bdf["value"].to_numpy(dtype=float))].copy()
+
+        # log10 transform (monotone; Mann–Whitney ranks are invariant, but we do
+        # it for consistency with the rest of the pipeline).
+        bdf = bdf[bdf["value"] > 0].copy()
+        bdf["value"] = np.log10(bdf["value"].to_numpy(dtype=float))
+
+        if b != "Control":
+            bdf = bdf.dropna(subset=["lastname"]).copy()
+            bdf = bdf.groupby("lastname", as_index=False)["value"].median()
+
+        bin_frames[b] = bdf
+
+    rows: list[dict] = []
+    for i in range(len(bins)):
+        for j in range(i + 1, len(bins)):
+            a, b = bins[i], bins[j]
+            va = bin_frames[a]["value"].to_numpy(dtype=float)
+            vb = bin_frames[b]["value"].to_numpy(dtype=float)
+            na = int(np.isfinite(va).sum())
+            nb = int(np.isfinite(vb).sum())
+
+            u_stat = np.nan
+            pval = np.nan
+            if na >= 1 and nb >= 1:
+                # SciPy supports method=... on recent versions; keep fallback
+                # for older versions.
+                try:
+                    res = mannwhitneyu(va, vb, alternative=alternative, method=method)
+                except TypeError:
+                    res = mannwhitneyu(va, vb, alternative=alternative)
+                u_stat = float(res.statistic) if np.isfinite(res.statistic) else np.nan
+                pval = float(res.pvalue) if np.isfinite(res.pvalue) else np.nan
+
+            row = {
+                "bin_a": a,
+                "bin_b": b,
+                "n_a": na,
+                "n_b": nb,
+                "test": "mannwhitneyu",
+                "scale": scale,
+                "unit": unit,
+                "alternative": alternative,
+                "method": method,
+                "u_stat": u_stat,
+                "p_value": pval,
+            }
+            if report_effect_size:
+                cd = cliffs_delta(va, vb)
+                row["cliffs_delta"] = cd
+                row["abs_cliffs_delta"] = float(abs(cd)) if np.isfinite(cd) else np.nan
+            rows.append(row)
+
+    out = pd.DataFrame(rows)
+    if len(out) == 0:
+        out["p_adj_bh"] = []
+        out["signif"] = []
+        return out
+
+    out["p_adj_bh"] = bh_adjust(out["p_value"].to_numpy(dtype=float))
+    out["signif"] = out["p_adj_bh"].map(stars)
     return out
 
 

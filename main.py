@@ -20,12 +20,12 @@ def main():
     p.add_argument("--plot", default="outputs/results/cfDNA_points_comparison_log.jpeg", help="analysis plot output")
     p.add_argument(
         "--violin_subset",
-        default="outputs/results/cfDNA_violin_subset_connected_log_excl_tp0p5.jpeg",
+        default="outputs/results/cfDNA_violin_subset_connected_log_excl_tp0p5_by_genetic_subtype.jpeg",
         help="subset violin plot output (Control + selected timepoints; connected per patient)",
     )
     p.add_argument(
         "--violin_subset_unconnected",
-        default="outputs/results/cfDNA_violin_subset_log_excl_tp0p5.jpeg",
+        default="outputs/results/cfDNA_violin_subset_log_excl_tp0p5_by_genetic_subtype.jpeg",
         help="subset violin plot output without connecting lines (Control + selected timepoints; points only). Use 'none' to disable.",
     )
     p.add_argument(

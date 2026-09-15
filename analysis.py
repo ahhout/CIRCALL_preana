@@ -10,9 +10,30 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import LogFormatter
+from matplotlib.lines import Line2D
 from scipy.stats import ttest_ind
 
 import stats_reporting
+
+SUBTYPE_COLORS = {
+    "B-Other": "#1f77b4",
+    "DUX4-r": "#aec7e8",
+    "ETV6::RUNX1": "#ff7f0e",
+    "ETV6::RUNX1-like": "#ffbb78",
+    "Hyperdiploidy": "#2ca02c",
+    "KMT2A-r": "#98df8a",
+    "MYC-r": "#d62728",
+    "PAX5-r": "#ff9896",
+    "PAX5alt": "#9467bd",
+    "Ph+": "#c5b0d5",
+    "Ph-like ABL-class": "#8c564b",
+    "Ph-like JAK-class": "#c49c94",
+    "T-Other": "#e377c2",
+    "TCF3::PBX1": "#f7b6d2",
+    "ZNF384-r": "#7f7f7f",
+    "iAmp21": "#c7c7c7",
+}
+UNKNOWN_SUBTYPE_COLOR = (0.35, 0.35, 0.35, 1.0)
 
 # ----------------------------- helpers -----------------------------
 
@@ -79,12 +100,12 @@ def main():
     p.add_argument("--violin", default="outputs/results/cfDNA_violin_log.jpeg", help="violin plot image (Control + all timepoints)")
     p.add_argument(
         "--violin_subset",
-        default="outputs/results/cfDNA_violin_subset_connected_log_excl_tp0p5.jpeg",
+        default="outputs/results/cfDNA_violin_subset_connected_log_excl_tp0p5_by_genetic_subtype.jpeg",
         help="violin plot image (Control + selected patient timepoints; connected per patient)",
     )
     p.add_argument(
         "--violin_subset_unconnected",
-        default="outputs/results/cfDNA_violin_subset_log_excl_tp0p5.jpeg",
+        default="outputs/results/cfDNA_violin_subset_log_excl_tp0p5_by_genetic_subtype.jpeg",
         help="(optional) second subset violin output without connecting lines (points only). Use 'none' to disable.",
     )
     p.add_argument(
@@ -181,7 +202,7 @@ def main():
         # Backward-compatible fallback for old default location
         parsed_path = Path("cfdna_parsed.csv")
     df = pd.read_csv(parsed_path)
-    required_cols = {"lastname","timepoint","tube","ml_plasma","pct_cfdna","total_ng_dna","ng_per_ml"}
+    required_cols = {"lastname","timepoint","tube","ml_plasma","pct_cfdna","dosage_ng_per_uL","total_ng_dna","ng_per_ml"}
     missing = required_cols - set(df.columns)
     if missing:
         raise SystemExit(f"parsed file is missing columns: {missing}")
@@ -431,10 +452,6 @@ def main():
         u = _stable_u01(key)
         return (u * 2.0 - 1.0) * width
 
-    cmap_patient = plt.get_cmap("turbo")
-    def _patient_color(patient: str):
-        return cmap_patient(_stable_u01(f"patient|{patient}"))
-
     def _parse_timepoints_arg(raw: str, available: set[str]) -> list[str]:
         raw = str(raw)
         sep = ";" if ";" in raw else ","
@@ -471,10 +488,20 @@ def main():
     df_pat = df_pat.rename(columns={"ng_per_ml": "ng/ml plasma"})
     patient_key_col = "patient_key" if "patient_key" in df_pat.columns else "lastname"
     df_pat["_patient"] = df_pat[patient_key_col].astype(str).str.strip().str.lower()
+    subtype_col = None
+    for c in df_pat.columns:
+        nc = _norm(c)
+        if nc in {"genetic subtype", "genetic_subtype"} or ("genetic" in nc and "subtype" in nc):
+            subtype_col = c
+            break
+    if subtype_col is None:
+        print("note: genetic_subtype column not found in parsed input; subtype colors will be set to 'unknown'")
 
     has_mrd_status = "MRD_IgTCR_status" in df_pat.columns
     has_mrd_raw = "MRD_IgTCR" in df_pat.columns
     keep_cols = ["_patient", "lastname", "timepoint", "ng/ml plasma"]
+    if subtype_col is not None:
+        keep_cols.append(subtype_col)
     if has_mrd_raw:
         keep_cols.append("MRD_IgTCR")
     if has_mrd_status:
@@ -511,6 +538,30 @@ def main():
         df_pts = df_pts.groupby(["_patient", "timepoint"], as_index=False)["ng/ml plasma"].mean()
     else:  # first
         df_pts = df_pts.groupby(["_patient", "timepoint"], as_index=False)["ng/ml plasma"].first()
+
+    def _norm_subtype(v) -> str:
+        if pd.isna(v):
+            return "unknown"
+        s = str(v).strip()
+        return s if s else "unknown"
+
+    if subtype_col is not None and subtype_col in df_pat.columns:
+        df_subtype = (
+            df_pat.dropna(subset=["_patient"])
+                  .assign(_genetic_subtype=lambda x: x[subtype_col].map(_norm_subtype))
+                  .groupby("_patient", as_index=False)
+                  .agg(_genetic_subtype=("_genetic_subtype", "first"))
+        )
+        df_pts = df_pts.merge(df_subtype, on="_patient", how="left")
+    else:
+        df_pts["_genetic_subtype"] = "unknown"
+
+    df_pts["_genetic_subtype"] = df_pts["_genetic_subtype"].map(_norm_subtype)
+    known_subtypes = sorted(s for s in df_pts["_genetic_subtype"].dropna().unique().tolist() if s != "unknown")
+    subtype_palette = {s: SUBTYPE_COLORS.get(s, UNKNOWN_SUBTYPE_COLOR) for s in known_subtypes}
+
+    def _subtype_color(subtype: str):
+        return subtype_palette.get(str(subtype), UNKNOWN_SUBTYPE_COLOR)
 
     # MRD status per patient+timepoint (preferred: use parsed MRD_IgTCR_status).
     status_col = None
@@ -650,7 +701,7 @@ def main():
                 alpha=0.85,
                 linewidths=0.9 if marker == "x" else 0.3,
                 zorder=6,
-                color=_patient_color(str(r["_patient"])),
+                color=_subtype_color(str(r["_genetic_subtype"])),
                 marker=marker,
             )
 
@@ -666,7 +717,27 @@ def main():
                 ys = ys[mask]
                 if ys.size < 2:
                     continue
-                plt.plot(xs, np.log10(ys), color="black", alpha=0.30, linewidth=0.6, zorder=2)
+                line_color = _subtype_color(str(g["_genetic_subtype"].iloc[0])) if "_genetic_subtype" in g.columns else "black"
+                plt.plot(xs, np.log10(ys), color=line_color, alpha=0.30, linewidth=0.6, zorder=2)
+
+        legend_handles = [
+            Line2D([0], [0], marker="o", linestyle="", color=c, markerfacecolor=c, markersize=5, label=s)
+            for s, c in subtype_palette.items()
+        ]
+        if (df_pts["_genetic_subtype"] == "unknown").any() or not legend_handles:
+            legend_handles.append(
+                Line2D([0], [0], marker="o", linestyle="", color=UNKNOWN_SUBTYPE_COLOR, markerfacecolor=UNKNOWN_SUBTYPE_COLOR, markersize=5, label="unknown")
+            )
+        plt.legend(
+            handles=legend_handles,
+            title="Genetic subtype",
+            loc="center left",
+            bbox_to_anchor=(1.02, 0.5),
+            borderaxespad=0.0,
+            fontsize=7,
+            title_fontsize=8,
+            frameon=True,
+        )
 
         (ymin, ymax), tick_vals = _log10_limits_and_ticks(
             np.concatenate(data_subset) if data_subset else np.array([]),
@@ -676,10 +747,10 @@ def main():
         plt.yticks([np.log10(t) for t in tick_vals], [_fmt_tick(t) for t in tick_vals])
         plt.xticks(range(len(cats_subset)), [pretty_label_subset(c) for c in cats_subset], rotation=15, ha="right")
         plt.ylabel("ng/ml plasma (log scale)")
-        plt.title("cfDNA by timepoint vs healthy donors (subset violin + points)")
+        plt.title("plasma cfDNA by timepoint and genetic subtype")
         plt.grid(True, which="both", axis="y", linestyle="--", alpha=0.4)
         plt.minorticks_on()
-        plt.tight_layout()
+        plt.tight_layout(rect=(0.0, 0.0, 0.82, 1.0))
         os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
         plt.savefig(out_path, format="jpeg", dpi=600)
         plt.close()
