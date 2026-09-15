@@ -2,14 +2,14 @@
 """Summarise CIRCALL rows where sample_id is 'na'.
 
 Uses only the Python standard library; no package installation is required.
-If no workbook is specified, the only non-temporary .xlsx file in the current
-directory is used.
+If no workbook is specified, the only non-temporary .xlsx file in data/raw/circall is used.
 """
 
 from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import re
 import zipfile
@@ -24,7 +24,7 @@ DOC_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}
 NS = {"m": MAIN_NS}
 HOSPITALS = {"001": "RDB", "002": "TRS"}
 CELL_REF = re.compile(r"([A-Z]+)\d+")
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 TIMEPOINT_ORDER = {"Diag": 0, "D4": 1, "D8": 2, "D15": 3, "TP1": 4, "TP2": 5}
 CORE_TIMEPOINTS = [
     ("Diag", "Diagnosis"),
@@ -50,13 +50,13 @@ def arguments() -> argparse.Namespace:
         "workbook",
         type=Path,
         nargs="?",
-        help="Input .xlsx file (defaults to the only .xlsx file in this directory)",
+        help="Input .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
     )
     parser.add_argument("--sheet", default="cohorte_lal", help="Sheet to parse")
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "output/missing_samples_by_hospital_timepoint.csv",
+        default=PROJECT_ROOT / "outputs/manual/bilan/missing_samples_by_hospital_timepoint.csv",
         help="Summary CSV path",
     )
     parser.add_argument(
@@ -67,22 +67,29 @@ def arguments() -> argparse.Namespace:
     parser.add_argument(
         "--table-output",
         type=Path,
-        default=PROJECT_ROOT / "output/missing_samples_bias_summary.png",
+        default=PROJECT_ROOT / "outputs/manual/bilan/missing_samples_bias_summary.png",
         help="Presentation-ready summary table image",
     )
     parser.add_argument(
         "--compartment-output",
         type=Path,
-        default=PROJECT_ROOT / "output/missing_samples_by_hospital_compartment.csv",
+        default=PROJECT_ROOT / "outputs/manual/bilan/missing_samples_by_hospital_compartment.csv",
         help="Hospital-by-compartment summary CSV",
     )
     parser.add_argument(
         "--compartment-table-output",
         type=Path,
-        default=PROJECT_ROOT / "output/missing_samples_compartment_summary.png",
+        default=PROJECT_ROOT / "outputs/manual/bilan/missing_samples_compartment_summary.png",
         help="Presentation-ready hospital-by-compartment table image",
     )
-    return parser.parse_args()
+    return parse_arguments(parser)
+
+
+def parse_arguments(parser):
+    args = parser.parse_args()
+    if target := os.environ.get("PRE_ANALYSIS_ARGUMENTS_FILE"):
+        Path(target).write_text(json.dumps(vars(args), indent=2, default=str) + "\n")
+    return args
 
 
 def resolve_workbook(workbook: Path | None) -> Path:
@@ -92,7 +99,7 @@ def resolve_workbook(workbook: Path | None) -> Path:
         return workbook
 
     candidates = sorted(
-        path for path in PROJECT_ROOT.glob("*.xlsx") if not path.name.startswith("~$")
+        path for path in (PROJECT_ROOT / "data/raw/circall").glob("*.xlsx") if not path.name.startswith("~$")
     )
     if len(candidates) == 1:
         return candidates[0]
@@ -187,7 +194,7 @@ def write_summary_table(
     except ImportError as exc:
         raise SystemExit(
             "Table rendering requires matplotlib. Run this script with the "
-            "cfDNA_inventory conda environment."
+            "pre_analysis conda environment."
         ) from exc
 
     columns = list(rows[0])

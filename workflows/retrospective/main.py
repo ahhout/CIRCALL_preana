@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from workflow_paths import parse_workflow_args
 import subprocess
 import sys
 from pathlib import Path
@@ -117,7 +118,7 @@ def main():
     p.add_argument("--skip-analysis", action="store_true", help="skip the analysis step")
     # --force kept for backward-compat, but parse always overwrites now
     p.add_argument("--force", action="store_true", help=argparse.SUPPRESS)
-    args = p.parse_args()
+    args = parse_workflow_args(p, inputs={'input': 'cfDNA_inventaire_2025.xlsx', 'donors': 'cfDNA_donors.xlsx'}, outputs=['parsed_csv', 'parsed_parquet', 'out_excel', 'plot', 'violin_subset', 'violin_subset_unconnected', 'pairwise_table', 'mixed_table'], root_flag='test_outputs_dir')
 
     base = Path(__file__).resolve().parent
     parse_script = base / "parse.py"

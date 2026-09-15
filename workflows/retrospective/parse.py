@@ -1,4 +1,5 @@
 import argparse
+from workflow_paths import parse_workflow_args
 import os
 import re
 import sys
@@ -120,7 +121,7 @@ def main():
         default="na,negative,neg,n/a",
         help="comma-separated tokens considered MRD-negative after lowercasing/stripping (default: 'na,negative,neg,n/a')",
     )
-    args = ap.parse_args()
+    args = parse_workflow_args(ap, inputs={'input': 'cfDNA_inventaire_2025.xlsx'}, outputs=['out_csv', 'out_parquet'], root_flag=None)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out_csv)), exist_ok=True)
 

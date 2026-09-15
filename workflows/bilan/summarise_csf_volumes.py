@@ -10,10 +10,10 @@ import zipfile
 from collections import Counter
 from pathlib import Path
 
-from summarise_missing_samples import parse_rows, resolve_workbook, write_csv
+from summarise_missing_samples import parse_arguments, parse_rows, resolve_workbook, write_csv
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 OUTPUT_FIELDS = [
     "compartment",
     "csf_row_count",
@@ -40,21 +40,21 @@ def arguments() -> argparse.Namespace:
         "workbook",
         type=Path,
         nargs="?",
-        help="CIRCALL .xlsx file (defaults to the only local .xlsx file)",
+        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "output/csf_volume_summary.csv",
+        default=PROJECT_ROOT / "outputs/manual/bilan/csf_volume_summary.csv",
         help="Output summary CSV path",
     )
     parser.add_argument(
         "--plot-output",
         type=Path,
-        default=PROJECT_ROOT / "output/csf_volume_violin.png",
+        default=PROJECT_ROOT / "outputs/manual/bilan/csf_volume_violin.png",
         help="Output violin plot path",
     )
-    return parser.parse_args()
+    return parse_arguments(parser)
 
 
 def numeric_value(raw_value: str) -> float | None:
@@ -139,7 +139,7 @@ def write_violin_plot(path: Path, values: list[float]) -> None:
     except ImportError as exc:
         raise SystemExit(
             "Plotting requires matplotlib and numpy. Run this script with the "
-            "cfDNA_inventory conda environment."
+            "pre_analysis conda environment."
         ) from exc
 
     numeric = np.asarray(values, dtype=float)

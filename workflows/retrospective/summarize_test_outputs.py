@@ -16,6 +16,7 @@ aggregate counts and contrast-level results.
 from __future__ import annotations
 
 import argparse
+from workflow_paths import parse_workflow_args
 import re
 import unicodedata
 from pathlib import Path
@@ -115,7 +116,8 @@ def main() -> None:
         default=None,
         help="output report workbook path (default: <outputs_dir>/results/final_stats_report.xlsx)",
     )
-    args = p.parse_args()
+    p.add_argument("--mixed_outlier_drop_n", type=int, default=2, help="Select existing outlier sensitivity artifacts (legacy default: 2; 0 disables)")
+    args = parse_workflow_args(p, inputs={'donors': 'cfDNA_donors.xlsx'}, outputs=['parsed', 'out_xlsx'], root_flag='outputs_dir')
 
     outputs_dir = Path(args.outputs_dir)
     if args.test_outputs_dir:
@@ -137,7 +139,7 @@ def main() -> None:
     # ---- Load primary outputs (if present) ----
     mixed_path = results_dir / "cfDNA_mixedlm_timepoint_contrasts_log10_bh.csv"
     pairwise_path = results_dir / "cfDNA_pairwise_bins_stats_log10_bh.csv"
-    outlier_cmp_path = results_dir / "cfDNA_mixedlm_outlier_drop2_contrasts_vs_base.csv"
+    outlier_cmp_path = results_dir / f"cfDNA_mixedlm_outlier_drop{args.mixed_outlier_drop_n}_contrasts_vs_base.csv"
     random_slope_path = results_dir / "cfDNA_mixedlm_random_slope_time_contrasts_log10_bh.csv"
 
     if not mixed_path.exists():

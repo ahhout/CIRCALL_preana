@@ -41,3 +41,7 @@ results/
 *.secret
 logs/
 *.log
+
+# Only explicitly synthetic fixtures may be committed.
+!tests/fixtures/synthetic_*.csv
+!tests/fixtures/synthetic_*.xlsx

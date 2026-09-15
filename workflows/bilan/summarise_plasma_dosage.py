@@ -11,14 +11,12 @@ from collections import defaultdict
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 
-from summarise_missing_samples import parse_rows, resolve_workbook, write_csv
+from summarise_missing_samples import parse_arguments, parse_rows, resolve_workbook, write_csv
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 THREE_DECIMALS = Decimal("0.001")
-DEFAULT_RETROSPECTIVE_WORKBOOK = Path(
-    "/home/arnohoutman/projects/cfDNA_inventory/outputs/results/cfdna_analysis.xlsx"
-)
+DEFAULT_RETROSPECTIVE_WORKBOOK = (PROJECT_ROOT / "outputs/manual/retrospective/results/cfdna_analysis.xlsx")
 OUTPUT_FIELDS = [
     "timepoint",
     "comparison_status",
@@ -49,7 +47,7 @@ def arguments() -> argparse.Namespace:
         "circall_workbook",
         type=Path,
         nargs="?",
-        help="CIRCALL .xlsx file (defaults to the only local .xlsx file)",
+        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
     )
     parser.add_argument(
         "--retrospective-workbook",
@@ -60,16 +58,16 @@ def arguments() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "output/plasma_dosage_circall_vs_retrospective.csv",
+        default=PROJECT_ROOT / "outputs/manual/bilan/plasma_dosage_circall_vs_retrospective.csv",
         help="Output comparison CSV path",
     )
     parser.add_argument(
         "--plot-output",
         type=Path,
-        default=PROJECT_ROOT / "output/plasma_dosage_violin.png",
+        default=PROJECT_ROOT / "outputs/manual/bilan/plasma_dosage_violin.png",
         help="Output paired violin plot path",
     )
-    return parser.parse_args()
+    return parse_arguments(parser)
 
 
 def normalized_timepoint(value: str) -> str:
@@ -147,7 +145,7 @@ def write_violin_plot(
     except ImportError as exc:
         raise SystemExit(
             "Plotting requires matplotlib and numpy. Run this script with the "
-            "cfDNA_inventory conda environment."
+            "pre_analysis conda environment."
         ) from exc
 
     # The reference project estimates densities in transformed space. log10(1+x)

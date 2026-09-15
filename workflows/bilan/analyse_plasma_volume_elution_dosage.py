@@ -9,13 +9,11 @@ import os
 import zipfile
 from pathlib import Path
 
-from summarise_missing_samples import parse_rows, resolve_workbook, write_csv
+from summarise_missing_samples import parse_arguments, parse_rows, resolve_workbook, write_csv
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-DEFAULT_RETROSPECTIVE_WORKBOOK = Path(
-    "/home/arnohoutman/projects/cfDNA_inventory/outputs/results/cfdna_analysis.xlsx"
-)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RETROSPECTIVE_WORKBOOK = (PROJECT_ROOT / "outputs/manual/retrospective/results/cfdna_analysis.xlsx")
 VARIABLES = {
     "volume": "Plasma volume (mL)",
     "elution_uL": "Elution volume (µL)",
@@ -100,18 +98,18 @@ def arguments() -> argparse.Namespace:
         "workbook",
         type=Path,
         nargs="?",
-        help="CIRCALL .xlsx file (defaults to the only local .xlsx file)",
+        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        default=PROJECT_ROOT / "output/plasma_volume_elution_dosage_correlations.csv",
+        default=PROJECT_ROOT / "outputs/manual/bilan/plasma_volume_elution_dosage_correlations.csv",
         help="Output correlation CSV path",
     )
     parser.add_argument(
         "--plot-output-dir",
         type=Path,
-        default=PROJECT_ROOT / "output",
+        default=PROJECT_ROOT / "outputs/manual/bilan",
         help="Directory for one PNG per correlation comparison",
     )
     parser.add_argument(
@@ -120,7 +118,7 @@ def arguments() -> argparse.Namespace:
         default=DEFAULT_RETROSPECTIVE_WORKBOOK,
         help="Retrospective analysis workbook",
     )
-    return parser.parse_args()
+    return parse_arguments(parser)
 
 
 def numeric_value(raw_value: str) -> float | None:
@@ -353,7 +351,7 @@ def write_scatterplot(
     except ImportError as exc:
         raise SystemExit(
             "Plotting requires matplotlib. Run this script with the "
-            "cfDNA_inventory conda environment."
+            "pre_analysis conda environment."
         ) from exc
 
     plot_columns = min(2, len(pairs))

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from workflow_paths import parse_workflow_args
 import hashlib
 import os
 import re
@@ -194,7 +195,7 @@ def main():
         default=0,
         help="outlier sensitivity: drop top-N observations by |residual| and refit once (0 disables). Suggested: 1 or 2",
     )
-    args = p.parse_args()
+    args = parse_workflow_args(p, inputs={'donors': 'cfDNA_donors.xlsx'}, outputs=['parsed', 'out_excel', 'plot', 'violin', 'violin_subset', 'violin_subset_unconnected', 'violin_total_ng', 'pairwise_table', 'mixed_table'], root_flag='test_outputs_dir')
 
     # load parsed (must include ALL timepoints already)
     parsed_path = Path(args.parsed)
@@ -238,15 +239,9 @@ def main():
     donors["ng/ml plasma"] = pd.to_numeric(donors[conc_col], errors="coerce")
     donors["timepoint"] = "Control"
 
-    # --- DEBUG: list any raw rows with ml_plasma > 10 ---
-    prob = df[df["ml_plasma"].astype(float) > 10].copy()
-    if len(prob):
-        prob = prob[["lastname", "timepoint", "ml_plasma"]].sort_values(["lastname", "timepoint"])
-        print("\nSamples with ml_plasma > 10 (patient | timepoint | value):")
-        for _, r in prob.iterrows():
-            print(f"  {r['lastname']} | {r['timepoint']} | {r['ml_plasma']}")
-    else:
-        print("\nNo samples with ml_plasma > 10 found.")
+    # Report volume diagnostics without patient names.
+    prob = df[df["ml_plasma"].astype(float) > 10]
+    print(f"Samples with ml_plasma > 10: {len(prob)}")
 
     # ============================================================
     # Scatter: Control vs Diagnosis vs TP1  (kept as before)
