@@ -2,7 +2,7 @@
 """Summarise CIRCALL rows where sample_id is 'na'.
 
 Uses only the Python standard library; no package installation is required.
-If no workbook is specified, the only non-temporary .xlsx file in data/raw/circall is used.
+If no workbook is specified, the only non-temporary .xlsx file in data/circall is used.
 """
 
 from __future__ import annotations
@@ -50,7 +50,7 @@ def arguments() -> argparse.Namespace:
         "workbook",
         type=Path,
         nargs="?",
-        help="Input .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
+        help="Input .xlsx file (defaults to the only .xlsx file in data/circall)",
     )
     parser.add_argument("--sheet", default="cohorte_lal", help="Sheet to parse")
     parser.add_argument(
@@ -99,7 +99,7 @@ def resolve_workbook(workbook: Path | None) -> Path:
         return workbook
 
     candidates = sorted(
-        path for path in (PROJECT_ROOT / "data/raw/circall").glob("*.xlsx") if not path.name.startswith("~$")
+        path for path in (PROJECT_ROOT / "data/circall").glob("*.xlsx") if not path.name.startswith("~$")
     )
     if len(candidates) == 1:
         return candidates[0]

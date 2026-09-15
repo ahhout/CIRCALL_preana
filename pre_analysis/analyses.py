@@ -36,14 +36,19 @@ def availability(frame):
 def measurement_summary(frame, metrics):
     rows = []
     data = frame.copy(); data['timepoint'] = data.timepoint.fillna('unmapped')
-    for keys, group in data.groupby(['cohort', 'compartment', 'timepoint'], dropna=False, sort=True):
+    grouped = [(keys, group) for keys, group in data.groupby(['cohort', 'compartment', 'timepoint'], dropna=False, sort=True)]
+    grouped += [((cohort, compartment, 'Overall'), group) for (cohort, compartment), group in data.groupby(['cohort','compartment'], dropna=False, sort=True)]
+    for keys, group in grouped:
         for metric in metrics:
             valid = group.loc[np.isfinite(group[metric])]
             values = valid[metric]
             rows.append(dict(cohort=keys[0], compartment=keys[1], timepoint=keys[2], measurement=metric,
                              inventory_records=len(group), measured_records=len(values),
                              measured_samples=valid.sample_key.nunique(), measured_patients=valid.patient_key.nunique(),
-                             unavailable_records=len(group)-len(values), mean=values.mean(), median=values.median(),
+                             unavailable_records=len(group)-len(values),
+                             total=values.sum() if len(values) else np.nan,
+                             mean=values.mean(), standard_deviation=values.std(ddof=1),
+                             q1=values.quantile(.25), median=values.median(), q3=values.quantile(.75),
                              minimum=values.min(), maximum=values.max(),
                              status='complete' if len(values) else 'unavailable'))
     return pd.DataFrame(rows)

@@ -15,7 +15,7 @@ from openpyxl import Workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-import run
+from pre_analysis import legacy as run
 
 spec = importlib.util.spec_from_file_location("workflow_paths", ROOT / "workflows/retrospective/workflow_paths.py")
 paths = importlib.util.module_from_spec(spec)
@@ -126,9 +126,9 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(json.loads((self.base / "out/run_manifest.json").read_text())["status"], "failed")
 
     def test_relative_paths_use_callers_directory(self):
-        result = subprocess.run([sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import run; print(run.arguments(['--inventory', 'synthetic.xlsx']).inventory)", str(ROOT)], cwd=self.base, capture_output=True, text=True, check=True)
+        result = subprocess.run([sys.executable, "-c", "import sys; sys.path.insert(0, sys.argv[1]); import pre_analysis.legacy as run; print(run.arguments(['--inventory', 'synthetic.xlsx']).inventory)", str(ROOT)], cwd=self.base, capture_output=True, text=True, check=True)
         self.assertEqual(Path(result.stdout.strip()), self.base / "synthetic.xlsx")
-        self.assertEqual(run.arguments([]).donors, ROOT / "data/raw/retrospective/cfDNA_donors.xlsx")
+        self.assertEqual(run.arguments([]).donors, ROOT / "data/retrospective/cfDNA_donors.xlsx")
 
     def test_legacy_output_root_redirects_defaults_and_keeps_overrides(self):
         parser = argparse.ArgumentParser()
@@ -141,7 +141,7 @@ class RunnerTests(unittest.TestCase):
             args = paths.parse_workflow_args(parser, inputs={"donors": "cfDNA_donors.xlsx"}, outputs=["plot", "out_excel"], root_flag="test_outputs_dir")
         self.assertEqual(Path(args.plot), self.base / "run/results/plot.jpeg")
         self.assertEqual(Path(args.out_excel), custom)
-        self.assertEqual(Path(args.donors), ROOT / "data/raw/retrospective/cfDNA_donors.xlsx")
+        self.assertEqual(Path(args.donors), ROOT / "data/retrospective/cfDNA_donors.xlsx")
 
     def test_all_cli_help_from_another_directory(self):
         scripts = [ROOT / "run.py", *sorted((ROOT / "workflows").rglob("*.py"))]

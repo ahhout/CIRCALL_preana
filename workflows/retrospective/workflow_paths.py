@@ -9,7 +9,7 @@ DEFAULT_OUTPUT = REPO_ROOT / "outputs/manual/retrospective"
 
 def parse_workflow_args(parser, *, inputs, outputs, root_flag):
     parser.set_defaults(**{
-        key: str(REPO_ROOT / "data/raw/retrospective" / filename)
+        key: str(REPO_ROOT / "data/retrospective" / filename)
         for key, filename in inputs.items()
     })
     if root_flag:

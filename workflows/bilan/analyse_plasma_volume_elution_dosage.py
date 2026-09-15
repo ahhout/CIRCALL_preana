@@ -98,7 +98,7 @@ def arguments() -> argparse.Namespace:
         "workbook",
         type=Path,
         nargs="?",
-        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
+        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/circall)",
     )
     parser.add_argument(
         "--output",

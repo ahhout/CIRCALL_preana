@@ -47,7 +47,7 @@ def arguments() -> argparse.Namespace:
         "circall_workbook",
         type=Path,
         nargs="?",
-        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/raw/circall)",
+        help="CIRCALL .xlsx file (defaults to the only .xlsx file in data/circall)",
     )
     parser.add_argument(
         "--retrospective-workbook",
