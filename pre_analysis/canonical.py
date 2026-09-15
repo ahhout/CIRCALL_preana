@@ -92,6 +92,28 @@ def run(args):
                  'identified_circall_plasma_formula_zeros':int((frame.cohort.eq('circall') & frame.compartment.eq('plasma')
                     & frame.sample_state.eq('present') & frame.dna_total_ng_status.eq('formula_zero_missing_inputs')).sum())}
         write_json(preparation/'summary.json',summary)
+        import numpy as np
+        basis=frame.loc[frame.compartment.eq('plasma'),['record_id','cohort','source','sample_id','source_row',
+            'dna_total_ng','volume_ml',PRIMARY,'cfDNA_total_ng','dna_total_ng_status']].copy()
+        basis['percentage_adjusted_endpoint']=basis.cfDNA_total_ng / basis.volume_ml.where(basis.volume_ml.gt(0))
+        comparable=np.isfinite(basis[PRIMARY]) & np.isfinite(basis.percentage_adjusted_endpoint)
+        basis['different_measurement_basis']=False
+        basis.loc[comparable,'different_measurement_basis']=~np.isclose(basis.loc[comparable,PRIMARY],basis.loc[comparable,'percentage_adjusted_endpoint'],rtol=RTOL,atol=ATOL)
+        reporting.table(preparation/'endpoint_basis.csv',basis)
+        write_json(preparation/'reconciliation.json',{
+            'primary_endpoint':'Recorded unadjusted total DNA / initial plasma volume, never percentage-adjusted',
+            'source_revision':'Revised workbook versions are recorded by input hashes; canonical output equality to the old inputs is not expected',
+            'measurement_basis_comparison':'Compares unadjusted and percentage-adjusted quantities in the current sources; it is not a comparison of old versus new file versions',
+            'comparable_plasma_records':int(comparable.sum()),
+            'records_with_different_measurement_basis':int(basis.different_measurement_basis.sum()),
+            'identified_circall_formula_zeros_removed':summary['identified_circall_plasma_formula_zeros'],
+            'pooled_controls_by_source':summary['controls_by_source'],
+            'undosed_pediatric_plasma_records':int((frame.source.eq('pediatric_controls') & frame.compartment.eq('plasma') & frame[PRIMARY].isna()).sum()),
+            'qc_holds':summary['qc_hold_records'],
+            'parsing':'Direct CIRCALL-style numeric conversion; unavailable inputs propagate only to dependent quantities',
+            'inventory':'Long-format compartment records; MNC assay columns are retained separately without copying plasma volume',
+            'eligibility':'See eligibility.csv and manifest settings for question-specific retained cohort rules',
+        })
         for question in tasks:
             if question=='inventory':
                 def inventory_task():
@@ -129,7 +151,9 @@ def run(args):
                     corr=pd.concat(correlations,ignore_index=True)
                     reporting.table(output/'yield/summary.csv',result)
                     reporting.table(output/'yield/correlations.csv',corr)
-                    reporting.workbook(output/'yield/summary.xlsx',{'yield':result,'correlations':corr})
+                    comparison=analyses.cohort_comparison(frame)
+                    reporting.table(output/'yield/cohort_comparison.csv',comparison)
+                    reporting.workbook(output/'yield/summary.xlsx',{'yield':result,'correlations':corr,'cohort_comparison':comparison})
                     for metric in analyses.YIELD_METRICS[:3]:
                         reporting.timepoint_plot(frame,cohorts,metric,output/'yield'/f'{metric}.png')
                     for x,y in PAIRS:

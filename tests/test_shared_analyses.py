@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import pandas as pd
 from pre_analysis import statistics
-from pre_analysis.analyses import correlations, availability
+from pre_analysis.analyses import correlations, availability, cohort_comparison
 from pre_analysis.policies import eligible, pooled_controls, PRIMARY
 from workflows.retrospective import stats_reporting as legacy
 
@@ -47,6 +47,19 @@ class SharedAnalysisTests(unittest.TestCase):
             self.assertEqual(table.query("timepoint == 'Overall'").paired_sample_count.unique().tolist(),[12])
             self.assertTrue(table.query("timepoint == 'tp1'").status.eq('complete').all())
             self.assertTrue(table.query("timepoint == 'tp2'").status.eq('unavailable').all())
+
+    def test_descriptive_cohort_comparison(self):
+        f=fixture()
+        f.loc[f.cohort.eq('retrospective'),PRIMARY]=2.
+        f.loc[f.cohort.eq('circall'),PRIMARY]=6.
+        result=cohort_comparison(f)
+        diag=result.loc[result.timepoint.eq('diag')].iloc[0]
+        self.assertEqual(diag.mean_difference_ng_per_ml,4.)
+        self.assertEqual(diag.mean_ratio_circall_to_retrospective,3.)
+        self.assertEqual(diag.mean_percent_difference,200.)
+        self.assertEqual(diag.retrospective_sample_count,6)
+        self.assertEqual(diag.circall_sample_count,6)
+        self.assertEqual(diag.matching_basis,'timepoint label only')
 
     def test_statistical_refactor_matches_legacy_on_identical_values(self):
         f=fixture();patients,_=eligible(f,'retrospective','longitudinal');controls=pooled_controls(f)

@@ -1,31 +1,30 @@
 # Pre-analysis
 
-Retrospective cfDNA inventory analysis and CIRCALL inventory summaries in one repository. The original calculations remain in two script-based workflows. The runner explicitly passes the retrospective analysis workbook to the CIRCALL comparison scripts.
+One canonical preparation and analysis workflow for retrospective and CIRCALL patient cohorts. Each cohort is analysed separately against a pooled reference of existing donors and pediatric CIRCALL controls. The primary endpoint is **unadjusted total extracted DNA divided by initial plasma volume**.
 
-## Environment
+## Setup
 
-Use Conda. Recreate the recorded Linux environment with:
+Use the existing Conda environment, or recreate the locked Linux environment:
 
 ```bash
 conda create --name pre_analysis --file conda-linux-64.lock
 conda activate pre_analysis
 ```
 
-Alternatively, `conda env create -f env.yml` resolves the same declared dependencies using currently available versions; use the lock file for migration-equivalent results. Optional Parquet export still requires an additional Parquet engine, as in the original project; it is not used by the default pipeline.
+`conda env create -f env.yml` is an alternative that resolves currently available dependency versions. The unchanged lock file is preferred for reproducing the migration validation.
 
-## Inputs and local files
+## Canonical inputs
 
-The local migration copied these inputs without changing their contents:
+| Source | Default file | Sheet |
+| --- | --- | --- |
+| Retrospective patients | `cfDNA_inventaire_retrospective.xlsx` in the repository root | `Inventaire` |
+| CIRCALL patients | `inventaire_CIRCALL_15092026.xlsx` in the repository root | `cohorte_lal` |
+| Pediatric controls | Same CIRCALL file | `cohorte_control` |
+| Existing donors | `data/retrospective/cfDNA_donors.xlsx` | First worksheet |
 
-| Input | Repository-relative location |
-| --- | --- |
-| Retrospective inventory | `data/raw/retrospective/cfDNA_inventaire_2025.xlsx` |
-| Healthy donors | `data/raw/retrospective/cfDNA_donors.xlsx` |
-| CIRCALL inventory | `data/raw/circall/inventaire_CIRCALL_ano_07092026.xlsx` |
+Workbooks and results remain Git-ignored. A code-only clone needs these local input files. Both control sources are prepared even when selecting a single patient cohort.
 
-`data/` and `outputs/` are ignored by Git. A code-only clone needs its own copies of the input workbooks. Historical workbooks and auxiliary files are under `data/archive/<source-project>/`; historical results are under `outputs/legacy/<source-project>/`. These historical outputs are not used as inputs by a full run. Caches and Excel lock files were not migrated.
-
-## Run the complete workflow
+## Run
 
 From the repository:
 
@@ -33,96 +32,113 @@ From the repository:
 conda run --no-capture-output -n pre_analysis python run.py
 ```
 
-This creates a fresh `outputs/<UTC-timestamp>/` directory and runs:
-
-1. Retrospective inventory parsing.
-2. Retrospective plots, statistics, and diagnostics.
-3. Consolidated statistical workbook.
-4. Missing-sample summaries, CSF volumes, plasma dosage comparisons, and volume/dosage correlations.
-
-Inputs can be overridden with `--inventory`, `--donors`, and `--circall`. Default input locations are relative to the repository; explicit relative paths are resolved from the directory where the command is invoked. The runner can therefore also be invoked by its absolute path from elsewhere.
+Canonical mode, both cohorts, and all investigations are the defaults. Other examples:
 
 ```bash
-python run.py --output-dir outputs/my_run
-python run.py --inventory /path/to/inventory.xlsx --donors /path/to/donors.xlsx --circall /path/to/circall.xlsx
-python run.py --stage retrospective --output-dir outputs/retrospective_run
-python run.py --stage bilan \
-  --retrospective-workbook outputs/retrospective_run/retrospective/results/cfdna_analysis.xlsx \
-  --output-dir outputs/bilan_run
+python run.py --cohort circall
+python run.py --analysis inventory
+python run.py --analysis volumes --output-dir outputs/volume_review
+python run.py --analysis yield
+python run.py --analysis longitudinal --mixed-outlier-drop-n 2
+python run.py --analysis longitudinal --mixed-random-slope-sensitivity
+python run.py --inventory /path/to/retrospective.xlsx --circall /path/to/circall.xlsx --donors /path/to/donors.xlsx
 ```
 
-A custom output destination must be new or empty. The runner refuses reuse, stops on a failed stage or missing required artifact, and leaves incomplete results available for inspection. Choose a new directory to retry. In `all` mode, both comparison scripts always receive the workbook generated in that run. Bilan-only runs require an explicit workbook.
+`--analysis` accepts `all`, `inventory`, `volumes`, `yield`, or `longitudinal`. `--cohort` accepts `all`, `retrospective`, or `circall`. Sensitivity options require `all` or `longitudinal`.
 
-## Outputs and provenance
+Defaults are resolved relative to the repository. Explicit relative paths are resolved from the caller's directory, so the runner also works when invoked by absolute path from elsewhere. The default output is a fresh `outputs/<UTC timestamp>/`; an explicit output directory must be new or empty.
+
+## Preparation and QC rules
+
+The canonical Excel reader loads cached cell values and formula metadata without changing or recalculating the source workbooks. Header mappings are explicit and duplicate/missing required headers fail clearly.
+
+Retrospective tube rows are expanded into compartment records. Their `MNC_*` fields produce a linked cell/pellet record with assay-specific quantities; plasma volume is never copied into that record. Source tissue, extraction type, original measurement cells, and source-row references are retained. The different MNC assays are not silently collapsed into a generic concentration. CIRCALL compartment rows retain their existing organisation. Known-patient scheduled rows remain in inventory; empty template people do not become patients.
+
+The endpoint is computed from `dna_total_ng / volume_ml` for plasma records with usable total DNA and positive volume. Existing donors use their supplied ng/mL endpoint. `cfDNA_fraction` remains a 0–1 fraction and does not multiply the primary endpoint. Percentage-adjusted `cfDNA_*` values are retained as additional measurements.
+
+Numeric parsing follows CIRCALL conventions: decimal commas and scientific notation are accepted; units, qualifiers, nonfinite numbers, missing markers, and technician notes such as `SK` are not converted into exact measurements. No arbitrary characters are stripped to extract a number.
+
+| Condition | Behaviour |
+| --- | --- |
+| Formula-generated zero total with missing concentration/elution | Total and its dependent ng/mL are unavailable |
+| Numeric zero with valid inputs | Retained; question-specific log rules determine eligibility |
+| Missing/nonpositive plasma volume | ng/mL unavailable; usable total DNA and concentration remain available |
+| Expected Excel errors | Affected measurements unavailable, without a discrepancy hold |
+| Contradictory numeric total or ng/mL | Record held from quantitative analyses; inventory and discrepancy record retained |
+
+QC compares total DNA with concentration × elution and recorded ng/mL with total DNA ÷ volume using `rtol=1e-9`, `atol=1e-12`. It does not invent missing operands or edit source values. Formula metadata and raw mapped measurements are available for review.
+
+Patient grouping preserves the existing within-cohort identity basis. Internal patient keys include a source namespace and a digest, keeping names out of tables and logs. These are internal pseudonymous keys, not a claim of anonymisation. Source sample identifiers and clinical measurements remain local.
+
+## Investigations
+
+| Investigation | Outputs and behaviour |
+| --- | --- |
+| Inventory | Coverage by cohort, compartment, hospital, and timepoint; unique patients/samples; distinct present, na-coded, and blank IDs |
+| Volumes | Overall and per-timepoint counts, sums, mean, sample SD, quartiles, range, and compartment figures for recorded fluid, blood, elution, and MNC counts |
+| Yield | Unadjusted plasma concentration/yield summaries; side-by-side cohort means/medians and descriptive differences; separate MNC assay summaries; all five existing volume/elution correlation pairs for each cohort |
+| Longitudinal | Sample and patient-median Welch checks, patient-median Mann–Whitney, separate patient random-intercept MixedLM fits, paired counts, diagnostic figures, and subtype/MRD-marked plots |
+
+Inventory coverage is independent of measurement availability. CIRCALL missingness rates use explicit `na` IDs divided by nonblank assessed IDs, as before. No retrospective expected-collection denominator is inferred. Distinct inventory records, samples, and patients are reported separately.
+
+Retrospective quantitative plasma analyses retain the cfDNA extraction and parsed-timepoint rules. Sample IDs remain optional for retrospective longitudinal analyses and required for dosage/correlations. CIRCALL dosage/correlation/longitudinal analyses require a present sample ID and timepoint. Retrospective correlations retain the post-inotuzumab exclusion. All policies are recorded in the run manifest.
+
+Model timepoints remain `diag;tp0,5;tp1;tp2` for retrospective patients and `diag;d4;d8;d15;tp1;tp2` for CIRCALL. Retrospective subset plots still omit `tp0,5`; those observations remain in the statistical model. No day/TP equivalence is inferred. Subtype source labels are retained; case-only variants share a display colour. Different spellings/languages are not assigned new biological annotations.
+
+Methods retain existing transformations: positive log10 concentrations for inference, log10(1+x) descriptive violins, log10 concentration or log10(1+total DNA) for correlations. Overall correlations require 3 pairs and timepoint-specific correlations 5; unavailable/constant groups are labelled explicitly. BH correction remains within each cohort/test family. The descriptive cohort-comparison table matches timepoint labels only and does not assert equivalent collection windows. No new cross-cohort model or cross-cohort hypothesis test is introduced. Cross markers denote controls or postdiagnosis MRD-negative observations; CIRCALL patient markers do not infer MRD status.
+
+Sensitivity analyses are opt-in. Outlier-drop refits retain the requested count. Random-slope sensitivity uses the legacy numeric TP scale for the retrospective cohort; CIRCALL is explicitly unavailable because no common numeric mapping of its day and TP labels has been agreed. CIRCALL MRD annotations are also unavailable: assay availability fields are not MRD results.
+
+## Results and provenance
 
 ```text
 outputs/<run-id>/
-  retrospective/
-    results/
-      cfdna_parsed.csv
-      cfdna_analysis.xlsx
-      final_stats_report.xlsx
-      ... statistical CSVs and plots
-    diagnostics/
-      pairwise_log10/
-      mixedlm/
-      ... optional sensitivity diagnostics
-  bilan/
-    ... five summary CSVs and eleven plots
-  logs/
-    ... per-stage logs and resolved arguments
+  prepared/
+    inventory.csv
+    pooled_controls.csv
+    measurement_availability.csv
+    discrepancies.csv
+    eligibility.csv
+    endpoint_basis.csv
+    reconciliation.json
+    summary.json
+    source_mappings.json
+    source_headers.json
+  inventory/                # CSV, Excel, coverage figure
+  volumes/                  # summaries and compartment figures
+  yield/                    # summaries, both cohorts' correlations and figures
+  longitudinal/
+    retrospective/          # statistics workbook, CSVs, diagnostics
+    circall/                # statistics workbook, CSVs, diagnostics
+    subtypes.png
+    trajectories.png
+  analysis_status.csv
   run_manifest.json
+  logs/
 ```
 
-The retrospective workbook's `Detailed` sheet is the interface to bilan. It preserves `patient_key`, `sample_id`, `timepoint`, `ml_plasma`, `dosage_ng_per_uL`, `total_ng_dna`, and `ng_per_ml`, along with existing additional columns. The runner validates the CIRCALL `cohorte_lal` headers and the workbook handoff.
+The manifest contains input hashes, runtime code hashes/revision, environment-lock hash, effective arguments, policies, stages, and analysis outcomes. `reconciliation.json` explains the intentional measurement-basis, control-pooling, parsing, and missingness changes. `endpoint_basis.csv` compares unadjusted and percentage-adjusted quantities within the current sources; it is not presented as an old-versus-new file comparison.
 
-The manifest records input SHA-256 hashes, resolved runner and stage arguments, commands, code revision and file hashes, Python executable/version, environment-lock hash, timestamps, and stage outcomes. Logs report aggregate volume diagnostics without patient names. Data tables and figures can contain clinical identifiers and remain local and Git-ignored.
+An unsupported analysis is labelled `unavailable`. A failed model is labelled `failed` and causes a nonzero overall exit, while the other cohort can still finish. Convergence and small-sample warnings remain in the logs. Inspect paired counts and diagnostics when interpreting results.
 
-## Scientific behaviour
-
-Both original parsers remain in use. Cohort membership, units, timepoint mappings, missing-value rules, and filters are preserved; samples are not newly joined across cohorts. The retrospective parser retains its existing LCR exclusion and MRD parsing rules. Bilan retains its compartment-specific selection and existing timepoint exclusions.
-
-Retrospective inference remains on log10 concentration with BH correction and the existing patient random-intercept MixedLM. Sample-level Welch comparisons, patient-median checks, Mann–Whitney summaries, plots, and diagnostics remain available. The default statistical subset includes `diag;tp0,5;tp1;tp2`; the subset violin plots exclude `tp0,5`, as before. MRD status continues to control the existing point markers.
-
-Sensitivity analyses remain opt-in:
+## Legacy mode and rollback
 
 ```bash
-python run.py --mixed-random-slope-sensitivity --mixed-outlier-drop-n 2
+python run.py --workflow legacy
+python run.py --workflow legacy --stage retrospective --output-dir outputs/legacy_ret
+python run.py --workflow legacy --stage bilan \
+  --retrospective-workbook outputs/legacy_ret/retrospective/results/cfdna_analysis.xlsx
 ```
 
-`--mixed-outlier-drop-n` defaults to `0` (disabled). It only controls the existing sensitivity refit, not the primary analysis. The report now selects the matching requested outlier count instead of assuming 2. The individual report CLI retains its legacy default of 2 when no count is supplied. Model convergence warnings should be assessed in the diagnostic logs; a missing required model result makes the combined run fail.
+Legacy mode uses the preserved old workbooks under `data/retrospective/` and `data/circall/`, with the old scripts, output layout, and calculations. `--stage` and `--retrospective-workbook` belong to legacy mode; `--cohort` and `--analysis` belong to canonical mode. Individual legacy scripts remain runnable with their existing flags; direct-script defaults retain legacy overwrite behaviour.
 
-## Individual scripts
+Rollback is an explicit legacy-mode invocation or reversal of the canonical-default commit. The original projects and historical results remain intact. [MIGRATION.md](MIGRATION.md) records the earlier repository merge; [CANONICAL_VALIDATION.md](CANONICAL_VALIDATION.md) records reconciliation validation.
 
-Scripts remain under `workflows/retrospective/` and `workflows/bilan/`, with their existing CLI options. Use `--help` for all analysis settings. Direct-script defaults write to `outputs/manual/retrospective/` or `outputs/manual/bilan/`; they retain legacy overwrite behaviour, so use the runner for isolated runs.
-
-```bash
-python workflows/retrospective/main.py --test_outputs_dir outputs/manual/retrospective
-python workflows/retrospective/summarize_test_outputs.py --outputs_dir outputs/manual/retrospective
-python workflows/bilan/summarise_missing_samples.py data/raw/circall/inventaire_CIRCALL_ano_07092026.xlsx
-python workflows/bilan/summarise_csf_volumes.py data/raw/circall/inventaire_CIRCALL_ano_07092026.xlsx
-python workflows/bilan/summarise_plasma_dosage.py --retrospective-workbook outputs/manual/retrospective/results/cfdna_analysis.xlsx
-python workflows/bilan/analyse_plasma_volume_elution_dosage.py --retrospective-workbook outputs/manual/retrospective/results/cfdna_analysis.xlsx
-```
-
-The retrospective output-root option now redirects every default artifact, including parsed data and all plots. Explicit per-file overrides remain supported. Bilan's standalone workbook autodetection is limited to non-temporary workbooks in `data/raw/circall`; multiple candidates require an explicit input.
-
-## Validation
-
-Synthetic tests create temporary workbooks and require no clinical data:
+## Tests
 
 ```bash
 conda run --no-capture-output -n pre_analysis python -m unittest discover -s tests -v
+python tests/validate_canonical.py --run-dir outputs/canonical_validation/release_final
 ```
 
-To compare fresh outputs against isolated source runs:
-
-```bash
-python tests/compare_outputs.py \
-  --baseline-retrospective /path/to/baseline/cfDNA_inventory/outputs \
-  --baseline-bilan /path/to/baseline/bilan/output \
-  --candidate outputs/my_run \
-  --report outputs/comparison.json
-```
-
-Comparison checks filenames, ordered sheets/columns/rows and categorical values, numeric values with `rtol=1e-9, atol=1e-12`, and exact image pixels. Failure reports contain filenames rather than patient records. See [MIGRATION.md](MIGRATION.md) for validation evidence and rollback.
+Unit tests use synthetic data. The second command is a migration-specific integration audit against the current source workbooks, including the five corrected samples and thirteen identified formula-zero records. It requires the local source files and validation hash snapshot; future source revisions can legitimately require updated migration expectations.

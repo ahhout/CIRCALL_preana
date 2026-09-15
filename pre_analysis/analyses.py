@@ -84,6 +84,34 @@ def correlations(frame, cohort):
     return pd.DataFrame(rows), audit
 
 
+def cohort_comparison(frame):
+    """Existing descriptive dosage comparison; matched labels are not calendar mappings."""
+    groups={}
+    for cohort in ('retrospective','circall'):
+        data,_=eligible(frame,cohort,'yield')
+        data=data.loc[np.isfinite(data[PRIMARY])]
+        groups[cohort]={tp:values[PRIMARY] for tp,values in data.groupby('timepoint')}
+    rows=[]
+    labels=sorted(set(groups['retrospective'])|set(groups['circall']))
+    for tp in labels:
+        result={'timepoint':tp,'matching_basis':'timepoint label only'}
+        means={}
+        for cohort in ('retrospective','circall'):
+            values=groups[cohort].get(tp,pd.Series(dtype=float))
+            result[cohort+'_sample_count']=len(values)
+            result[cohort+'_mean_ng_per_ml']=values.mean()
+            result[cohort+'_median_ng_per_ml']=values.median()
+            means[cohort]=values.mean()
+        r,c=means['retrospective'],means['circall']
+        both=np.isfinite(r) and np.isfinite(c)
+        result['comparison_status']='matched labels' if both else 'retrospective only' if np.isfinite(r) else 'circall only'
+        result['mean_difference_ng_per_ml']=c-r if both else np.nan
+        result['mean_ratio_circall_to_retrospective']=c/r if both and r!=0 else np.nan
+        result['mean_percent_difference']=(c/r-1)*100 if both and r!=0 else np.nan
+        rows.append(result)
+    return pd.DataFrame(rows)
+
+
 def paired_counts(data, timepoints):
     patients = {tp: set(data.loc[data.timepoint.eq(tp), 'patient_key'].dropna()) for tp in timepoints}
     return pd.DataFrame([{'timepoint_a': a, 'timepoint_b': b, 'paired_patients': len(patients[a] & patients[b])}

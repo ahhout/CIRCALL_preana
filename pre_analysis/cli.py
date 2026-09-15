@@ -9,7 +9,7 @@ ROOT=Path(__file__).resolve().parents[1]
 
 def arguments(argv=None):
     parser=argparse.ArgumentParser(description='Pre-analysis: shared cohort analyses or preserved legacy workflows')
-    parser.add_argument('--workflow',choices=['canonical','legacy'],default='legacy')
+    parser.add_argument('--workflow',choices=['canonical','legacy'],default='canonical')
     parser.add_argument('--cohort',choices=['all','retrospective','circall'])
     parser.add_argument('--analysis',choices=['all','inventory','volumes','yield','longitudinal'])
     parser.add_argument('--stage',choices=['all','retrospective','bilan'],help='Legacy mode only')

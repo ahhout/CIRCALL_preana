@@ -23,6 +23,9 @@ class CanonicalRunnerTests(unittest.TestCase):
             with self.subTest(args=args), redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
                 arguments(args)
 
+    def test_default_is_canonical(self):
+        self.assertEqual(arguments([]).workflow,'canonical')
+
     def test_canonical_defaults_and_relative_overrides(self):
         args=arguments(['--workflow','canonical','--inventory','my.xlsx'])
         self.assertEqual(args.inventory,Path('my.xlsx').resolve())
@@ -53,6 +56,7 @@ class CanonicalRunnerTests(unittest.TestCase):
         frame['genetic_subtype']=''
         frame['dna_total_ng_status']=''
         for metric in MEASUREMENTS:
+            if metric not in frame:frame[metric]=float('nan')
             frame[metric+'_status']=''
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'dummy.xlsx';source.write_text('synthetic mocked source')

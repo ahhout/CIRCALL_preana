@@ -143,7 +143,11 @@ def timepoint_plot(frame, cohorts, metric, path, *, longitudinal=False, connect=
             else:
                 ax.set_ylim(0,high+max(.05,high*.06))
                 ticks=[v for v in (0,.1,.5,1,2,5,10,20,50,100,200,500,1000,2000,5000,10000) if np.log10(1+v)<=ax.get_ylim()[1]]
-                ax.set_yticks(np.log10(1+np.asarray(ticks)),[f'{v:g}' for v in ticks])
+                spaced=[]
+                for value in ticks:
+                    if not spaced or np.log10(1+value)-np.log10(1+spaced[-1])>=ax.get_ylim()[1]/16:
+                        spaced.append(value)
+                ax.set_yticks(np.log10(1+np.asarray(spaced)),[f'{v:g}' for v in spaced])
     if subtype and used_subtypes:
         fig.legend(handles=[Line2D([],[],marker='o',linestyle='',color=palette[key],label=display_labels[key]) for key in sorted(used_subtypes)],
                    loc='center left',bbox_to_anchor=(1,.5),fontsize=8,title='Genetic subtype')
