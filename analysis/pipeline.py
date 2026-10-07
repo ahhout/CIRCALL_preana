@@ -24,7 +24,7 @@ LAYERED_WORKFLOWS = ('data_integrity', 'sample_statistics', 'advanced_analysis',
 PATH_OPTIONS = {'inventory', 'circall', 'donors', 'blood-counts', 'extraction-protocols', 'retrospective-blasts', 'rules', 'definitions'}
 STATISTICS = {'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions', 'assessment-time'}
 ADVANCED = {'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions',
-            'predictors', 'pool-cohorts', 'spearman-sensitivity', 'retrospective-wbc-unit'}
+            'predictors', 'pool-cohorts', 'spearman-sensitivity', 'retrospective-wbc-unit', 'sample-selection-seed'}
 DISEASE = {'inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts', 'cohort', 'analysis',
            'include-controls', 'pool-mrd', 'rules', 'definitions', 'blood-count-unit', 'retrospective-blast-unit',
            'baseline-day-max', 'baseline-selection', 'overlay-max-day', 'kinetics-y-scale',
@@ -38,7 +38,7 @@ CANONICAL = {'inventory', 'circall', 'donors', 'blood-counts', 'extraction-proto
              'longitudinal-followups', 'longitudinal-descriptive-visits'}
 ASSOCIATIONS = {'inventory', 'sheet', 'phase', 'blood-tissue', 'marrow-tissue', 'nucleic-acid', 'tube', 'log-level', 'predictors', 'circall', 'pool-cohorts', 'spearman-sensitivity', 'retrospective-wbc-unit'}
 BOOLEANS = {'spearman-sensitivity', 'pool-mrd', 'pool-cohorts', 'plot-diagnosis-as-d1', 'mixed-random-slope-sensitivity', 'include-controls'}
-INTEGERS = {'mixed-outlier-drop-n', 'baseline-day-max', 'overlay-max-day', 'trend-bootstrap-resamples', 'trend-bootstrap-seed', 'jitter-seed'}
+INTEGERS = {'mixed-outlier-drop-n', 'baseline-day-max', 'overlay-max-day', 'trend-bootstrap-resamples', 'trend-bootstrap-seed', 'jitter-seed', 'sample-selection-seed'}
 FLOATS = {'mrd-unknown-level', 'mrd-negative-level', 'mrd-positive-nq-level'}
 
 

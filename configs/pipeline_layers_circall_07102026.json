@@ -39,6 +39,7 @@
         ],
         "retrospective-wbc-unit": "x10^9/L",
         "spearman-sensitivity": true,
+        "sample-selection-seed": 123,
         "pool-cohorts": true
       }
     },

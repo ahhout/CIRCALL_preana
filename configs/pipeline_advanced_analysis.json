@@ -11,6 +11,7 @@
       "rules": "definitions/data_integrity.json",
       "definitions": "definitions/advanced_analysis.json",
       "predictors": ["peripheral_blast_percent"],
+      "sample-selection-seed": 123,
       "retrospective-wbc-unit": "x10^9/L",
       "spearman-sensitivity": true,
       "pool-cohorts": true

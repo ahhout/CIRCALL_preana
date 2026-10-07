@@ -37,8 +37,11 @@ def arguments(argv=None):
     p.add_argument('--pool-cohorts', action=argparse.BooleanOptionalAction, default=True, help='Compatible pooled descriptions; no pooled inference')
     p.add_argument('--retrospective-wbc-unit', choices=['unknown', 'x10^9/L'], default='unknown')
     p.add_argument('--validate-only', action='store_true')
+    p.add_argument('--sample-selection-seed', type=int, default=123, help='Reproducible selection of one numeric diagnosis sample per patient')
     engine.add_predictor_argument(p)
     a = p.parse_args(argv)
+    if a.sample_selection_seed < 0:
+        p.error('Sample selection seed must be nonnegative')
     try:
         engine.select_predictors(a.predictors)
     except ValueError:
@@ -55,6 +58,7 @@ def arguments(argv=None):
 def preflight(args):
     rules = load_rules(args.rules)
     definitions = load_definitions(args.definitions)
+    definitions['rules']['sample_selection_seed'] = args.sample_selection_seed
     inputs, states = capture_sources(args)
     inputs['definitions'] = args.definitions
     settings = {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items() if k not in ('output_dir', 'validate_only')}
@@ -63,7 +67,7 @@ def preflight(args):
     previews = {}
     for cohort, path in sources(args).items():
         try:
-            frame, counts, _, issues = prepare(path, cohort, definitions)
+            frame, counts, _, issues = prepare(path, cohort, definitions, sample_selection_seed=args.sample_selection_seed)
             previews[cohort] = dict(counts=counts, preparation_issues=len(issues), status='blocked' if issues else 'prepared')
         except Exception as error:
             previews[cohort] = dict(status='unavailable', error_code=type(error).__name__)
@@ -120,7 +124,7 @@ def run(args):
                 issues = [dict(reason='layer1_errors', field=g['field'], sheet=g['sheet'], rule=g['rule'], occurrences=g['count'])
                           for g in integrity['groups'] if g['severity'] == 'error']
             else:
-                frame, preparation_counts, evidence, issues = prepare(path, cohort, d)
+                frame, preparation_counts, evidence, issues = prepare(path, cohort, d, sample_selection_seed=args.sample_selection_seed)
                 counts.update(preparation_counts)
             status = 'blocked' if issues else 'complete'
             result, models, residuals = analyze(frame, cohort, args, d, status=status, counts=counts, blocking=issues)
@@ -194,7 +198,7 @@ def validate_results(output, record):
         validate_workbook(native/'associations.xlsx', result, d)
         if result['status'] == 'complete':
             rows = json.loads((native/'observations.json').read_text())
-            columns = ['subject_hash', 'cohort', 'cfdna_ng_per_ml', 'outcome_sample_n', 'eligible_sample_n',
+            columns = ['subject_hash', 'cohort', 'cfdna_ng_per_ml', 'outcome_sample_n', 'eligible_sample_n', 'available_outcome_sample_n',
                        *[p.variable for p in engine.PREDICTORS], *[p.variable+'_sample_n' for p in engine.PREDICTORS]]
             frame = pd.DataFrame(rows, columns=columns)
             if any(set(r) != set(columns) for r in rows):

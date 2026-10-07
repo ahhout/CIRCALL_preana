@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "canonical_missing_token": "na",
-  "definition_version": "diagnosis-1",
+  "definition_version": "diagnosis-2",
   "timepoint": "diag",
   "outcome": "cfdna_ng_per_ml_plasma",
   "outcome_unit": "ng/mL plasma",
@@ -13,7 +13,7 @@
       "required": ["patient_id", "sample_id", "timepoint", "specimen_type", "nucleic_acid", "tube", "cfdna_ng_per_ml_plasma"],
       "outcome_filters": {"specimen_type": "plasma", "nucleic_acid": "cfDNA", "tube": "Roche"},
       "sources": {"sex": ["sex"], "age_diag": ["age_diag"], "genetic_subtype": ["genetic_subtype"], "gb_per_l": ["GB_per_L"], "peripheral_blast_percent": ["cytology", "cytospin_%"], "tumor_fraction_percent": ["cytology", "cytospin_%"]},
-      "aggregation": {"sex": "first nonmissing eligible plasma", "age_diag": "median eligible plasma", "genetic_subtype": "first nonmissing diagnosis", "gb_per_l": "median diagnosis", "peripheral_blast_percent": "median eligible plasma; cytology then cytospin", "tumor_fraction_percent": "median diagnosis bone marrow; join by patient_id"}
+      "aggregation": {"sex": "selected diagnosis plasma sample; no fallback", "age_diag": "selected diagnosis plasma sample; no fallback", "genetic_subtype": "first nonmissing diagnosis", "gb_per_l": "selected diagnosis plasma sample; no fallback", "peripheral_blast_percent": "selected diagnosis plasma sample; cytology then cytospin", "tumor_fraction_percent": "median diagnosis bone marrow; join by patient_id"}
     },
     "circall": {
       "sheet": "cohorte_lal", "identity": "circall_id",
@@ -28,11 +28,13 @@
     "source_annotations": "Selected inventory/donor literal missing and unknown markers standardized to na; historical aliases remain readable. Clinical uncertain significance is unchanged.",
     "identity": "Recorded IDs, trimmed without case folding, qualified by cohort; no name fallback or cross-cohort linkage",
     "receipt": "Present sample ID required for outcome; missing/unknown tokens and formulas are not receipt evidence",
-    "outcome": "Median of all numeric eligible diagnosis plasma measurements, including zeros; reject negatives; no endpoint substitution or recalculation",
-    "log_analysis": "Predictor-specific complete pairs with positive patient medians; nonpositive medians counted; no pseudocount",
+    "outcome": "One uniformly randomly selected numeric eligible diagnosis plasma sample per patient, including zero candidates; reject negatives; no endpoint substitution or recalculation",
+    "sample_selection_seed": 123,
+    "sample_selection": "Independent seeded RNG per cohort-qualified patient; candidates sorted by cohort/patient/sample-ID hash, source row breaks repeated-ID ties; select once across predictors; no redraw for zero or missing clinical values; all-missing outcomes retain one selected eligible row with unavailable outcome",
+    "log_analysis": "Predictor-specific complete pairs with positive selected sample outcomes; nonpositive outcomes counted; no pseudocount",
     "clinical_validation": "Unknown/missing markers remain unavailable; malformed numeric clinical annotations or values outside approved ranges block the cohort",
     "blast_conversion": "Source fractions in [0,1] multiplied by 100 exactly once",
-    "categorical_discordance": "Retrospective first nonmissing with discordance counts; CIRCALL conflicting metadata block the cohort",
+    "categorical_discordance": "Retrospective sex from selected sample, subtype first nonmissing diagnosis, with discordance counts retained; CIRCALL conflicting metadata block the cohort",
     "inference": "Separate log10(cfDNA) OLS; existing HC3 continuous uncertainty, categorical omnibus, ordinary 95% intervals and estimability checks",
     "correction": "BH within cohort over configured predictors; unavailable tests enter adjustment as p=1 and remain unavailable",
     "sensitivity": "Selected peripheral-blast Spearman only; two-sided asymptotic unadjusted secondary analysis",

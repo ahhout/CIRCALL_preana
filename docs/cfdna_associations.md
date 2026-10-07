@@ -58,27 +58,39 @@ population, contributing outcome samples and clinical source records, nonpositiv
 pairs, and selected versus descriptive status. Summary contains selection
 exclusions, missing outcomes, integrity reviews, repeat counts and retrospective
 categorical discordance counts when present. Descriptions retain genuine zero
-medians on the original outcome scale; logarithmic models and figures require
-positive medians. A plasma row can contribute a clinical predictor independently
-of whether its cfDNA measurement is available.
+selected outcomes on the original scale; logarithmic models and figures require
+positive selected outcomes. Coverage counts one contributing outcome sample per
+patient; Summary also counts available but unselected numeric samples.
 
-The current implementation contributes one diagnosis observation per patient:
-the median of all available numeric eligible plasma cfDNA measurements, including
-genuine zeros. Cohort-qualified identities keep patients separate across cohorts.
-Missing outcomes are not filled, and negative outcomes are rejected. This gives
-each patient one outcome observation regardless of the number of contributing
-samples, but the median does not retain variation between those samples. A zero
-patient median remains in original-scale descriptions and is excluded from
-logarithmic models and figures. The exact eligibility and aggregation rules are
+Layer 3 selects one diagnosis sample per patient uniformly at random among
+eligible samples with an available numeric cfDNA outcome, including genuine zeros.
+The shipped profiles expose `sample-selection-seed`; the standalone CLI exposes
+`--sample-selection-seed`. Selection is reproducible for a fixed seed, with an
+independent generator per cohort-qualified patient and candidates ordered by
+hashed sample identity. Worksheet row order does not affect distinct sample IDs;
+repeated identical sample IDs use source row as the tie-break. The same selected
+sample is used across predictors. Selection does not favour positive outcomes or
+complete clinical annotations, and there is no redraw if the selected outcome is
+zero or a clinical value is missing. Patients with no numeric candidate retain an
+unavailable outcome; no value is imputed and negative outcomes remain errors.
+
+Retrospective sex, age, WBC and peripheral blood blasts come from that selected
+plasma row, preserving sample-level pairing without borrowing missing values from
+another row. Diagnosis subtype and matched marrow metadata retain their existing
+patient-level rules; CIRCALL clinical metadata must still be concordant. A selected
+zero outcome remains in descriptions but is excluded from logarithmic analyses.
+Selected rows and sample hashes are recorded only in local audit evidence; public
+reports do not contain sample or patient identifiers. The exact rules are
 in the [Layer 3 contract](workflow_contracts.md#layer-3-diagnosis-cfdna-associations--october-6-2026).
 
 The October 7 investigator review confirmed diagnosis-only scope and peripheral
 blood blast percentage as the current sole primary tested association, with more
-predictors to be considered later. The patient-median choice remains under review;
-retaining multiple diagnosis observations per patient is a proposed alternative,
-not an implemented or approved change. Before choosing an analysis, distinguish
-repeated assays of the same specimen from distinct collected specimens and
-establish whether clinical predictors can be matched to each observation.
+predictors to be considered later. The investigator subsequently approved random
+selection of one eligible diagnosis sample, replacing patient-median aggregation.
+Repeated collections remain distinct source records; this selection is an analysis
+rule, not a claim that they are duplicate records. It discards repeat measurements
+from inference and results can depend on the chosen seed; the primary seed must not
+be chosen by inspecting significance.
 
 The current primary analysis is ordinary least-squares regression of log10(cfDNA)
 on the selected predictor, separately within each cohort, with HC3 robust

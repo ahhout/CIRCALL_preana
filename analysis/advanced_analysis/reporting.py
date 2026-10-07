@@ -160,7 +160,7 @@ def figure(frame, predictor, model, coverage, association, scope, args, definiti
         if displayed.empty:
             ax.text(.5, .5, f'No positive {display_label} values for logarithmic display', transform=ax.transAxes, ha='center')
     if coverage['nonpositive_pairs']:
-        notes.append(f"Nonpositive patient medians excluded from log display/models: {coverage['nonpositive_pairs']}; no pseudocount")
+        notes.append(f"Nonpositive selected sample outcomes excluded from log display/models: {coverage['nonpositive_pairs']}; no pseudocount")
     if association and association['status'] != 'fit':
         notes.append('Fit unavailable: '+association['reason'])
     if association and association['status'] == 'fit':

@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import random
 
 import numpy as np
 import pandas as pd
@@ -50,7 +51,10 @@ def measurement(cell, d, *, maximum=None):
     return value, 'zero' if value == 0 else ('numeric_text' if state == 'text' else 'numeric')
 
 
-def prepare(path, cohort, d):
+def prepare(path, cohort, d, *, sample_selection_seed=None):
+    seed = d['rules']['sample_selection_seed'] if sample_selection_seed is None else sample_selection_seed
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ValueError('Sample selection seed must be a nonnegative integer')
     config = d['cohorts'][cohort]
     sheet = read_sheet(path, config['sheet'])
     headers = [c.value for c in sheet.headers]
@@ -69,7 +73,7 @@ def prepare(path, cohort, d):
     for field in config['required']:
         if field not in headers:
             issues.append(dict(reason='missing_header', field=field, sheet=sheet.name))
-    columns = ['subject_hash', 'cohort', 'cfdna_ng_per_ml', 'outcome_sample_n', 'eligible_sample_n',
+    columns = ['subject_hash', 'cohort', 'cfdna_ng_per_ml', 'outcome_sample_n', 'eligible_sample_n', 'available_outcome_sample_n',
                *[p.variable for p in engine.PREDICTORS], *[p.variable+'_sample_n' for p in engine.PREDICTORS]]
     if issues:
         return pd.DataFrame(columns=columns), dict(counts), evidence, issues
@@ -102,6 +106,9 @@ def prepare(path, cohort, d):
         marrow = token(value('specimen_type')) == 'bone marrow'
         row = dict(subject_hash=hashed, cohort=cohort, sheet=sheet.name, row=cells[0].row,
                    eligible_outcome=eligible, marrow=marrow, measurements={})
+        # Only the hash enters local evidence; source sample IDs stay in memory.
+        row['sample_hash'] = hashlib.sha256((cohort+'\0'+key+'\0'+str(value('sample_id')).strip()).encode()).hexdigest()
+        row['selected_sample'] = False
 
         def numeric(field, *, maximum=None, clinical=False):
             val, state = measurement(source.get(field), d, maximum=maximum)
@@ -153,20 +160,36 @@ def prepare(path, cohort, d):
         plasma = [r for r in rows if r['eligible_outcome']]
         if not plasma:
             continue
-        outcomes = [r['outcome'] for r in plasma if r['outcome'] is not None]
-        record = dict(subject_hash=hashed, cohort=cohort, cfdna_ng_per_ml=float(np.median(outcomes)) if outcomes else np.nan,
-                      outcome_sample_n=len(outcomes), eligible_sample_n=len(plasma))
+        candidates = [r for r in plasma if r['outcome'] is not None]
+        # A separate RNG per patient avoids changes when unrelated patients are
+        # added. Hash order is invariant to worksheet order for distinct samples;
+        # repeated identical sample IDs use source row as the explicit tie-break.
+        ordered = sorted(candidates or plasma, key=lambda r: (r['sample_hash'], r['row']))
+        rng = random.Random(f'{seed}\0{cohort}\0{hashed}')
+        selected = rng.choice(ordered)
+        selected['selected_sample'] = True
+        record = dict(subject_hash=hashed, cohort=cohort,
+                      cfdna_ng_per_ml=float(selected['outcome']) if candidates else np.nan,
+                      outcome_sample_n=int(bool(candidates)), eligible_sample_n=len(plasma),
+                      available_outcome_sample_n=len(candidates))
         for p in engine.PREDICTORS:
             values = [r[p.variable] for r in rows if r[p.variable] is not None]
-            record[p.variable+'_sample_n'] = len(values)
-            record[p.variable] = (values[0] if p.kind == 'categorical' or cohort == 'circall' else float(np.median(values))) if values else np.nan
+            if cohort == 'retrospective' and p.variable in ('sex', 'age_diag', 'gb_per_l', 'peripheral_blast_percent'):
+                value = selected[p.variable]
+                record[p.variable] = value if value is not None else np.nan
+                record[p.variable+'_sample_n'] = int(value is not None)
+            else:
+                record[p.variable+'_sample_n'] = len(values)
+                record[p.variable] = (values[0] if p.kind == 'categorical' or cohort == 'circall' else float(np.median(values))) if values else np.nan
             if cohort == 'retrospective' and p.kind == 'categorical' and len(set(values)) > 1:
                 counts['discordant_'+p.variable+'_patients'] += 1
         records.append(record)
     frame = pd.DataFrame(records, columns=columns)
     counts.update(eligible_patients=len(frame), patients_with_numeric_outcome=int(frame.cfdna_ng_per_ml.notna().sum()),
                   patients_with_missing_outcome=int(frame.cfdna_ng_per_ml.isna().sum()),
-                  patients_with_nonpositive_median=int(frame.cfdna_ng_per_ml.le(0).sum()),
-                  patients_with_positive_median=int(frame.cfdna_ng_per_ml.gt(0).sum()),
+                  patients_with_nonpositive_outcome=int(frame.cfdna_ng_per_ml.le(0).sum()),
+                  patients_with_positive_outcome=int(frame.cfdna_ng_per_ml.gt(0).sum()),
+                  selected_numeric_outcome_samples=int(frame.outcome_sample_n.sum()),
+                  unselected_numeric_outcome_samples=int((frame.available_outcome_sample_n-frame.outcome_sample_n).sum()),
                   patients_with_repeated_eligible_samples=int(frame.eligible_sample_n.gt(1).sum()))
     return frame, dict(counts), evidence, issues

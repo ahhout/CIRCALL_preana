@@ -88,7 +88,7 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
         for category, group in groups:
             values = group.cfdna_ng_per_ml
             desc = dict(predictor=p.variable, category=str(category), n=len(group),
-                        outcome_samples=int(group.outcome_sample_n.sum()), nonpositive_medians=int(values.le(0).sum()),
+                        outcome_samples=int(group.outcome_sample_n.sum()), nonpositive_outcomes=int(values.le(0).sum()),
                         median_cfdna_ng_per_ml=values.median(), q1_cfdna_ng_per_ml=values.quantile(.25),
                         q3_cfdna_ng_per_ml=values.quantile(.75), minimum_cfdna_ng_per_ml=values.min(), maximum_cfdna_ng_per_ml=values.max(),
                         status='descriptive', correlation_scale='log10(cfDNA), positive complete pairs')

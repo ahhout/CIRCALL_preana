@@ -17,7 +17,7 @@ def sources(tmp_path, **kwargs):
     circ = tmp_path/'circall.xlsx'
     data = [row(f'001-{i:04}-X-Z', 5+i**2, cytology=i/20,
                 **{'diag_blood_blast_pct':i/20, 'diag_bm_blast_pct':.5+i/20, 'diag_blood_wbc_x10*9/L':i+1}) for i in range(1, 6)]
-    fixture(retro, rows=data)
+    fixture(retro, rows=[*data, row('001-0001-X-Z', 40, cytology=.7, sample_id='PRIVATE_REPEAT_SENTINEL')])
     fixture(circ, 'circall', data, controls=True, **kwargs)
     donor = tmp_path/'donors.xlsx'
     b = Workbook()
@@ -71,10 +71,10 @@ def test_execution_failure_safe_report_and_peer_completion(tmp_path, monkeypatch
     paths = sources(tmp_path)
     monkeypatch.setattr(runner, 'figures', lambda *a: None)
     original = runner.prepare
-    def fail(path, cohort, d):
+    def fail(path, cohort, d, **kwargs):
         if cohort == 'retrospective':
             raise RuntimeError('PRIVATE_IDENTIFIER_SENTINEL')
-        return original(path, cohort, d)
+        return original(path, cohort, d, **kwargs)
     monkeypatch.setattr(runner, 'prepare', fail)
     output = tmp_path/'failed'
     assert runner.main(cli(paths, output)) == 1
@@ -100,13 +100,13 @@ def test_standalone_master_equivalence_privacy_artifacts_and_fresh_destination(t
     retro, circ, donor = paths
     hashes = [digest(p) for p in paths]
     options = {'inventory':str(retro), 'circall':str(circ), 'donors':str(donor), 'cohort':'all',
-               'retrospective-wbc-unit':'x10^9/L', 'include-controls':True}
+               'retrospective-wbc-unit':'x10^9/L', 'include-controls':True, 'sample-selection-seed':37}
     profile = tmp_path/'profile.json'
     profile.write_text(json.dumps({'schema_version':1, 'workflows':[dict(name='advanced_analysis', options=options)]}))
     standalone, master = tmp_path/'standalone', tmp_path/'master'
     assert integrated(['--config', str(profile), '--validate-only', '--output-dir', str(master)]) == 0
     assert not master.exists()
-    assert runner.main(cli(paths, standalone)) == 0
+    assert runner.main(cli(paths, standalone)+['--sample-selection-seed', '37']) == 0
     assert integrated(['--config', str(profile), '--output-dir', str(master)]) == 0
     assert [digest(p) for p in paths] == hashes
     from tests.validation.validate_advanced_analysis import compare
@@ -117,6 +117,12 @@ def test_standalone_master_equivalence_privacy_artifacts_and_fresh_destination(t
             relative = Path('.audit/workflows/03_advanced_analysis')/scope/name
             assert json.loads((standalone/relative).read_text()) == json.loads((master/relative).read_text())
     for output in (standalone, master):
+        record = json.loads((output/'.audit/workflows/03_advanced_analysis/run_manifest.json').read_text())
+        assert record['resolved_settings']['sample_selection_seed'] == 37
+        assert record['resolved_settings']['association_definition']['rules']['sample_selection_seed'] == 37
+        result = json.loads((output/'.audit/workflows/03_advanced_analysis/retrospective/associations.json').read_text())
+        assert result['summary']['unselected_numeric_outcome_samples'] == 1
+        assert result['tables']['Associations'][0]['contributing_outcome_samples'] == 5
         index = json.loads((output/'.audit/artifact_index.json').read_text())
         assert all(digest(output/a['path']) == a['sha256'] for a in index['artifacts'])
         assert all(digest(output/a['path']) == digest(output/a['source']) == a['sha256'] for a in index['publications'])
@@ -145,3 +151,4 @@ def test_profile_registration_and_definitions_provenance():
     args = workflow_args(entry)
     assert args.cohort == 'all' and args.include_controls and args.pool_cohorts and args.spearman_sensitivity
     assert args.predictors == ['peripheral_blast_percent'] and args.retrospective_wbc_unit == 'x10^9/L'
+    assert args.sample_selection_seed == 123
