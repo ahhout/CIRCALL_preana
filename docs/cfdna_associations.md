@@ -3,7 +3,8 @@
 ## Layer 3: harmonized diagnosis associations
 
 The read-only `advanced_analysis` workflow independently reads the explicitly
-selected October 5 inventories through the shared raw/cached cell reader. It
+selected inventories (October 5 retrospective and October 7 CIRCALL in the shipped
+profile) through the shared raw/cached cell reader. It
 does not consume Layer 2 summaries or change the older `cfdna_associations`
 preparation described below. Its scientific decisions and mappings are in the
 [Layer 3 contract](workflow_contracts.md#layer-3-diagnosis-cfdna-associations--october-6-2026)
@@ -19,7 +20,7 @@ Equivalent standalone command with the shipped scientific settings:
 ```bash
 conda run -n pre_analysis python -m analysis.advanced_analysis \
   --inventory input/cfDNA_inventaire_retrospective_05102026.xlsx \
-  --circall input/inventaire_CIRCALL_05102026.xlsx \
+  --circall input/inventaire_CIRCALL_07102026.xlsx \
   --donors input/cfDNA_donors.xlsx --cohort all --include-controls \
   --rules configs/definitions/data_integrity.json \
   --definitions configs/definitions/advanced_analysis.json \
@@ -60,6 +61,32 @@ categorical discordance counts when present. Descriptions retain genuine zero
 medians on the original outcome scale; logarithmic models and figures require
 positive medians. A plasma row can contribute a clinical predictor independently
 of whether its cfDNA measurement is available.
+
+The current implementation contributes one diagnosis observation per patient:
+the median of all available numeric eligible plasma cfDNA measurements, including
+genuine zeros. Cohort-qualified identities keep patients separate across cohorts.
+Missing outcomes are not filled, and negative outcomes are rejected. This gives
+each patient one outcome observation regardless of the number of contributing
+samples, but the median does not retain variation between those samples. A zero
+patient median remains in original-scale descriptions and is excluded from
+logarithmic models and figures. The exact eligibility and aggregation rules are
+in the [Layer 3 contract](workflow_contracts.md#layer-3-diagnosis-cfdna-associations--october-6-2026).
+
+The October 7 investigator review confirmed diagnosis-only scope and peripheral
+blood blast percentage as the current sole primary tested association, with more
+predictors to be considered later. The patient-median choice remains under review;
+retaining multiple diagnosis observations per patient is a proposed alternative,
+not an implemented or approved change. Before choosing an analysis, distinguish
+repeated assays of the same specimen from distinct collected specimens and
+establish whether clinical predictors can be matched to each observation.
+
+The current primary analysis is ordinary least-squares regression of log10(cfDNA)
+on the selected predictor, separately within each cohort, with HC3 robust
+uncertainty for continuous predictors. It has no patient random effect and is not
+a mixed-effects model. Peripheral-blast Spearman is a secondary analysis on the
+same complete patient pairs. If repeated observations are retained, dependence
+within patients must be addressed in the model and in any correlation inference;
+the current HC3 calculation does not provide patient-cluster adjustment.
 
 Continuous coefficients describe change in log10(cfDNA); fold changes use ten
 percentage points for blast predictors and one recorded unit otherwise. Ordinary
