@@ -803,3 +803,28 @@ Use `conda run -n pre_analysis python -m analysis.sample_annotations
 backed up under that destination. Rollback requires reviewing later edits and
 restoring only affected implementation/source files from their checkpoints.
 Retain existing results and migration evidence.
+
+## CIRCALL control/template formula repair — October 7, 2026
+
+The investigator requested repairing equations on `cohorte_control` and
+`template` in the selected October 5 CIRCALL workbook. Explicit sheet selection
+in `analysis.repair_inventory_formulas` repairs existing five-endpoint DNA/cfDNA
+formulas regardless of current cached quality. Use the approved operand columns,
+numeric-input guards, positive plasma-volume denominator and plasma-only ng/mL
+scope. Genuine measured numeric values and nonformula blanks remain untouched.
+Template planned-date/day expressions retain their recorded references, offsets
+and day-one convention, with numeric Excel-date guards to avoid invented results
+when dates are unavailable. No treatment schedule or clinical interpretation is
+changed, and the patient sheet remains byte-identical.
+
+The command is `conda run -n pre_analysis python -m analysis.repair_inventory_formulas
+--circall input/inventaire_CIRCALL_05102026.xlsx --sheets cohorte_control template
+--output-dir <fresh-migration-folder> --adopt`. Omission of `--sheets` retains the
+older defect-row correction scope. Original workbooks are backed up; unchanged
+cells/caches/extensions are verified. Edited formula caches are cleared and Excel
+is instructed to rebuild its calculation chain; open, recalculate and save in
+Excel before relying on derived results. No calculated cache is invented by Python.
+The implementation checkpoint is
+`archive/migrations/control_template_formulas_before_20261007/`; it records
+pre-change HEAD and the affected helper/test/contract hashes and excludes clinical
+data. Source backups and correction/validation records stay outside Git.

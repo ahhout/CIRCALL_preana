@@ -9,25 +9,28 @@ import tempfile
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
-from analysis.provenance import digest, write_json
+from analysis.provenance import ROOT, digest, envelope, utc_now, write_json
 from analysis.sample_io import read_sheet
 from analysis.workbook_cleanup import NS, REL
 from analysis.extraction_status import CELL, cell_xml
 
 
-def plan(source):
+def plan(source, sheets=None):
     from analysis.data_integrity.checks import inspect_cohort, load_rules
     from analysis.provenance import ROOT
     findings=inspect_cohort(source,'circall',True,load_rules(ROOT/'configs/definitions/data_integrity.json'))
     error_rows={(f['sheet'],int(re.search(r'\d+$',f['cell'])[0])) for f in findings['findings'] if f['severity']=='error' and f.get('cell')}
     changes={}
-    for name in ('cohorte_lal','cohorte_control'):
+    selected = sheets if sheets is not None else ('cohorte_lal','cohorte_control')
+    if not selected or len(set(selected))!=len(selected) or any(name not in ('cohorte_lal','cohorte_control','template') for name in selected):
+        raise ValueError('Select distinct supported CIRCALL sheets')
+    for name in selected:
         s=read_sheet(source,name);headers=[c.value for c in s.headers]
         if len([h for h in headers if h])!=len(set(h for h in headers if h)):
             raise ValueError('Duplicate headers')
         edits={}
         for row in s.rows:
-            if (name,row[0].row) not in error_rows:continue
+            if sheets is None and (name,row[0].row) not in error_rows:continue
             r={h:c for h,c in zip(headers,row) if h}
             def ref(f):return r[f].coordinate
             for field,a,b in [('dna_total_ng','dna_concentration_ng_per_ul','elution_volume_ul'),
@@ -40,12 +43,31 @@ def plan(source):
                 x,y=ref(a),ref(b)
                 if field=='dna_ng_per_ml_plasma':
                     formula=f'=IF(AND({ref("specimen_type")}="plasma",ISNUMBER({x}),ISNUMBER({y}),{y}>0),{x}/{y},"")'
+                elif sheets is not None and field=='cfdna_ng_per_ml_plasma':
+                    formula=f'=IF(AND({ref("specimen_type")}="plasma",ISNUMBER({x}),ISNUMBER({y})),{x}*{y},"")'
                 else:formula=f'=IF(AND(ISNUMBER({x}),ISNUMBER({y})),{x}*{y},"")'
                 if cell.formula!=formula:
                     edits[cell.coordinate]={'field':field,'formula':formula,'reason':'approved_guarded_calculation','old_formula':cell.formula}
             if name=='cohorte_lal' and row[0].row==199 and r['cfdna_fraction'].formula=='=AK199/AE199':
                 cell=r['cfdna_fraction']
                 edits[cell.coordinate]={'field':'cfdna_fraction','formula':None,'reason':'remove_invalid_identifier_division_no_measurement_available','old_formula':cell.formula}
+            if sheets is not None and name=='template':
+                for field in ('sampling_plan','day'):
+                    cell=r.get(field)
+                    if cell is None or cell.formula is None:continue
+                    # Retain the recorded reference/offset; guard numeric Excel dates.
+                    # Unsupported expressions require review, not guessed timing rules.
+                    expr=cell.formula[1:]
+                    if 'ISNUMBER(' in expr.upper():continue
+                    if field=='sampling_plan':
+                        match=re.fullmatch(r'(\$?[A-Z]+\$?\d+)(?:\+\d+)?',expr)
+                        if match is None:raise ValueError('Unsupported planned-date formula')
+                        formula=f'=IF(ISNUMBER({match[1]}),{expr},"")'
+                    else:
+                        match=re.fullmatch(r'(\$?[A-Z]+\$?\d+)-(\$?[A-Z]+\$?\d+)\+1',expr)
+                        if match is None:raise ValueError('Unsupported treatment-day formula')
+                        formula=f'=IF(AND(ISNUMBER({match[1]}),ISNUMBER({match[2]})),{expr},"")'
+                    edits[cell.coordinate]={'field':field,'formula':formula,'reason':'guard_recorded_date_calculation_preserve_offset','old_formula':cell.formula}
         changes[name]=edits
     return changes
 
@@ -72,12 +94,18 @@ def calculation_metadata(archive):
     return parts
 
 
-def run(source,destination,adopt=False):
+def run(source,destination,adopt=False,*,sheets=None):
     source=Path(source).resolve();destination=Path(destination).absolute()
     lock=source.with_name('~$'+source.name)
     if lock.exists():raise ValueError('Save and close Excel first')
     if destination.exists() or any(p.is_symlink() for p in (destination,*destination.parents)):raise ValueError('Fresh destination required')
-    before=digest(source);changes=plan(source)
+    before=digest(source);changes=plan(source,sheets)
+    provenance=envelope('inventory_formula_repair',{'sheets':list(changes),'adopt':adopt},
+                        {'circall':source,'rules':ROOT/'configs/definitions/data_integrity.json'},
+                        [Path(__file__),ROOT/'analysis/sample_io.py',ROOT/'analysis/extraction_status.py',
+                         ROOT/'analysis/data_integrity/checks.py',ROOT/'analysis/sample_definitions.py',
+                         ROOT/'analysis/workbook_cleanup.py',ROOT/'analysis/provenance.py'],
+                        ROOT/'environments/conda-linux-64.lock')
     original_sheets={name:read_sheet(source,name) for name in changes}
     materialized={}
     destination.mkdir(parents=True);backup=destination/'original.xlsx';shutil.copyfile(source,backup)
@@ -137,7 +165,8 @@ def run(source,destination,adopt=False):
         if any(cells.get(coord)!=cell for coord,cell in original_cells.items() if coord not in edits):raise ValueError('Unchanged source cells differ')
         for coord,edit in edits.items():
             if cells[coord].formula!=edit['formula'] or cells[coord].value is not None:raise ValueError('Formula verification failed')
-    report={'source_sha256':before,'updated_sha256':digest(output),'changes':changes,
+    report={**provenance,'source':str(source),'backup':str(backup),'output':str(output),
+            'source_sha256':before,'updated_sha256':digest(output),'changes':changes,
             'recalculation_required':True,'adopted':False,'shared_formula_materialized_preserving_values':materialized}
     write_json(destination/'formula_correction_report.json',report)
     if digest(source)!=before or lock.exists():raise ValueError('Source changed or reopened')
@@ -149,15 +178,19 @@ def run(source,destination,adopt=False):
             staged.replace(source)
         finally:staged.unlink(missing_ok=True)
         report['adopted']=True;write_json(destination/'formula_correction_report.json',report)
+    report.update(status='complete',finished_utc=utc_now())
+    write_json(destination/'formula_correction_report.json',report)
     return report
 
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
     p.add_argument('--circall',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);p.add_argument('--adopt',action='store_true')
+    p.add_argument('--sheets',nargs='+',choices=['cohorte_lal','cohorte_control','template'],
+                   help='Repair all existing calculation formulas on only these sheets; omission retains defect-row repair')
     a=p.parse_args(argv)
     try:
-        r=run(a.circall,a.output_dir,a.adopt)
+        r=run(a.circall,a.output_dir,a.adopt,sheets=a.sheets)
         print({k:len(v) for k,v in r['changes'].items()});print('Excel recalculation required; no numeric measurements changed')
         return 0
     except Exception as error:

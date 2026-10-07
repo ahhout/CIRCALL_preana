@@ -5,12 +5,52 @@ import re
 from pathlib import Path
 import unittest
 from openpyxl import load_workbook
-from analysis.repair_inventory_formulas import run
+from openpyxl.utils import get_column_letter
+from analysis.repair_inventory_formulas import run,plan
 from analysis.provenance import digest
 from analysis.sample_io import read_sheet
 from tests.sample_statistics.test_statistics import fixture
 
 class FormulaRepairTests(unittest.TestCase):
+    def test_explicit_controls_template_guards_dates_and_preserves_other_sheets(self):
+        with TemporaryDirectory() as t:
+            root=Path(t);source=root/'synthetic.xlsx';fixture(source)
+            b=load_workbook(source);control=b['cohorte_control']
+            template=b.copy_worksheet(control);template.title='template'
+            headers=[c.value for c in template[1]]
+            start=len(headers)+1;template.cell(1,start,'tt_d1_date')
+            sampled=start+1;template.cell(1,sampled,'sampling_date')
+            day=start+2;template.cell(1,day,'day')
+            for sheet in (control,template):
+                def ref(field):return get_column_letter(headers.index(field)+1)+'2'
+                sheet[ref('dna_total_ng')]='='+ref('elution_volume_ul')+'*'+ref('dna_concentration_ng_per_ul')
+                sheet[ref('dna_ng_per_ml_plasma')]='='+ref('dna_total_ng')+'/'+ref('extraction_input_volume_ml')
+                sheet[ref('cfdna_concentration_ng_per_ul')]='='+ref('cfdna_fraction')+'*'+ref('dna_concentration_ng_per_ul')
+                sheet[ref('cfdna_total_ng')]='='+ref('cfdna_fraction')+'*'+ref('dna_total_ng')
+                sheet[ref('cfdna_ng_per_ml_plasma')]='='+ref('cfdna_fraction')+'*'+ref('dna_ng_per_ml_plasma')
+            a=get_column_letter(start)+'2';e=get_column_letter(sampled)+'2'
+            template.cell(2,headers.index('sampling_plan')+1,'='+a+'+70')
+            template.cell(2,day,'='+e+'-'+a+'+1')
+            # Preserve a numeric endpoint even when it does not match inputs.
+            control[ref('cfdna_total_ng')]=123
+            b.save(source);b.close()
+            original=read_sheet(source,'cohorte_lal');before=digest(source)
+            report=run(source,root/'repair',True,sheets=['cohorte_control','template'])
+            self.assertEqual(digest(root/'repair/original.xlsx'),before)
+            self.assertEqual(read_sheet(source,'cohorte_lal').rows,original.rows)
+            self.assertEqual(len(report['changes']['cohorte_control']),4)
+            self.assertEqual(len(report['changes']['template']),7)
+            b=load_workbook(source);control=b['cohorte_control'];template=b['template']
+            self.assertEqual(control[ref('cfdna_total_ng')].value,123)
+            self.assertIn('>0',control[ref('dna_ng_per_ml_plasma')].value)
+            self.assertIn('="plasma"',control[ref('cfdna_ng_per_ml_plasma')].value)
+            self.assertEqual(template.cell(2,headers.index('sampling_plan')+1).value,f'=IF(ISNUMBER({a}),{a}+70,"")')
+            self.assertEqual(template.cell(2,day).value,f'=IF(AND(ISNUMBER({e}),ISNUMBER({a})),{e}-{a}+1,"")')
+            b.close()
+            self.assertFalse(any(plan(source,['cohorte_control','template']).values()))
+            self.assertEqual(report['status'],'complete')
+            self.assertIsNotNone(report['started_utc']);self.assertIsNotNone(report['finished_utc'])
+
     def test_preserve_measurements_and_invalidate_only_changed_caches(self):
         with TemporaryDirectory() as t:
             root=Path(t);source=root/'synthetic.xlsx';fixture(source)
