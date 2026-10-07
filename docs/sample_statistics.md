@@ -40,17 +40,27 @@ An omitted assessment timestamp is captured once during workflow execution.
 
 Outputs default to `outputs/layer2_sample_statistics/run_<timestamp>/`, with
 `{retrospective,circall,pooled}/statistics.xlsx` and PNG/PDF
-figures. Pooled output exists only when both cohorts are selected. Excel tabs are
-Summary, Receipt, Measurements, Availability, Definitions, CIRCALL Missed samples,
-and optional Controls. Main counts show the overall total and specimen/visit
-breakdown; do not add the total to its breakdown. Center and previous overlapping
-views remain in native audit statistics JSON, under `tables.audit_detail`, and
-are not exported as workbook rows. Measurement rows show metric/specimen/visit.
+figures. Pooled output exists only when both cohorts are selected. The workbook opens on **Inventory** and has
+up to four visible tabs:
+
+| Tab | What to read |
+| --- | --- |
+| Inventory | One overall row followed by specimen/visit counts: patients, inventory samples, received, marked missing, unassessed, overdue and DNA-ID-derived extracted counts. Timed receipt rates are assessed only where applicable; hover over a rate to see its exact numerator and denominator. Overall and breakdown rows overlap. |
+| Measurements | Received-sample measurements by specimen, visit and recorded DNA label, with units, measured/missing sample counts, median and Q1/Q3. Visits follow protocol order. Mean, SD, minimum, maximum, total and further coverage counts are retained in hidden columns. |
+| Controls | Optional separate control inventory and measurement tables. Controls never enter patient counts or pooled results. |
+| Overdue | CIRCALL only: approved patient pseudonyms and the specimen/visit/reason for samples explicitly marked missing beyond the deadline at this assessment. Source worksheet/row remain in hidden columns. |
+
+A hidden **Reference** tab preserves metadata, blocking reasons, all original main
+summary/receipt/measurement/availability rows, control tables and definitions. Unhide
+it in Excel for technical details. Hiding is a navigation choice, not access control.
+Center and previous overlapping views remain in native audit statistics JSON under
+`tables.audit_detail`; they are not added to the workbook. Filtering and formatting
+do not change sample populations, denominators or calculation results.
 
 Layer 1 is executed against the actual selected sources. Definite errors block the
 whole affected cohort, including its controls. Reports describing blocked outcomes
 are still published, independent cohorts finish, and the final exit is nonzero.
-A blocked workbook has reasons instead of zero-valued statistics. Preflight checks
+A blocked workbook shows reasons in Inventory and explicit blocked messages on the other tabs instead of zero-valued statistics. Preflight checks
 configuration/provenance; it does not certify clean clinical data.
 
 The audit retains source/rule/code/environment hashes, settings, raw-free integrity
@@ -128,5 +138,5 @@ The [October 7 Layer 2 review amendment](workflow_contracts.md#layer-2-measureme
 excludes albumin/DIN from this layer and combines pooled cohorts into one box per
 metric and nominal visit, with cohort-colored observations. cfDNA fragment size
 is pooled separately within plasma and CSF at the shared visits. Other statistical
-rules and source-integrity gates remain as previously defined. Worksheet selection
-and content will be reviewed separately with the investigator.
+rules and source-integrity gates remain as previously defined. The workbook layout
+uses the report organization described above; detailed evidence remains available.
