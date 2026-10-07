@@ -854,3 +854,27 @@ snapshot is `archive/migrations/layer2_simplification_before_20261007T110719Z/`;
 it records the affected file hashes and Git HEAD/status without clinical inputs,
 outputs or credentials. Original measurements, identity rules, integrity holds,
 controls, model scope and historical results are preserved.
+
+## Audited October 7 CIRCALL equation correction
+
+After the read-only audit of the investigator-selected
+`input/inventaire_CIRCALL_07102026.xlsx`, the investigator explicitly requested
+fixing the file. The audit identified 504 incorrect patient-sheet equations and
+983 unguarded date formulas; 208 day results had unavailable source dates.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Scope | Restrict edits to the cell locations in an explicit equation audit whose input hash matches the current workbook. Preserve all other formulas, measured numeric values, identifiers, metadata and sheets. Archive the original before adoption and verify reverse XML patches and reopened cells. | Investigator request to fix the audited file; existing preservation safeguards |
+| Derived endpoints | Replace the 168 incorrect DNA ng/mL formulas with guarded mass/plasma-volume division; replace 84 cfDNA amount and 84 cfDNA ng/mL formulas with fraction × the corresponding total-DNA endpoint. Use the approved operand headers and plasma applicability. | Approved five-equation contract and audited wrong operands |
+| Assay fields | Clear only the 84 recognized, audited fraction formulas and 84 fragment-size formulas whose caches are blank and whose derivations have incompatible units. Leave missing cells rather than inventing fraction/size measurements. Existing numeric assay observations remain unchanged; the original invalid formulas remain in the backup and correction log. The opt-in clearing flag requires a source-matched audit. | Investigator authorized correction following explicit audit findings; assay definitions |
+| Dates | Add numeric-input guards to the 436 planned-date and 547 treatment-day expressions, retaining references, offsets and day-one convention. Do not infer collection dates or retain derived day caches when source dates are unavailable. | Requested repair of audited equations; existing missing-date safeguards |
+| Unchanged assumptions | Retain the control/template formulas already verified and the auxiliary subtype weighting expressions. Their fixed 85%/15% scientific assumptions remain outside this repair's validation. Retain extraction-status/data-quality gates; equation correction does not resolve missing IDs or conflicting methods. | Audited scope and no unsupported scientific changes |
+
+Run the existing repair CLI with `--sheets cohorte_lal --audit <equation-audit.json>
+--clear-invalid-assay-formulas --adopt`, explicit `--circall` and a fresh
+`--output-dir`. Edited formula caches are cleared and Excel is instructed to
+recalculate. Open/recalculate/save in Excel before consuming derived results.
+The pre-change code/test/contract snapshot is
+`archive/migrations/circall_oct7_repair_before_20261007T115811Z/` and excludes
+clinical data and outputs. The original workbook and correction evidence are
+retained separately under the source repair destination, outside Git.

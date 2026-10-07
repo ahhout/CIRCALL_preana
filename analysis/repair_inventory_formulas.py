@@ -1,5 +1,6 @@
 """Repair approved CIRCALL formulas without recalculating or altering measurements."""
 import argparse
+import json
 from html import escape
 from pathlib import Path
 import posixpath
@@ -15,12 +16,20 @@ from analysis.workbook_cleanup import NS, REL
 from analysis.extraction_status import CELL, cell_xml
 
 
-def plan(source, sheets=None):
+def plan(source, sheets=None, *, audit=None, clear_invalid_assay_formulas=False):
     from analysis.data_integrity.checks import inspect_cohort, load_rules
     from analysis.provenance import ROOT
     findings=inspect_cohort(source,'circall',True,load_rules(ROOT/'configs/definitions/data_integrity.json'))
     error_rows={(f['sheet'],int(re.search(r'\d+$',f['cell'])[0])) for f in findings['findings'] if f['severity']=='error' and f.get('cell')}
     changes={}
+    allowed=None
+    if audit is not None:
+        evidence=json.loads(Path(audit).read_text())
+        if evidence.get('workflow')!='circall_equation_audit' or evidence['inputs']['inventory']['sha256']!=digest(source):
+            raise ValueError('Equation audit must match the current source hash')
+        allowed={(f['sheet'],f['cell']) for key in ('equation_defects','date_guard_findings') for f in evidence[key]}
+    if clear_invalid_assay_formulas and allowed is None:
+        raise ValueError('Clearing invalid assay formulas requires an explicit source-matched audit')
     selected = sheets if sheets is not None else ('cohorte_lal','cohorte_control')
     if not selected or len(set(selected))!=len(selected) or any(name not in ('cohorte_lal','cohorte_control','template') for name in selected):
         raise ValueError('Select distinct supported CIRCALL sheets')
@@ -51,7 +60,16 @@ def plan(source, sheets=None):
             if name=='cohorte_lal' and row[0].row==199 and r['cfdna_fraction'].formula=='=AK199/AE199':
                 cell=r['cfdna_fraction']
                 edits[cell.coordinate]={'field':'cfdna_fraction','formula':None,'reason':'remove_invalid_identifier_division_no_measurement_available','old_formula':cell.formula}
-            if sheets is not None and name=='template':
+            if clear_invalid_assay_formulas:
+                bad_fraction=f'=IF(AND({ref("specimen_type")}="plasma",ISNUMBER({ref("dna_ng_per_ml_plasma")}),ISNUMBER({ref("extraction_input_volume_ml")}),{ref("extraction_input_volume_ml")}>0),{ref("dna_ng_per_ml_plasma")}/{ref("extraction_input_volume_ml")},"")'
+                bad_size=f'=IF(AND({ref("specimen_type")}="plasma",ISNUMBER({ref("cfdna_concentration_ng_per_ul")}),ISNUMBER({ref("cfdna_fraction")})),{ref("cfdna_concentration_ng_per_ul")}*{ref("cfdna_fraction")},"")'
+                for field,wrong in (('cfdna_fraction',bad_fraction),('cfdna_avg_size_bp',bad_size)):
+                    cell=r[field]
+                    if cell.formula==wrong and (name,cell.coordinate) in allowed:
+                        if cell.value not in (None,''):
+                            raise ValueError('Invalid assay formula has a nonblank result; review before clearing')
+                        edits[cell.coordinate]={'field':field,'formula':None,'reason':'clear_audited_invalid_assay_formula_no_measurement_available','old_formula':cell.formula}
+            if sheets is not None and name in ('cohorte_lal','template'):
                 for field in ('sampling_plan','day'):
                     cell=r.get(field)
                     if cell is None or cell.formula is None:continue
@@ -68,7 +86,9 @@ def plan(source, sheets=None):
                         if match is None:raise ValueError('Unsupported treatment-day formula')
                         formula=f'=IF(AND(ISNUMBER({match[1]}),ISNUMBER({match[2]})),{expr},"")'
                     edits[cell.coordinate]={'field':field,'formula':formula,'reason':'guard_recorded_date_calculation_preserve_offset','old_formula':cell.formula}
-        changes[name]=edits
+        changes[name]={coord:item for coord,item in edits.items() if allowed is None or (name,coord) in allowed}
+    if allowed is not None and {(name,coord) for name,edits in changes.items() for coord in edits}!=allowed:
+        raise ValueError('Not every audited defect has an approved repair in the selected sheets')
     return changes
 
 
@@ -94,14 +114,16 @@ def calculation_metadata(archive):
     return parts
 
 
-def run(source,destination,adopt=False,*,sheets=None):
+def run(source,destination,adopt=False,*,sheets=None,audit=None,clear_invalid_assay_formulas=False):
     source=Path(source).resolve();destination=Path(destination).absolute()
     lock=source.with_name('~$'+source.name)
     if lock.exists():raise ValueError('Save and close Excel first')
     if destination.exists() or any(p.is_symlink() for p in (destination,*destination.parents)):raise ValueError('Fresh destination required')
-    before=digest(source);changes=plan(source,sheets)
-    provenance=envelope('inventory_formula_repair',{'sheets':list(changes),'adopt':adopt},
-                        {'circall':source,'rules':ROOT/'configs/definitions/data_integrity.json'},
+    before=digest(source);changes=plan(source,sheets,audit=audit,clear_invalid_assay_formulas=clear_invalid_assay_formulas)
+    inputs={'circall':source,'rules':ROOT/'configs/definitions/data_integrity.json'}
+    if audit is not None:inputs['equation_audit']=Path(audit)
+    provenance=envelope('inventory_formula_repair',{'sheets':list(changes),'adopt':adopt,'clear_invalid_assay_formulas':clear_invalid_assay_formulas},
+                        inputs,
                         [Path(__file__),ROOT/'analysis/sample_io.py',ROOT/'analysis/extraction_status.py',
                          ROOT/'analysis/data_integrity/checks.py',ROOT/'analysis/sample_definitions.py',
                          ROOT/'analysis/workbook_cleanup.py',ROOT/'analysis/provenance.py'],
@@ -188,9 +210,11 @@ def main(argv=None):
     p.add_argument('--circall',type=Path,required=True);p.add_argument('--output-dir',type=Path,required=True);p.add_argument('--adopt',action='store_true')
     p.add_argument('--sheets',nargs='+',choices=['cohorte_lal','cohorte_control','template'],
                    help='Repair all existing calculation formulas on only these sheets; omission retains defect-row repair')
+    p.add_argument('--audit',type=Path,help='Source-matched equation audit; restrict edits to its recorded defects')
+    p.add_argument('--clear-invalid-assay-formulas',action='store_true',help='Clear only audited, recognized invalid fraction/fragment-size formulas with blank caches')
     a=p.parse_args(argv)
     try:
-        r=run(a.circall,a.output_dir,a.adopt,sheets=a.sheets)
+        r=run(a.circall,a.output_dir,a.adopt,sheets=a.sheets,audit=a.audit,clear_invalid_assay_formulas=a.clear_invalid_assay_formulas)
         print({k:len(v) for k,v in r['changes'].items()});print('Excel recalculation required; no numeric measurements changed')
         return 0
     except Exception as error:

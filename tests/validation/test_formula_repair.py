@@ -2,6 +2,7 @@ from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 from io import BytesIO
 import re
+import json
 from pathlib import Path
 import unittest
 from openpyxl import load_workbook
@@ -12,6 +13,37 @@ from analysis.sample_io import read_sheet
 from tests.sample_statistics.test_statistics import fixture
 
 class FormulaRepairTests(unittest.TestCase):
+    def test_audited_repair_clears_only_invalid_assay_formulas_and_preserves_good_formulas(self):
+        with TemporaryDirectory() as t:
+            root=Path(t);source=root/'synthetic.xlsx';fixture(source)
+            b=load_workbook(source);sheet=b['cohorte_lal'];headers=[c.value for c in sheet[1]]
+            def ref(field):return get_column_letter(headers.index(field)+1)+'2'
+            volume=ref('extraction_input_volume_ml');mass=ref('dna_total_ng');specimen=ref('specimen_type')
+            normalized=ref('dna_ng_per_ml_plasma');fraction=ref('cfdna_fraction');concentration=ref('cfdna_concentration_ng_per_ul')
+            sheet[normalized]=f'=IF(AND(ISNUMBER({mass}),ISNUMBER({ref("elution_volume_ul")})),{mass}*{ref("elution_volume_ul")},"")'
+            sheet[fraction]=f'=IF(AND({specimen}="plasma",ISNUMBER({normalized}),ISNUMBER({volume}),{volume}>0),{normalized}/{volume},"")'
+            size=ref('cfdna_avg_size_bp')
+            sheet[size]=f'=IF(AND({specimen}="plasma",ISNUMBER({concentration}),ISNUMBER({fraction})),{concentration}*{fraction},"")'
+            healthy=ref('cfdna_total_ng');sheet[healthy]=f'=IF(AND(ISNUMBER({fraction}),ISNUMBER({mass})),{fraction}*{mass},"")'
+            plan_cell=ref('sampling_plan');sheet[plan_cell]='=A2+70'
+            b.save(source);b.close()
+            original=read_sheet(source,'cohorte_lal');original_cells={c.coordinate:c for row in original.rows for c in row}
+            audit=root/'audit.json';evidence={'workflow':'circall_equation_audit','inputs':{'inventory':{'sha256':digest(source)}},
+                'equation_defects':[{'sheet':'cohorte_lal','cell':c} for c in (normalized,fraction,size)],
+                'date_guard_findings':[{'sheet':'cohorte_lal','cell':plan_cell}]}
+            audit.write_text(json.dumps(evidence))
+            result=run(source,root/'repair',True,sheets=['cohorte_lal'],audit=audit,clear_invalid_assay_formulas=True)
+            self.assertEqual(len(result['changes']['cohorte_lal']),4)
+            after=read_sheet(source,'cohorte_lal');cells={c.coordinate:c for row in after.rows for c in row}
+            self.assertIsNone(cells[fraction].formula);self.assertIsNone(cells[size].formula)
+            self.assertIsNone(cells[fraction].value);self.assertIsNone(cells[size].value)
+            self.assertEqual(cells[healthy],original_cells[healthy])
+            self.assertEqual(cells[ref('dna_total_ng')],original_cells[ref('dna_total_ng')])
+            self.assertIn(f'{mass}/{volume}',cells[normalized].formula)
+            self.assertEqual(cells[plan_cell].formula,'=IF(ISNUMBER(A2),A2+70,"")')
+            with self.assertRaises(ValueError):plan(source,['cohorte_lal'],audit=audit,clear_invalid_assay_formulas=True)
+            with self.assertRaises(ValueError):plan(source,['cohorte_lal'],clear_invalid_assay_formulas=True)
+
     def test_explicit_controls_template_guards_dates_and_preserves_other_sheets(self):
         with TemporaryDirectory() as t:
             root=Path(t);source=root/'synthetic.xlsx';fixture(source)
