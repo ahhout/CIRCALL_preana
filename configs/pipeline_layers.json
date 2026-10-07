@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "workflows": [
+    {
+      "name": "data_integrity",
+      "options": {
+        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "cohort": "all",
+        "include-controls": true,
+        "donors": "../input/cfDNA_donors.xlsx",
+        "rules": "definitions/data_integrity.json"
+      }
+    },
+    {
+      "name": "sample_statistics",
+      "options": {
+        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "cohort": "all",
+        "include-controls": true,
+        "donors": "../input/cfDNA_donors.xlsx",
+        "rules": "definitions/data_integrity.json",
+        "definitions": "definitions/sample_statistics.json"
+      }
+    },
+    {
+      "name": "advanced_analysis",
+      "options": {
+        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "donors": "../input/cfDNA_donors.xlsx",
+        "cohort": "all",
+        "include-controls": true,
+        "rules": "definitions/data_integrity.json",
+        "definitions": "definitions/advanced_analysis.json",
+        "predictors": [
+          "peripheral_blast_percent"
+        ],
+        "retrospective-wbc-unit": "x10^9/L",
+        "spearman-sensitivity": true,
+        "pool-cohorts": true
+      }
+    },
+    {
+      "name": "disease_modeling",
+      "options": {
+        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "blood-counts": "../input/CIRCALL_wbc_blast_count_01102026.xlsx",
+        "retrospective-blasts": "../input/retrospective_blast_count_01102026.xlsx",
+        "donors": "../input/cfDNA_donors.xlsx",
+        "cohort": "all",
+        "analysis": "all",
+        "include-controls": true,
+        "pool-mrd": true,
+        "rules": "definitions/data_integrity.json",
+        "definitions": "definitions/disease_modeling.json",
+        "blood-count-unit": "x10^9/L",
+        "retrospective-blast-unit": "x10^9/L",
+        "baseline-day-max": 1,
+        "baseline-selection": "latest",
+        "overlay-max-day": 8,
+        "kinetics-y-scale": "log",
+        "mrd-unknown-level": 1e-06,
+        "mrd-negative-level": 1e-08,
+        "mrd-positive-nq-level": 1e-06,
+        "retrospective-mrd-duplicate-policy": "worst",
+        "jitter-seed": 42
+      }
+    }
+  ]
+}

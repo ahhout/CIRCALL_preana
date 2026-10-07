@@ -5,15 +5,17 @@ __pycache__/
 *.pyd
 *.so
 
-# Conda / venv artifacts
-.venv/
+# Local Conda artifacts
 .micromamba-root/
+.maintenance/
 
 # Data & outputs (often large / potentially sensitive)
 raw_data/
 runs/
 scratch/
 data/
+input/
+archive/
 output/
 outputs/
 results/

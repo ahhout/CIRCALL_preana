@@ -1,0 +1,138 @@
+schema_version: 1
+
+run:
+  name: blast_kinetics
+
+input:
+  path: ../../input/retrospective_blast_count_01102026.xlsx
+  format: excel
+  sheet: blast
+  delimiter: ","
+  decimal: ","
+
+columns:
+  subject: lastname
+  time: day
+  value: blast_count_x10*9/L
+  group: subtype
+
+measurement:
+  name: Blast count
+  unit: percent of baseline
+
+time:
+  minimum: 1
+  maximum: 15
+  tick_step: 1
+  minimum_measurements: 2
+
+normalization:
+  mode: percent_of_baseline
+  baseline_time: 1
+  output_baseline: 100
+  missing_baseline_policy: exclude
+  nonpositive_baseline_policy: exclude
+
+grouping:
+  require_constant_per_subject: true
+  unknown_policy: error
+  aliases:
+    B Other: B-Other
+    HeH: Hyperdiploidy
+    IGH::DUX4: DUX4-r
+    KMT2A: KMT2A-r
+    KMT2A::AFF1: KMT2A-r
+    PAX5 altered: PAX5alt
+    T Other: T-Other
+  colors:
+    B-Other: "#1f77b4"
+    DUX4-r: "#aec7e8"
+    ETV6::RUNX1: "#ff7f0e"
+    ETV6::RUNX1-like: "#ffbb78"
+    Hyperdiploidy: "#2ca02c"
+    KMT2A-r: "#98df8a"
+    MYC-r: "#d62728"
+    PAX5-r: "#ff9896"
+    PAX5alt: "#9467bd"
+    Ph+: "#c5b0d5"
+    Ph-like ABL-class: "#8c564b"
+    Ph-like JAK-class: "#c49c94"
+    T-Other: "#e377c2"
+    TCF3::PBX1: "#f7b6d2"
+    ZNF384-r: "#7f7f7f"
+    iAmp21: "#c7c7c7"
+
+bootstrap:
+  confidence: 0.95
+  resamples: 2000
+  minimum_observations: 2
+  seed: 42
+
+analysis:
+  winsorization:
+    enabled: true
+    lower_limit: 0.025
+    upper_limit: 0.025
+  model:
+    enabled: true
+    time_origin: 1
+    response_transform: log_offset
+    log_offset: 0.1
+    anchor_at_baseline: true
+
+plots:
+  scatter:
+    enabled: true
+    title: "Blast kinetics in the blood (n = {n_subjects})"
+    x_label: Day
+    y_label: "Blast count (% of baseline, log scale)"
+    y_scale: log
+    y_limits: [0.005, 170]
+    y_ticks:
+      values: [0.01, 0.1, 1, 10, 100]
+      labels: ["<LOD", "0.1", "1", "10", "100"]
+    detection_limit: 0.01
+    width: 12
+    height: 6
+    dpi: 450
+    title_fontsize: 16
+    label_fontsize: 14
+    legend_title: Subtype
+    legend_fontsize: 12
+    marker_size: 45
+    marker_alpha: 0.7
+    marker_edge_color: black
+    marker_edge_width: 0.3
+    jitter: 0.15
+    jitter_seed: 42
+    ci_color: black
+    ci_alpha: 0.18
+  model:
+    enabled: true
+    title: "ALL blast kinetics in the peripheral blood (total n = {n_subjects})"
+    x_label: Day
+    y_label: "Blast count (% of baseline)"
+    y_scale: linear
+    y_limits: [-8, 160]
+    y_ticks: null
+    detection_limit: 0.01
+    width: 10
+    height: 6
+    dpi: 450
+    title_fontsize: 16
+    label_fontsize: 14
+    legend_fontsize: 12
+    legend_columns: 4
+    marker_size: 30
+    marker_alpha: 0.8
+    marker_edge_color: white
+    marker_edge_width: 0.5
+    jitter: 0.1
+    jitter_seed: 42
+    trend_color: black
+    trend_marker: o
+    trend_marker_size: 6
+    trend_label: Baseline-anchored mixed-model trend
+
+output:
+  root: ../../output

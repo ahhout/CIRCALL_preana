@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "definition_version": "disease-tracking-1",
+  "missing_tokens": ["", "na", "n/a", "nan", "none", "-", "sk"],
+  "unknown_tokens": ["?"],
+  "visits": ["TP1", "TP2"],
+  "pooled_visits": ["Diagnosis", "TP1", "TP2"],
+  "mrd": {
+    "retrospective": {"sheet": "Inventaire", "identity": "patient_id", "value": "MRD_IgTCR", "visit": "timepoint", "specimen": "specimen_type", "specimen_filter": "bone marrow"},
+    "circall": {"sheet": "cohorte_lal", "identity": "circall_id", "values": {"TP1": "MRD_TP1", "TP2": "MRD_TP2"}},
+    "unit": "residual clone fraction",
+    "minimum_exclusive": 0,
+    "maximum_inclusive": 1,
+    "retrospective_population": "Identified patient/visit groups with selected marrow rows, including missing results",
+    "circall_population": "Identified patients with at least one nonmissing follow-up clinical MRD result",
+    "retrospective_repeat_priority": ["negative", "positive_nonquantifiable", "quantified"],
+    "pooled_denominator": "Fixed union of source-specific MRD populations; complete nominal visit grid; no enrolled-cohort denominator",
+    "pooled_status_display_groups": [
+      {"statuses": ["normalized_baseline", "quantified"], "label": "Quantifiable blasts", "color": "#D56757"},
+      {"statuses": ["positive_nonquantifiable", "unknown_significance"], "label": "Pos NQ", "color": "#E5AB48"},
+      {"statuses": ["negative"], "label": "Negative", "color": "#65A58C"}
+    ],
+    "default_display_levels": {"negative": 1e-8, "unknown_significance": 1e-6, "positive_nonquantifiable": 1e-6},
+    "default_duplicate_policy": "worst"
+  },
+  "counts": {
+    "retrospective": {"identity": "lastname", "sheets": {"blast": "blast_count_x10*9/L"}, "identity_rule": "Case-sensitive trimmed surname within count source only; no inventory linkage"},
+    "circall": {"identity": "circall_id", "sheets": {"blast": "blast_count_x10*9/L", "wbc": "wbc_count_x10*9/L"}, "identity_rule": "Recorded protocol ID; count-source namespace, separate from MRD"},
+    "day": "day",
+    "date_fields": ["tt_d1_date", "num_date"],
+    "unit": "x10^9/L",
+    "duplicate_rule": "Reject repeated measured subject/day/measurement; no averaging",
+    "missing_cache_rule": "Formula count/day without a saved result is unavailable, not zero; measured counts require an integer day",
+    "default_baseline_day_max": 1,
+    "default_baseline_selection": "latest",
+    "default_overlay_max_day": 8,
+    "default_y_scale": "log",
+    "full_range": "All selected observed counts, using diagnostic display baseline then recorded days; early-window view is separate"
+  },
+  "colors": {"retrospective": "#4C78A8", "circall": "#F58518"},
+  "default_jitter_seed": 42,
+  "rules": {
+    "scope": "Descriptive disease tracking only; normalized modeling disabled",
+    "integrity": "Whole-cohort inventory gate, selected controls included; additional clinical/count errors block affected cohort; reviews permit execution",
+    "identity": "Recorded patient_id/circall_id for inventory MRD; isolated legacy surname basis for retrospective counts; no name fallback or cross-modality/cohort linkage",
+    "eligibility": "Clinical annotations independent of plasma receipt, cfDNA availability and sample visit for CIRCALL metadata",
+    "unknown": "Unknown source marker is unavailable, distinct from clinical uncertain significance",
+    "normalization": "No baseline normalization of recorded counts; assumed MRD reference and categorical positions are display conventions only",
+    "privacy": "No patient-level MRD/count tables, identifiers, names, DOB or notes exported, including audit; source observations reconstructed in memory for validation",
+    "pooling": "Compatible MRD descriptions only, both cohorts with retained MRD populations; count comparisons retain separate cohort trajectories and denominators"
+  }
+}

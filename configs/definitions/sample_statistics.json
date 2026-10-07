@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "timezone": "Europe/Paris",
+  "grace_hours": 72,
+  "deadline_visits": ["diag", "d4", "d8", "d15", "tp1"],
+  "pooled_visits": ["diag", "tp1", "tp2"],
+  "visits": ["diag", "d4", "d8", "d15", "tp0,5", "tp1", "tp1,5", "tp2", "tp3", "maintenance start", "maintenance end", "3y post-rc", "après inotuzumab", "rc autre", "relapse"],
+  "specimens": ["plasma", "blood pellet", "CSF", "bone marrow"],
+  "missing_tokens": ["", "na", "n/a", "none", "nan", "-", "sk"],
+  "unknown_tokens": ["?"],
+  "manual_missed_token": "na",
+  "centers": {"001": "RDB", "002": "TRS"},
+  "retrospective_center": "RDB",
+  "metrics": {
+    "extraction_input_volume_ml": {"unit": "mL available specimen", "specimens": ["plasma", "CSF"], "sum": true, "pool": ["plasma", "CSF"]},
+    "elution_volume_ul": {"unit": "µL", "specimens": ["plasma", "blood pellet", "CSF", "bone marrow"], "sum": true, "pool": [], "exclude_cohorts": ["retrospective"]},
+    "dna_concentration_ng_per_ul": {"plot_scale": "log", "unit": "ng/µL", "specimens": ["plasma", "blood pellet", "CSF", "bone marrow"], "sum": false, "pool": ["plasma"]},
+    "dna_total_ng": {"unit": "ng", "specimens": ["plasma", "blood pellet", "CSF", "bone marrow"], "sum": true, "pool": ["plasma"]},
+    "dna_ng_per_ml_plasma": {"plot_scale": "log", "unit": "ng/mL recorded available plasma", "specimens": ["plasma"], "sum": false, "pool": ["plasma"]},
+    "cfdna_fraction": {"unit": "fraction", "specimens": ["plasma", "CSF"], "sum": false, "pool": []},
+    "cfdna_concentration_ng_per_ul": {"plot_scale": "log", "unit": "ng/µL", "specimens": ["plasma", "CSF"], "sum": false, "pool": ["plasma"]},
+    "cfdna_total_ng": {"unit": "ng", "specimens": ["plasma", "CSF"], "sum": true, "pool": ["plasma"]},
+    "cfdna_ng_per_ml_plasma": {"plot_scale": "log", "unit": "ng/mL recorded available plasma", "specimens": ["plasma"], "sum": false, "pool": ["plasma"]},
+    "cfdna_avg_size_bp": {"unit": "bp", "specimens": ["plasma", "CSF"], "sum": false, "pool": []},
+    "MNC_albumin_ng_per_uL": {"plot_scale": "log", "unit": "ng/µL (albumin assay)", "specimens": ["blood pellet", "bone marrow"], "sum": false, "pool": []},
+    "MNC_DIN": {"unit": "DNA integrity number", "specimens": ["blood pellet", "bone marrow"], "sum": false, "pool": []}
+  }
+}

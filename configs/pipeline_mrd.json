@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "workflows": [
+    {
+      "name": "canonical",
+      "options": {
+        "circall": "../input/inventaire_CIRCALL_01102026.xlsx",
+        "donors": "../input/cfDNA_donors.xlsx",
+        "extraction-protocols": "../configs/sample_analysis/extraction_protocols.json",
+        "cohort": "all",
+        "analysis": "mrd",
+        "pool-cohorts": false,
+        "mrd-unknown-level": 1e-06,
+        "mrd-negative-level": 1e-08,
+        "inventory": "../input/cfDNA_inventaire_retrospective.xlsx",
+        "retrospective-mrd-tissue": "Moelle",
+        "retrospective-mrd-duplicate-policy": "worst",
+        "pool-mrd": true
+      }
+    }
+  ]
+}

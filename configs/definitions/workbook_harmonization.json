@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "authorization": "Investigator approval on 2026-10-05; harmonize agreed headers and specimen labels in new copies, preserve identifiers and assay-specific fields.",
+  "header_mapping": {
+    "treatment_phase": "timepoint",
+    "tissue": "specimen_type",
+    "compartment": "specimen_type",
+    "volume_ml": "extraction_input_volume_ml",
+    "elution_volume_uL": "elution_volume_ul",
+    "dna_concentration_ng_per_uL": "dna_concentration_ng_per_ul",
+    "dna_ng_per_mL_plasma": "dna_ng_per_ml_plasma",
+    "cfDNA_fraction": "cfdna_fraction",
+    "cfDNA_ng/µl": "cfdna_concentration_ng_per_ul",
+    "cfDNA_total_ng": "cfdna_total_ng",
+    "cfDNA_ng_per_mL_plasma": "cfdna_ng_per_ml_plasma",
+    "cfDNA_avg_size_bp": "cfdna_avg_size_bp",
+    "dosage_pg/uL": "dosage_pg_per_ul"
+  },
+  "template_header_aliases": {
+    "volume": "extraction_input_volume_ml",
+    "elution_uL": "elution_volume_ul",
+    "dosage_ng/uL": "dna_concentration_ng_per_ul",
+    "dosage_ng_total": "dna_total_ng",
+    "dosage_ng/mL_plasma": "dna_ng_per_ml_plasma",
+    "cfDNA_pct": "cfdna_fraction",
+    "cfDNA_ng/mL_plasma": "cfdna_ng_per_ml_plasma"
+  },
+  "specimen_mapping": {
+    "Plasma": "plasma",
+    "plasma": "plasma",
+    "CSF": "CSF",
+    "LCR": "CSF",
+    "Moelle": "bone marrow",
+    "bone marrow": "bone marrow",
+    "blood pellet": "blood pellet"
+  },
+  "conditional_specimen_mapping": {
+    "source_label": "Sang",
+    "required_nucleic_acid": "celDNA",
+    "target_label": "blood pellet"
+  },
+  "selected_sheets": {
+    "retrospective": ["Inventaire"],
+    "circall": ["cohorte_lal", "cohorte_control", "template"]
+  },
+  "constraints": [
+    "One row represents one sample; do not merge or delete rows.",
+    "No identifier, MRD or assay-specific column renaming.",
+    "No numeric values, units, timepoint values, formulas, cached results or column positions are changed.",
+    "Source labels and schema remain recoverable from retained source files and the mapping report.",
+    "Existing formula errors remain review items; this operation is not a scientific validation or formula repair."
+  ]
+}

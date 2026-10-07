@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "workflow": "cfdna_associations",
+      "path": "input/cfDNA_inventaire_retrospective.xlsx",
+      "sha256": "2ddc64b0f4baee1824e11c1d8274ecd15356c19e4bff80ef617526ab90bd1cd8"
+    }
+  ]
+}

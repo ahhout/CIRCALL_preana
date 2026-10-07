@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "definition_version": "diagnosis-1",
+  "timepoint": "diag",
+  "outcome": "cfdna_ng_per_ml_plasma",
+  "outcome_unit": "ng/mL plasma",
+  "missing_tokens": ["", "na", "n/a", "none", "nan", "-", "sk"],
+  "unknown_tokens": ["?"],
+  "cohorts": {
+    "retrospective": {
+      "sheet": "Inventaire", "identity": "patient_id",
+      "required": ["patient_id", "sample_id", "timepoint", "specimen_type", "nucleic_acid", "tube", "cfdna_ng_per_ml_plasma"],
+      "outcome_filters": {"specimen_type": "plasma", "nucleic_acid": "cfDNA", "tube": "Roche"},
+      "sources": {"sex": ["sex"], "age_diag": ["age_diag"], "genetic_subtype": ["genetic_subtype"], "gb_per_l": ["GB_per_L"], "peripheral_blast_percent": ["cytology", "cytospin_%"], "tumor_fraction_percent": ["cytology", "cytospin_%"]},
+      "aggregation": {"sex": "first nonmissing eligible plasma", "age_diag": "median eligible plasma", "genetic_subtype": "first nonmissing diagnosis", "gb_per_l": "median diagnosis", "peripheral_blast_percent": "median eligible plasma; cytology then cytospin", "tumor_fraction_percent": "median diagnosis bone marrow; join by patient_id"}
+    },
+    "circall": {
+      "sheet": "cohorte_lal", "identity": "circall_id",
+      "required": ["circall_id", "sample_id", "timepoint", "specimen_type", "cfdna_ng_per_ml_plasma"],
+      "outcome_filters": {"specimen_type": "plasma"},
+      "sources": {"sex": [], "age_diag": [], "genetic_subtype": ["genetic_subtype"], "gb_per_l": ["diag_blood_wbc_x10*9/L"], "peripheral_blast_percent": ["diag_blood_blast_pct"], "tumor_fraction_percent": ["diag_bm_blast_pct"]},
+      "aggregation": {"sex": "unavailable; not derived", "age_diag": "unavailable; not derived", "genetic_subtype": "concordant diagnosis metadata", "gb_per_l": "concordant diagnosis metadata", "peripheral_blast_percent": "concordant diagnosis metadata", "tumor_fraction_percent": "concordant diagnosis metadata"}
+    }
+  },
+  "units": {"sex": "recorded category", "age_diag": "years", "genetic_subtype": "recorded category", "gb_per_l": "x10^9/L", "peripheral_blast_percent": "percentage points", "tumor_fraction_percent": "percentage points"},
+  "rules": {
+    "identity": "Recorded IDs, trimmed without case folding, qualified by cohort; no name fallback or cross-cohort linkage",
+    "receipt": "Present sample ID required for outcome; missing/unknown tokens and formulas are not receipt evidence",
+    "outcome": "Median of all numeric eligible diagnosis plasma measurements, including zeros; reject negatives; no endpoint substitution or recalculation",
+    "log_analysis": "Predictor-specific complete pairs with positive patient medians; nonpositive medians counted; no pseudocount",
+    "clinical_validation": "Unknown/missing markers remain unavailable; malformed numeric clinical annotations or values outside approved ranges block the cohort",
+    "blast_conversion": "Source fractions in [0,1] multiplied by 100 exactly once",
+    "categorical_discordance": "Retrospective first nonmissing with discordance counts; CIRCALL conflicting metadata block the cohort",
+    "inference": "Separate log10(cfDNA) OLS; existing HC3 continuous uncertainty, categorical omnibus, ordinary 95% intervals and estimability checks",
+    "correction": "BH within cohort over configured predictors; unavailable tests enter adjustment as p=1 and remain unavailable",
+    "sensitivity": "Selected peripheral-blast Spearman only; two-sided asymptotic unadjusted secondary analysis",
+    "pooling": "Descriptive only; both cohorts and comparable confirmed units per predictor; cohort colors; no controls or pooled inference",
+    "volume": "Legacy extraction_input_volume_ml is available specimen volume; entire volume used when extracted; retain recorded ng/mL endpoint; never use blood_volume_ml",
+    "unavailable": "Absolute peripheral/marrow blasts and hematocrit unavailable; no WBC-times-fraction derivation; Hb is not hematocrit",
+    "jitter_seed": 123
+  }
+}

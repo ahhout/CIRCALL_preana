@@ -1,0 +1,11 @@
+{
+  "repository": "multivariate_analysis_retrospective",
+  "revision": "81f14d045c02410e587ed239d62c6588d841ae95",
+  "snapshot": "archive/migrations/cfdna_associations_20261001T072810Z",
+  "original_files": {
+    "analyze_blast_cfdna.py": "dbe3857103a13169836e7a260b23b199add8a699ccd727d43ba2a25c0f7ce5b4",
+    "environment.yml": "fabd656dadbeb21403001491344d111efa9279c95b375dff7954c05ba262ac1e",
+    "tests/test_analyze_blast_cfdna.py": "53ad26e26d75084aea2dee17184fe92203c61541b285f1f55f56069e6f788567"
+  },
+  "test_adaptation": "Import engine through scripts.workflows.cfdna_associations; assertions unchanged."
+}

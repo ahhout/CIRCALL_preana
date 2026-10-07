@@ -1,0 +1,4218 @@
+{
+  "schema_version": 1,
+  "source_sha256": "6571d596b9fba977edf333f16de31e3113914b5fc27545d446c5e560859c8b14",
+  "predictors": [
+    {
+      "variable": "sex",
+      "label": "Sex",
+      "kind": "categorical",
+      "output_name": "cfDNA_sex",
+      "robust_se": false,
+      "figure_name": "log10_cfDNA_vs_sex.png"
+    },
+    {
+      "variable": "age_diag",
+      "label": "Age at diagnosis",
+      "kind": "continuous",
+      "output_name": "cfDNA_age_diag",
+      "robust_se": true,
+      "figure_name": "log10_cfDNA_vs_age_diag.png"
+    },
+    {
+      "variable": "genetic_subtype",
+      "label": "Genetic subtype",
+      "kind": "categorical",
+      "output_name": "cfDNA_genetic_subtype",
+      "robust_se": false,
+      "figure_name": "log10_cfDNA_vs_genetic_subtype.png"
+    },
+    {
+      "variable": "peripheral_blast_percent",
+      "label": "Peripheral blood blasts (%)",
+      "kind": "continuous",
+      "output_name": "cfDNA_vs_peripheral_blood_blast_percent",
+      "robust_se": true,
+      "figure_name": "log10_cfDNA_ng_per_mL_vs_peripheral_blood_blast_percent.png"
+    },
+    {
+      "variable": "gb_per_l",
+      "label": "Peripheral blood WBC count (source units)",
+      "kind": "continuous",
+      "output_name": "cfDNA_vs_peripheral_blood_wbc_count",
+      "robust_se": true,
+      "figure_name": "log10_cfDNA_ng_per_mL_vs_peripheral_blood_wbc_count.png"
+    },
+    {
+      "variable": "tumor_fraction_percent",
+      "label": "Bone marrow blasts (%)",
+      "kind": "continuous",
+      "output_name": "cfDNA_vs_bone_marrow_blast_percent",
+      "robust_se": true,
+      "figure_name": "log10_cfDNA_ng_per_mL_vs_bone_marrow_blast_percent.png"
+    }
+  ],
+  "cases": [
+    {
+      "name": "regular_sex",
+      "predictor": "sex",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "sex",
+            "log10_cfDNA ~ C(sex)",
+            "conventional OLS",
+            12,
+            "Intercept",
+            1.152122777127019,
+            1.054788263129808,
+            1.24945729112423,
+            0.043684222781019,
+            26.373887499439125,
+            1.41561e-10,
+            0.212755832738243,
+            0.654485525907338,
+            0.02083236260836,
+            -0.077084401130804,
+            -17.77065889776584,
+            -16.80084559818984,
+            10.0
+          ],
+          [
+            "fit",
+            "",
+            "sex",
+            "log10_cfDNA ~ C(sex)",
+            "conventional OLS",
+            12,
+            "C(sex)[T.M]",
+            0.028495766843744,
+            -0.109156022938106,
+            0.166147556625594,
+            0.061778820318644,
+            0.461254628961319,
+            0.654485525907338,
+            0.212755832738243,
+            0.654485525907338,
+            0.02083236260836,
+            -0.077084401130804,
+            -17.77065889776584,
+            -16.80084559818984,
+            10.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.1521227771270188,
+        1.180618543970763,
+        1.1521227771270188,
+        1.180618543970763,
+        1.1521227771270188,
+        1.180618543970763,
+        1.1521227771270188,
+        1.180618543970763,
+        1.1521227771270188,
+        1.180618543970763,
+        1.1521227771270188,
+        1.180618543970763
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            10.0,
+            0.166666666666667,
+            0.242532118093384,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "regular_age_diag",
+      "predictor": "age_diag",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "age_diag",
+            "log10_cfDNA ~ age_diag",
+            "HC3 robust",
+            12,
+            "Intercept",
+            0.971819842774993,
+            0.931625425338475,
+            1.012014260211511,
+            0.018039458088838,
+            53.871897813621196,
+            1.18e-13,
+            123.77066881739606,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ],
+          [
+            "fit",
+            "",
+            "age_diag",
+            "log10_cfDNA ~ age_diag",
+            "HC3 robust",
+            12,
+            "age_diag",
+            0.021616757530433,
+            0.017287395202235,
+            0.025946119858632,
+            0.001943039736657,
+            11.125226686112786,
+            5.93312431e-07,
+            123.77066881739606,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0150533578358591,
+        1.0425655946927739,
+        1.0700778315496888,
+        1.0975900684066036,
+        1.1251023052635185,
+        1.1526145421204332,
+        1.180126778977348,
+        1.207639015834263,
+        1.2351512526911776,
+        1.2626634895480926,
+        1.2901757264050073,
+        1.317687963261922
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            10.0,
+            0.294871794871795,
+            0.261446383169691,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "regular_genetic_subtype",
+      "predictor": "genetic_subtype",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1,
+          2
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            12,
+            "Intercept",
+            1.137738229951027,
+            1.012402123051127,
+            1.263074336850927,
+            0.055405569940536,
+            20.534726583845384,
+            7.193561e-09,
+            0.261530662884518,
+            0.775526562981091,
+            0.054925754216625,
+            -0.155090744846347,
+            -16.1959313352273,
+            -14.741211385863298,
+            9.0
+          ],
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            12,
+            "C(genetic_subtype)[T.B]",
+            0.029238109822267,
+            -0.148013912410616,
+            0.20649013205515,
+            0.078355308440917,
+            0.3731477854409,
+            0.717675620160379,
+            0.261530662884518,
+            0.775526562981091,
+            0.054925754216625,
+            -0.155090744846347,
+            -16.1959313352273,
+            -14.741211385863298,
+            9.0
+          ],
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            12,
+            "C(genetic_subtype)[T.C]",
+            0.056659181971325,
+            -0.120592840261558,
+            0.233911204204208,
+            0.078355308440917,
+            0.723105850754813,
+            0.487980359504559,
+            0.261530662884518,
+            0.775526562981091,
+            0.054925754216625,
+            -0.155090744846347,
+            -16.1959313352273,
+            -14.741211385863298,
+            9.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.1377382299510272,
+        1.166976339773294,
+        1.1943974119223522,
+        1.1377382299510272,
+        1.166976339773294,
+        1.1943974119223522,
+        1.1377382299510272,
+        1.166976339773294,
+        1.1943974119223522,
+        1.1377382299510272,
+        1.166976339773294,
+        1.1943974119223522
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            9.0,
+            0.25,
+            0.266945711856261,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "regular_peripheral_blast_percent",
+      "predictor": "peripheral_blast_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "peripheral_blast_percent",
+            "log10_cfDNA ~ peripheral_blast_percent",
+            "HC3 robust",
+            12,
+            "Intercept",
+            1.011652969010847,
+            0.978141162483902,
+            1.045164775537793,
+            0.01504026847208,
+            67.26295949363058,
+            1.3e-14,
+            123.77066881739441,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946714,
+            -47.73505360989114,
+            10.0
+          ],
+          [
+            "fit",
+            "",
+            "peripheral_blast_percent",
+            "log10_cfDNA ~ peripheral_blast_percent",
+            "HC3 robust",
+            12,
+            "peripheral_blast_percent",
+            0.003400388825012,
+            0.00271936553743,
+            0.004081412112594,
+            0.000305646700148,
+            11.12522668611271,
+            5.93312431e-07,
+            123.77066881739441,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946714,
+            -47.73505360989114,
+            10.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0150533578358594,
+        1.042565594692774,
+        1.070077831549689,
+        1.0975900684066038,
+        1.1251023052635187,
+        1.1526145421204337,
+        1.1801267789773484,
+        1.2076390158342634,
+        1.235151252691178,
+        1.262663489548093,
+        1.2901757264050078,
+        1.3176879632619227
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            10.0,
+            0.294871794871795,
+            0.261446383169703,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      },
+      "spearman": {
+        "spearman_n": 12,
+        "spearman_rho": 0.951048951048951,
+        "spearman_p_value": 2.038424632e-06,
+        "spearman_status": "computed",
+        "spearman_reason": "",
+        "spearman_method": "Two-sided scipy.stats.spearmanr; asymptotic p-value; average ranks for ties",
+        "spearman_inference": "Sensitivity only; unadjusted p-value; primary regression unchanged"
+      }
+    },
+    {
+      "name": "regular_gb_per_l",
+      "predictor": "gb_per_l",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "gb_per_l",
+            "log10_cfDNA ~ gb_per_l",
+            "HC3 robust",
+            12,
+            "Intercept",
+            1.009923957743892,
+            0.976133746846851,
+            1.043714168640933,
+            0.01516521776321,
+            66.59475475478459,
+            1.4e-14,
+            123.77066881739302,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ],
+          [
+            "fit",
+            "",
+            "gb_per_l",
+            "log10_cfDNA ~ gb_per_l",
+            "HC3 robust",
+            12,
+            "gb_per_l",
+            0.002564700045984,
+            0.002051046888401,
+            0.003078353203566,
+            0.000230530138247,
+            11.125226686112649,
+            5.93312431e-07,
+            123.77066881739302,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0150533578358596,
+        1.0425655946927743,
+        1.0700778315496893,
+        1.0975900684066042,
+        1.125102305263519,
+        1.152614542120434,
+        1.1801267789773489,
+        1.2076390158342638,
+        1.2351512526911785,
+        1.2626634895480935,
+        1.2901757264050082,
+        1.3176879632619234
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            10.0,
+            0.294871794871795,
+            0.261446383169716,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "regular_tumor_fraction_percent",
+      "predictor": "tumor_fraction_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "tumor_fraction_percent",
+            "log10_cfDNA ~ tumor_fraction_percent",
+            "HC3 robust",
+            12,
+            "Intercept",
+            0.958309369318472,
+            0.915746934557039,
+            1.000871804079906,
+            0.019102236255829,
+            50.16739173802475,
+            2.39e-13,
+            123.77066881739353,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ],
+          [
+            "fit",
+            "",
+            "tumor_fraction_percent",
+            "log10_cfDNA ~ tumor_fraction_percent",
+            "HC3 robust",
+            12,
+            "tumor_fraction_percent",
+            0.003782932567826,
+            0.003025294160391,
+            0.004540570975261,
+            0.000340031953915,
+            11.125226686112672,
+            5.93312431e-07,
+            123.77066881739353,
+            5.93312431e-07,
+            0.925644905317763,
+            0.91820939584954,
+            -48.70486690946716,
+            -47.73505360989115,
+            10.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0150533578358594,
+        1.042565594692774,
+        1.070077831549689,
+        1.097590068406604,
+        1.125102305263519,
+        1.1526145421204337,
+        1.1801267789773486,
+        1.2076390158342636,
+        1.2351512526911785,
+        1.2626634895480933,
+        1.2901757264050082,
+        1.3176879632619232
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            12,
+            10.0,
+            0.294871794871795,
+            0.261446383169711,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_sex",
+      "predictor": "sex",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": null,
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "sex",
+            "log10_cfDNA ~ C(sex)",
+            "conventional OLS",
+            10,
+            "Intercept",
+            1.182547332552423,
+            1.085864424034237,
+            1.279230241070608,
+            0.041926598067278,
+            28.205182081666656,
+            2.697377e-09,
+            0.131032120744244,
+            0.726739456167666,
+            0.01611506618083,
+            -0.106870550546567,
+            -17.19498281894417,
+            -16.589812632956075,
+            8.0
+          ],
+          [
+            "fit",
+            "",
+            "sex",
+            "log10_cfDNA ~ C(sex)",
+            "conventional OLS",
+            10,
+            "C(sex)[T.M]",
+            0.02146315233403,
+            -0.115267128142066,
+            0.158193432810125,
+            0.05929316361091,
+            0.361983591816318,
+            0.726739456167668,
+            0.131032120744244,
+            0.726739456167666,
+            0.01611506618083,
+            -0.106870550546567,
+            -17.19498281894417,
+            -16.589812632956075,
+            8.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.1825473325524227,
+        1.2040104848864523,
+        1.1825473325524227,
+        1.2040104848864523,
+        1.1825473325524227,
+        1.2040104848864523,
+        1.1825473325524227,
+        1.2040104848864523,
+        1.1825473325524227,
+        1.2040104848864523
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            8.0,
+            0.2,
+            0.208763384553099,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_age_diag",
+      "predictor": "age_diag",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": null,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "age_diag",
+            "log10_cfDNA ~ age_diag",
+            "HC3 robust",
+            10,
+            "Intercept",
+            0.96943857248661,
+            0.89225897703925,
+            1.046618167933969,
+            0.033468975301957,
+            28.965289906258736,
+            2.184522e-09,
+            50.25872437323909,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279775,
+            -38.305673156809654,
+            8.0
+          ],
+          [
+            "fit",
+            "",
+            "age_diag",
+            "log10_cfDNA ~ age_diag",
+            "HC3 robust",
+            10,
+            "age_diag",
+            0.021789767243904,
+            0.014702040883087,
+            0.028877493604721,
+            0.003073596552848,
+            7.089338782512731,
+            0.000103073005459,
+            50.25872437323909,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279775,
+            -38.305673156809654,
+            8.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0684829690498079,
+        1.0962154000875033,
+        1.1239478311251987,
+        1.151680262162894,
+        1.1794126932005897,
+        1.2071451242382851,
+        1.2348775552759805,
+        1.262609986313676,
+        1.2903424173513716,
+        1.318074848389067
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            8.0,
+            0.345454545454546,
+            0.317148453313125,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_genetic_subtype",
+      "predictor": "genetic_subtype",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": null,
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1,
+          2
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            10,
+            "Intercept",
+            1.183650973268036,
+            1.046173566544747,
+            1.321128379991325,
+            0.058139218791605,
+            20.358907427200258,
+            1.72926694e-07,
+            0.023751688568717,
+            0.976606511833588,
+            0.006740454682369,
+            -0.277047986836955,
+            -15.100152300984249,
+            -14.192397022002112,
+            7.0
+          ],
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            10,
+            "C(genetic_subtype)[T.B]",
+            0.017764533298917,
+            -0.17665787980904,
+            0.212186946406874,
+            0.082221271720865,
+            0.216057632375551,
+            0.835103873015656,
+            0.023751688568717,
+            0.976606511833588,
+            0.006740454682369,
+            -0.277047986836955,
+            -15.100152300984249,
+            -14.192397022002112,
+            7.0
+          ],
+          [
+            "fit",
+            "",
+            "genetic_subtype",
+            "log10_cfDNA ~ C(genetic_subtype)",
+            "conventional OLS",
+            10,
+            "C(genetic_subtype)[T.C]",
+            0.010746438654316,
+            -0.171119075885635,
+            0.192611953194267,
+            0.076910957171081,
+            0.139725717239631,
+            0.892812003338356,
+            0.023751688568717,
+            0.976606511833588,
+            0.006740454682369,
+            -0.277047986836955,
+            -15.100152300984249,
+            -14.192397022002112,
+            7.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.1943974119223517,
+        1.183650973268036,
+        1.201415506566953,
+        1.1943974119223517,
+        1.183650973268036,
+        1.201415506566953,
+        1.1943974119223517,
+        1.183650973268036,
+        1.201415506566953,
+        1.1943974119223517
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            7.0,
+            0.333333333333333,
+            0.307532017337893,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_peripheral_blast_percent",
+      "predictor": "peripheral_blast_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": null,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "peripheral_blast_percent",
+            "log10_cfDNA ~ peripheral_blast_percent",
+            "HC3 robust",
+            10,
+            "Intercept",
+            1.009590503138297,
+            0.944581988276048,
+            1.074599018000547,
+            0.028190979309104,
+            35.812537481173884,
+            4.04776e-10,
+            50.2587243732386,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485013,
+            -38.91084334279776,
+            -38.30567315680967,
+            8.0
+          ],
+          [
+            "fit",
+            "",
+            "peripheral_blast_percent",
+            "log10_cfDNA ~ peripheral_blast_percent",
+            "HC3 robust",
+            10,
+            "peripheral_blast_percent",
+            0.00342760383612,
+            0.002312680588351,
+            0.004542527083889,
+            0.000483487098201,
+            7.089338782512696,
+            0.000103073005459,
+            50.2587243732386,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485013,
+            -38.91084334279776,
+            -38.30567315680967,
+            8.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.068482969049808,
+        1.0962154000875035,
+        1.1239478311251991,
+        1.1516802621628945,
+        1.1794126932005902,
+        1.2071451242382856,
+        1.2348775552759812,
+        1.2626099863136766,
+        1.290342417351372,
+        1.3180748483890676
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            8.0,
+            0.345454545454546,
+            0.31714845331314,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      },
+      "spearman": {
+        "spearman_n": 10,
+        "spearman_rho": 0.915151515151515,
+        "spearman_p_value": 0.000204472406149,
+        "spearman_status": "computed",
+        "spearman_reason": "",
+        "spearman_method": "Two-sided scipy.stats.spearmanr; asymptotic p-value; average ranks for ties",
+        "spearman_inference": "Sensitivity only; unadjusted p-value; primary regression unchanged"
+      }
+    },
+    {
+      "name": "missing_gb_per_l",
+      "predictor": "gb_per_l",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": null,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "gb_per_l",
+            "log10_cfDNA ~ gb_per_l",
+            "HC3 robust",
+            10,
+            "Intercept",
+            1.007847653730101,
+            0.942317946248616,
+            1.073377361211586,
+            0.028416994783786,
+            35.466370085874296,
+            4.37292e-10,
+            50.25872437323834,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279773,
+            -38.30567315680964,
+            8.0
+          ],
+          [
+            "fit",
+            "",
+            "gb_per_l",
+            "log10_cfDNA ~ gb_per_l",
+            "HC3 robust",
+            10,
+            "gb_per_l",
+            0.002585226622158,
+            0.001744309935281,
+            0.003426143309035,
+            0.000364663997796,
+            7.089338782512678,
+            0.000103073005459,
+            50.25872437323834,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279773,
+            -38.30567315680964,
+            8.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0684829690498079,
+        1.0962154000875035,
+        1.123947831125199,
+        1.1516802621628945,
+        1.17941269320059,
+        1.2071451242382856,
+        1.234877555275981,
+        1.2626099863136764,
+        1.290342417351372,
+        1.3180748483890676
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            8.0,
+            0.345454545454546,
+            0.317148453313139,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "missing_tumor_fraction_percent",
+      "predictor": "tumor_fraction_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": null
+        },
+        {
+          "cfdna_ng_per_ml": null,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "ci95_low",
+          "ci95_high",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0,
+          1
+        ],
+        "data": [
+          [
+            "fit",
+            "",
+            "tumor_fraction_percent",
+            "log10_cfDNA ~ tumor_fraction_percent",
+            "HC3 robust",
+            10,
+            "Intercept",
+            0.95581996795917,
+            0.874449562482506,
+            1.037190373435835,
+            0.035286322446018,
+            27.087548423937406,
+            3.716247e-09,
+            50.258724373239,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279776,
+            -38.30567315680967,
+            8.0
+          ],
+          [
+            "fit",
+            "",
+            "tumor_fraction_percent",
+            "log10_cfDNA ~ tumor_fraction_percent",
+            "HC3 robust",
+            10,
+            "tumor_fraction_percent",
+            0.003813209267683,
+            0.00257285715454,
+            0.005053561380826,
+            0.000537879396748,
+            7.089338782512725,
+            0.000103073005459,
+            50.258724373239,
+            0.000103073005459,
+            0.887840395097789,
+            0.873820444485012,
+            -38.91084334279776,
+            -38.30567315680967,
+            8.0
+          ]
+        ]
+      },
+      "predictions": [
+        1.0684829690498083,
+        1.0962154000875037,
+        1.1239478311251991,
+        1.1516802621628945,
+        1.17941269320059,
+        1.2071451242382856,
+        1.234877555275981,
+        1.2626099863136764,
+        1.290342417351372,
+        1.3180748483890674
+      ],
+      "diagnostics": {
+        "columns": [
+          "status",
+          "n",
+          "df_resid",
+          "max_leverage",
+          "max_cooks_distance",
+          "note"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "review",
+            10,
+            8.0,
+            0.345454545454545,
+            0.317148453313135,
+            "Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "small_sex",
+      "predictor": "sex",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "sex",
+            "",
+            "conventional OLS",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "small_age_diag",
+      "predictor": "age_diag",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "age_diag",
+            "",
+            "HC3 robust",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "small_genetic_subtype",
+      "predictor": "genetic_subtype",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "genetic_subtype",
+            "",
+            "conventional OLS",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "small_peripheral_blast_percent",
+      "predictor": "peripheral_blast_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "peripheral_blast_percent",
+            "",
+            "HC3 robust",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      },
+      "spearman": {
+        "spearman_n": 2,
+        "spearman_rho": null,
+        "spearman_p_value": null,
+        "spearman_status": "unavailable",
+        "spearman_reason": "Requires at least three complete pairs and nonconstant variables",
+        "spearman_method": "Two-sided scipy.stats.spearmanr; asymptotic p-value; average ranks for ties",
+        "spearman_inference": "Sensitivity only; unadjusted p-value; primary regression unchanged"
+      }
+    },
+    {
+      "name": "small_gb_per_l",
+      "predictor": "gb_per_l",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "gb_per_l",
+            "",
+            "HC3 robust",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "small_tumor_fraction_percent",
+      "predictor": "tumor_fraction_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "At least 3 complete observations are required.",
+            "tumor_fraction_percent",
+            "",
+            "HC3 robust",
+            2,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "constant_sex",
+      "predictor": "sex",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "F",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "F",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "F",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "F",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "F",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "F",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "sex",
+            "",
+            "conventional OLS",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "constant_age_diag",
+      "predictor": "age_diag",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 2.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "age_diag",
+            "",
+            "HC3 robust",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "constant_genetic_subtype",
+      "predictor": "genetic_subtype",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "genetic_subtype",
+            "",
+            "conventional OLS",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "constant_peripheral_blast_percent",
+      "predictor": "peripheral_blast_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "peripheral_blast_percent",
+            "",
+            "HC3 robust",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      },
+      "spearman": {
+        "spearman_n": 12,
+        "spearman_rho": null,
+        "spearman_p_value": null,
+        "spearman_status": "unavailable",
+        "spearman_reason": "Requires at least three complete pairs and nonconstant variables",
+        "spearman_method": "Two-sided scipy.stats.spearmanr; asymptotic p-value; average ranks for ties",
+        "spearman_inference": "Sensitivity only; unadjusted p-value; primary regression unchanged"
+      }
+    },
+    {
+      "name": "constant_gb_per_l",
+      "predictor": "gb_per_l",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 22.272727272727273
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 29.545454545454547
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 36.81818181818181
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 44.09090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 51.36363636363636
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 58.63636363636363
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 65.9090909090909
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 73.18181818181819
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 80.45454545454545
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 87.72727272727272
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 95.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "gb_per_l",
+            "",
+            "HC3 robust",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    },
+    {
+      "name": "constant_tumor_fraction_percent",
+      "predictor": "tumor_fraction_percent",
+      "input": [
+        {
+          "cfdna_ng_per_ml": 10.0,
+          "sex": "F",
+          "age_diag": 2.0,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 1.0,
+          "gb_per_l": 2.0,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 11.578674345041959,
+          "sex": "M",
+          "age_diag": 3.272727272727272,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 9.090909090909092,
+          "gb_per_l": 12.727272727272727,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 12.484521369809757,
+          "sex": "F",
+          "age_diag": 4.545454545454545,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 17.181818181818183,
+          "gb_per_l": 23.454545454545453,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 12.463637244427693,
+          "sex": "M",
+          "age_diag": 5.818181818181818,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 25.272727272727273,
+          "gb_per_l": 34.18181818181818,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 12.294982082801022,
+          "sex": "F",
+          "age_diag": 7.090909090909091,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 33.36363636363637,
+          "gb_per_l": 44.90909090909091,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 12.931325063867064,
+          "sex": "M",
+          "age_diag": 8.363636363636363,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 41.45454545454546,
+          "gb_per_l": 55.63636363636363,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 14.751065113991505,
+          "sex": "F",
+          "age_diag": 9.636363636363637,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 49.54545454545455,
+          "gb_per_l": 66.36363636363636,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 17.229769359440887,
+          "sex": "M",
+          "age_diag": 10.909090909090908,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 57.63636363636364,
+          "gb_per_l": 77.0909090909091,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 19.035940114094227,
+          "sex": "F",
+          "age_diag": 12.181818181818182,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 65.72727272727273,
+          "gb_per_l": 87.81818181818181,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 19.34125894547121,
+          "sex": "M",
+          "age_diag": 13.454545454545455,
+          "genetic_subtype": "A",
+          "peripheral_blast_percent": 73.81818181818183,
+          "gb_per_l": 98.54545454545453,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 18.977506793474745,
+          "sex": "F",
+          "age_diag": 14.727272727272727,
+          "genetic_subtype": "B",
+          "peripheral_blast_percent": 81.90909090909092,
+          "gb_per_l": 109.27272727272727,
+          "tumor_fraction_percent": 15.0
+        },
+        {
+          "cfdna_ng_per_ml": 19.49846358538194,
+          "sex": "M",
+          "age_diag": 16.0,
+          "genetic_subtype": "C",
+          "peripheral_blast_percent": 90.0,
+          "gb_per_l": 120.0,
+          "tumor_fraction_percent": 15.0
+        }
+      ],
+      "table": {
+        "columns": [
+          "status",
+          "reason",
+          "predictor",
+          "formula",
+          "standard_error_type",
+          "n",
+          "term",
+          "coefficient",
+          "std_error",
+          "t_statistic",
+          "p_value",
+          "f_statistic",
+          "f_p_value",
+          "multiple_r_squared",
+          "adjusted_r_squared",
+          "aic",
+          "bic",
+          "df_resid"
+        ],
+        "index": [
+          0
+        ],
+        "data": [
+          [
+            "skipped",
+            "The predictor has fewer than 2 observed values.",
+            "tumor_fraction_percent",
+            "",
+            "HC3 robust",
+            12,
+            "",
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,526 @@
+{
+  "schema_version": 1,
+  "basis": "Existing methods on explicitly synthetic, identical prepared clinical observations; identity/source changes tested separately",
+  "method_sha256": {
+    "analysis/sample_analysis/mrd.py": "8e3633ba235a87c03a334768d5171b5e56126550b76dc01ea51cfce11e9e3f7c",
+    "analysis/sample_analysis/retrospective_mrd.py": "c94db2d23203ebaaf1042da33dce7f85fd0ae54dd4139e1104ac704ad27a3895",
+    "analysis/sample_analysis/blood_counts.py": "47b602d9009bcefb5e09ba0f517c2ac896c74cb287b8e7cb354634185055b94b",
+    "analysis/sample_analysis/retrospective_blasts.py": "1e52ccf891878b12f99459334f9ecc09115a86a5fc33264c866d66cd669ffea5",
+    "analysis/sample_analysis/pooled_mrd.py": "2c7fa2e3801d8b065d4cfb1efae1ac698794de785b77326d53a298e61fa3660d"
+  },
+  "mrd_observations": {
+    "retrospective": [
+      [
+        "TP1",
+        "quantified",
+        0.001,
+        null
+      ],
+      [
+        "TP2",
+        "negative",
+        null,
+        null
+      ]
+    ],
+    "circall": [
+      [
+        "Diagnosis",
+        "normalized_baseline",
+        null,
+        null
+      ],
+      [
+        "TP1",
+        "quantified",
+        0.001,
+        null
+      ],
+      [
+        "TP2",
+        "negative",
+        null,
+        null
+      ]
+    ]
+  },
+  "counts_summary": {
+    "retrospective": [
+      {
+        "measurement": "blast",
+        "source_rows": 6,
+        "patients_in_sheet": 1,
+        "patients_with_measurements": 1,
+        "measurements": 6,
+        "missing_counts": 0,
+        "plotted_measurements": 5,
+        "earlier_diagnostic_measurements_not_plotted": 1,
+        "zero_counts": 1,
+        "first_day": -2,
+        "last_day": 29
+      }
+    ],
+    "circall": [
+      {
+        "measurement": "blast",
+        "source_rows": 6,
+        "patients_in_sheet": 1,
+        "patients_with_measurements": 1,
+        "measurements": 6,
+        "missing_counts": 0,
+        "plotted_measurements": 5,
+        "earlier_diagnostic_measurements_not_plotted": 1,
+        "zero_counts": 1,
+        "first_day": -2,
+        "last_day": 29
+      },
+      {
+        "measurement": "wbc",
+        "source_rows": 6,
+        "patients_in_sheet": 1,
+        "patients_with_measurements": 1,
+        "measurements": 6,
+        "missing_counts": 0,
+        "plotted_measurements": 5,
+        "earlier_diagnostic_measurements_not_plotted": 1,
+        "zero_counts": 1,
+        "first_day": -2,
+        "last_day": 29
+      }
+    ]
+  },
+  "pooled_summary": [
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "normalized_baseline",
+      "patients": 2,
+      "denominator": 2,
+      "percent": 100.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "Diagnosis",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "quantified",
+      "patients": 2,
+      "denominator": 2,
+      "percent": 100.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP1",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "negative",
+      "patients": 2,
+      "denominator": 2,
+      "percent": 100.0
+    },
+    {
+      "cohort": "pooled",
+      "timepoint": "TP2",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 2,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "normalized_baseline",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "Diagnosis",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "quantified",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP1",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "negative",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "circall",
+      "timepoint": "TP2",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "normalized_baseline",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "Diagnosis",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "quantified",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "negative",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP1",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "normalized_baseline",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "quantified",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "positive_nonquantifiable",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "unknown_significance",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "negative",
+      "patients": 1,
+      "denominator": 1,
+      "percent": 100.0
+    },
+    {
+      "cohort": "retrospective",
+      "timepoint": "TP2",
+      "status": "missing",
+      "patients": 0,
+      "denominator": 1,
+      "percent": 0.0
+    }
+  ]
+}

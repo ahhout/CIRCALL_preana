@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "provenance": "Investigator-confirmed plasma extraction workflows, 2026-09-17",
+  "protocols": {
+    "circall": {
+      "workflow": "Maxwell",
+      "max_plasma_per_well_ml": 5,
+      "per_well_elution_options_uL": [50, 60],
+      "handling": "Plasma exceeding one-well capacity is split across wells; each well produces eluate.",
+      "unresolved": "Whether wells are combined into one recorded result, and how 50 versus 60 uL is selected, are not confirmed. Do not infer well count or per-well volume from recorded elution volume."
+    },
+    "retrospective": {
+      "workflow": "manual",
+      "max_plasma_per_well_ml": null,
+      "per_well_elution_options_uL": [],
+      "handling": "All plasma processed together by manual extraction; Maxwell well rules do not apply.",
+      "unresolved": "Detailed manual extraction settings are not confirmed."
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "workflows": [{
+    "name": "data_integrity",
+    "options": {
+      "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
+      "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+      "cohort": "all",
+      "include-controls": true,
+      "donors": "../input/cfDNA_donors.xlsx",
+      "rules": "definitions/data_integrity.json"
+    }
+  }]
+}
