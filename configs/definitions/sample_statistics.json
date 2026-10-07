@@ -1,9 +1,12 @@
 {
   "schema_version": 1,
   "canonical_missing_token": "na",
-  "definition_version": "sample-statistics-2",
+  "definition_version": "sample-statistics-3",
+  "pooled_display": "combined_box_per_visit_with_cohort_points",
   "extraction_basis": "dna_id",
-  "receipt_rule": "Literal na establishes missingness; overdue only after more than 72 hours with applicable CIRCALL timing. Blank/unknown IDs remain unassessed; undated na remains marked_na.",
+  "receipt_rule": "Received, marked missing or unassessed. Literal na marks missingness; a separate overdue flag requires more than 72 hours with applicable CIRCALL timing. Only assessed timing contributes receipt percentages.",
+  "inventory_views": ["overall", "specimen_visit"],
+  "measurement_views": ["visit"],
   "timezone": "Europe/Paris",
   "grace_hours": 72,
   "deadline_visits": ["diag", "d4", "d8", "d15", "tp1"],
@@ -25,8 +28,6 @@
     "cfdna_concentration_ng_per_ul": {"plot_scale": "log", "unit": "ng/µL", "specimens": ["plasma", "CSF"], "sum": false, "pool": ["plasma"]},
     "cfdna_total_ng": {"description": "Total amount of cfDNA in the extract", "unit": "ng", "specimens": ["plasma", "CSF"], "sum": true, "pool": ["plasma"]},
     "cfdna_ng_per_ml_plasma": {"plot_scale": "log", "unit": "ng/mL recorded available plasma", "specimens": ["plasma"], "sum": false, "pool": ["plasma"]},
-    "cfdna_avg_size_bp": {"unit": "bp", "specimens": ["plasma", "CSF"], "sum": false, "pool": []},
-    "MNC_albumin_ng_per_uL": {"plot_scale": "log", "unit": "ng/µL (albumin assay)", "specimens": ["blood pellet", "bone marrow"], "sum": false, "pool": []},
-    "MNC_DIN": {"unit": "DNA integrity number", "specimens": ["blood pellet", "bone marrow"], "sum": false, "pool": []}
+    "cfdna_avg_size_bp": {"unit": "bp", "specimens": ["plasma", "CSF"], "sum": false, "pool": ["plasma", "CSF"]}
   }
 }

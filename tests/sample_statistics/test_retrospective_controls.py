@@ -26,7 +26,7 @@ class DonorTests(unittest.TestCase):
         self.assertNotIn('PRIVATE_DONOR',json.dumps(r))
         rows,issues=observations(self.donors,self.d);self.assertFalse(issues)
         summary=aggregate(rows,self.d)
-        metric=next(m for m in summary['measurements'] if m['field']=='dna_ng_per_ml_plasma' and m['view']=='specimen')
+        metric=next(m for m in summary['measurements'] if m['field']=='dna_ng_per_ml_plasma' and m['view']=='visit')
         self.assertEqual(metric['n'],2);self.assertEqual(metric['mean'],1.25)
         self.assertTrue(all(r['classified_percentage'] is None for r in summary['receipt']))
         self.assertTrue(all(r['control'] for r in rows))

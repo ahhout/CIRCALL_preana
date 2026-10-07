@@ -77,7 +77,7 @@ def run(args):
             for row in rows:
                 item={k:v for k,v in row.items() if k not in ('patient_id','subject_key')}
                 item['subject_key']=hashlib.sha256(row['subject_key'].encode()).hexdigest()
-                if row['receipt']=='missed':item['patient_id']=row['patient_id']
+                if row.get('overdue',False):item['patient_id']=row['patient_id']
                 sanitized.append(item)
             write_json(native/'observations.json',sanitized)
         write_json(native/'statistics.json',result)

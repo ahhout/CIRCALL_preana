@@ -4,10 +4,11 @@ Layer 2 describes inventory samples and received-sample measurements. It does no
 run associations, tests, MRD or kinetics. Existing analysis profiles remain unchanged.
 
 The [October 7 shared amendment](workflow_contracts.md#shared-sample-annotations-and-receipt-revision--october-7-2026)
-defines current extraction (yes/no from DNA-ID presence), canonical literal `na`,
-and receipt logic. Only explicit `na` with applicable timing can become overdue;
-blank IDs remain unassessed. Undated `na` is marked missing with lateness
-unassessed and excluded from received/overdue percentages. Historical acceptance
+defines current extraction (yes/no from DNA-ID presence) and canonical literal `na`.
+The later [Layer 2 review amendment](workflow_contracts.md#layer-2-measurement-and-pooled-display-review--october-7-2026)
+uses Received, Marked missing and Unassessed, with a separate overdue flag. Only
+explicit `na` with applicable timing can become overdue; blank IDs remain
+unassessed. Untimed rows show counts only. Historical acceptance
 records retain their original source/rule hashes.
 The scientific decision table in [workflow_contracts.md](workflow_contracts.md#layer-2-descriptive-statistics--october-6-2026)
 is authoritative. Definitions are in `configs/definitions/sample_statistics.json`;
@@ -41,7 +42,10 @@ Outputs default to `outputs/layer2_sample_statistics/run_<timestamp>/`, with
 `{retrospective,circall,pooled}/statistics.xlsx` and PNG/PDF
 figures. Pooled output exists only when both cohorts are selected. Excel tabs are
 Summary, Receipt, Measurements, Availability, Definitions, CIRCALL Missed samples,
-and optional Controls. Distinct views overlap; do not sum across views.
+and optional Controls. Main counts show the overall total and specimen/visit
+breakdown; do not add the total to its breakdown. Center and previous overlapping
+views remain in native audit statistics JSON, under `tables.audit_detail`, and
+are not exported as workbook rows. Measurement rows show metric/specimen/visit.
 
 Layer 1 is executed against the actual selected sources. Definite errors block the
 whole affected cohort, including its controls. Reports describing blocked outcomes
@@ -111,11 +115,18 @@ beneath `figures/controls/`. Receipt-status plots stay at the corresponding figu
 root. Filenames contain the metric and an assay suffix only when multiple assays
 would otherwise collide. PNG/PDF pairs stay together; empty folders are not created.
 
-Concentration plots (ng/µL and ng/mL, including albumin) use base-10 logarithmic
+Concentration plots (ng/µL and ng/mL) use base-10 logarithmic
 y-axes with values displayed in their original units. Zero/nonpositive values are
 counted on the figure but cannot be plotted; boxplots use positive values only.
 Tables retain all observations, including genuine zeros, with no pseudocount.
 Mass, volume, fraction and size plots retain linear axes. Subtitles use one rule for every measurement: specimen · Patient samples or
 specimen · Controls. Internal DNA-type/group labels never appear in subtitles;
-measurement groupings and tables remain unchanged. The legacy assay key holds
+the concentration-scale change itself preserves stored values. The legacy assay key holds
 DNA-type metadata, and not_recorded means the label was absent, not missing DNA.
+
+The [October 7 Layer 2 review amendment](workflow_contracts.md#layer-2-measurement-and-pooled-display-review--october-7-2026)
+excludes albumin/DIN from this layer and combines pooled cohorts into one box per
+metric and nominal visit, with cohort-colored observations. cfDNA fragment size
+is pooled separately within plasma and CSF at the shared visits. Other statistical
+rules and source-integrity gates remain as previously defined. Worksheet selection
+and content will be reviewed separately with the investigator.

@@ -50,22 +50,30 @@ class RulesTests(unittest.TestCase):
 
     def test_receipt_boundary_and_fallback(self):
         for sample in ('na',):
-            for asof,expected in [('2026-09-30T23:59:59+02:00','not_yet_due'),('2026-10-01T00:00:00+02:00','pending'),('2026-10-04T00:00:00+02:00','pending'),('2026-10-04T00:00:01+02:00','missed')]:
-                with self.subTest(sample=sample,asof=asof):self.assertEqual(self.classify(sample,asof=asof)['receipt'],expected)
-        self.assertEqual(self.classify('SYNTHETIC',asof='2026-09-30T12:00:00+02:00')['receipt'],'received_early')
+            for asof,expected in [('2026-09-30T23:59:59+02:00','not_yet_due'),('2026-10-01T00:00:00+02:00','pending'),('2026-10-04T00:00:00+02:00','pending'),('2026-10-04T00:00:01+02:00','overdue')]:
+                with self.subTest(sample=sample,asof=asof):
+                    result=self.classify(sample,asof=asof)
+                    self.assertEqual(result['receipt'],'marked_missing')
+                    self.assertEqual(result['receipt_timing'],expected)
+                    self.assertEqual(result['overdue'],expected=='overdue')
+        early=self.classify('SYNTHETIC',asof='2026-09-30T12:00:00+02:00')
+        self.assertEqual(early['receipt'],'received');self.assertEqual(early['receipt_timing'],'received_early')
+        self.assertFalse(early['due_received'])
         for visit,plan in [('tp2',date(2026,1,1)),('tp1',None),('tp1','01/10/2026')]:
-            self.assertEqual(self.classify('na',visit,plan)['receipt'],'marked_na')
+            missing=self.classify('na',visit,plan)
+            self.assertEqual(missing['receipt'],'marked_missing')
+            self.assertFalse(missing['overdue']);self.assertFalse(missing['overdue_assessed'])
             self.assertEqual(self.classify(None,visit,plan)['receipt'],'unassessed')
             self.assertEqual(self.classify('?',visit,plan)['receipt'],'unassessed')
             self.assertEqual(self.classify('SYNTHETIC',visit,plan)['receipt'],'received')
-        self.assertEqual(self.classify('na',cohort='retrospective')['receipt'],'marked_na')
+        self.assertEqual(self.classify('na',cohort='retrospective')['receipt'],'marked_missing')
         for sample in (None, '', '?', 'sk'):
             self.assertEqual(self.classify(sample)['receipt'], 'unassessed')
 
     def test_only_explicit_overdue_missingness_enters_denominator(self):
         rows=[]
         for sample, planned in [(None,date(2026,10,1)),('?',date(2026,10,1)),('na',None),
-                                ('na',date(2026,10,1)),('SYNTHETIC',date(2026,10,1))]:
+                                ('na',date(2026,10,1)),('SYNTHETIC',date(2026,10,1)),('EARLY-SYNTHETIC',date(2026,10,10)),('UNTIMED-SYNTHETIC',None)]:
             rows.append(dict(subject_key='SYNTHETIC',patient_id='SYNTHETIC',center='RDB',visit='tp1',
                              specimen='plasma',control=False,extraction_status='no',measurements={},sheet='synthetic',row=2,
                              **self.classify(sample,planned=planned)))
@@ -73,12 +81,15 @@ class RulesTests(unittest.TestCase):
         overall=[r for r in tables['receipt'] if r['view']=='overall']
         self.assertTrue(all(r['classified_denominator']==2 for r in overall if r['basis']=='deadline'))
         self.assertEqual(len(tables['missed']),1)
-        self.assertTrue(all(r['classified_percentage'] is None for r in overall if r['status'] in ('unassessed','marked_na')))
+        self.assertTrue(all(r['classified_percentage'] is None for r in overall if r['status']=='unassessed' or r['basis']=='manual_or_id'))
+        received=next(r for r in overall if r['status']=='received')
+        self.assertEqual(received['samples'],2);self.assertEqual(received['classified_samples'],1)
+        self.assertEqual(received['classified_percentage'],.5)
 
     def test_dst_elapsed_not_wall_time(self):
         for start,at,after in [(date(2026,3,28),'2026-03-31T01:00:00+02:00','2026-03-31T01:00:01+02:00'),(date(2026,10,24),'2026-10-26T23:00:00+01:00','2026-10-26T23:00:01+01:00')]:
-            self.assertEqual(self.classify('na',planned=start,asof=at)['receipt'],'pending')
-            self.assertEqual(self.classify('na',planned=start,asof=after)['receipt'],'missed')
+            self.assertFalse(self.classify('na',planned=start,asof=at)['overdue'])
+            self.assertTrue(self.classify('na',planned=start,asof=after)['overdue'])
         with self.assertRaises(ValueError):core.assessment('2026-10-05T12:00:00')
 
     def test_measurements(self):
@@ -120,6 +131,9 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(issues,[]);self.assertEqual(skipped,2)
         t=core.aggregate([r for r in rows if not r['control']],D)
         self.assertEqual(t['summary'][0],dict(view='overall',samples=2,patients=1,received_samples=1,received_patients=1))
+        self.assertEqual({r['view'] for r in t['summary']},{'overall','specimen_visit'})
+        self.assertFalse(any('center' in r for key in ('summary','receipt','measurements','availability') for r in t[key]))
+        self.assertTrue(any('center' in r for r in t['audit_detail']['summary']))
         receipts=[r for r in t['receipt'] if r['view']=='overall']
         self.assertEqual([r['classified_percentage'] for r in receipts],[.5,.5])
         self.assertEqual(len(t['missed']),1)

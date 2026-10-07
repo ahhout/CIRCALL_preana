@@ -828,3 +828,29 @@ The implementation checkpoint is
 `archive/migrations/control_template_formulas_before_20261007/`; it records
 pre-change HEAD and the affected helper/test/contract hashes and excludes clinical
 data. Source backups and correction/validation records stay outside Git.
+
+## Layer 2 measurement and pooled display review — October 7, 2026
+
+The investigator requested excluding albumin/DIN, combining pooled plot bins,
+and pooling cfDNA fragment sizes during Layer 2 review. These changes supersede
+the corresponding measurement/display rows in the October 6 Layer 2 contract.
+The investigator then confirmed three receipt labels plus a separate overdue
+flag, and moving center detail to audit evidence. Worksheet/content redesign
+remains explicitly deferred until after these modifications.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Metric exclusions | Remove `MNC_albumin_ng_per_uL` and `MNC_DIN` from Layer 2 metrics, tables, availability summaries and figures. Preserve source values and original Layer 1 integrity scope; other DNA measurements remain selected. | Investigator: “exclude these” |
+| Pooled bins | One combined distribution per metric and nominal visit, using all eligible samples from both cohorts. Cohort-colored points share the bin and retain a legend. Concentration boxes use positive values under the retained log display; tables retain genuine zeros. Metrics/units and specimens remain separate. No new inferential model or patient averaging. | Investigator: pooled endpoints are plotted together, not in separate bins |
+| Fragment size | Extend pooled `cfdna_avg_size_bp` to plasma and CSF separately, using the existing shared diag/TP1/TP2 visits and received-sample rules. Within each specimen, combine cohort contributions even when DNA-type metadata are unavailable in one cohort; do not impute metadata. Retain cohort-colored points and contribution counts. | Investigator explicitly requested merged fragment sizes with clear cohort colors; existing metric specimen/visit scope |
+| Receipt categories | Received (actual sample ID), Marked missing (literal na), Unassessed (blank/unknown ID). A separate overdue flag requires the retained applicable CIRCALL visit/date and more than 72 elapsed hours; exactly 72 is not overdue. Early/future/pending timing remains recorded in audit observations, without extra receipt categories. Measurements still include early received samples. | Investigator confirmed “three labels plus overdue flag” |
+| Timed percentages | Only reliable applicable timing supplies rates: due received + overdue missing. Early receipt, pending/future marked missing and unassessed receipt stay outside that denominator. Untimed rows show counts only, fixing the former received-only 100% manual rate. Main receipt rows distinguish all-category counts from assessed numerator/overdue counts. | Confirmed retention of the timed denominator; earlier review identified undated 100% issue |
+| Main grouping | Inventory/receipt counts show one overall total plus specimen-by-visit breakdown; measurement summaries show metric/specimen/visit with existing applicable DNA-type distinctions. Full previous center and overlapping views, plus pooled cohort contributions, remain under `tables.audit_detail` in native statistics JSON. Audit observations retain source metadata. These details are excluded from visible workbook rows; source population and sample weighting do not change. | Investigator confirmed moving center detail to audit evidence |
+| Reports | Preserve current worksheet selection pending the requested worksheet-by-worksheet review. Do not infer a full workbook redesign from measurement/plot changes. | Investigator requested report review after other modifications |
+
+The scientific settings are versioned as `sample-statistics-3` in
+`configs/definitions/sample_statistics.json`. The pre-change scoped implementation
+snapshot is `archive/migrations/layer2_simplification_before_20261007T110719Z/`;
+it records the affected file hashes and Git HEAD/status without clinical inputs,
+outputs or credentials. Original measurements, identity rules, integrity holds,
+controls, model scope and historical results are preserved.
