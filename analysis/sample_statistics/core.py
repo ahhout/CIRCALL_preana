@@ -11,6 +11,7 @@ import numpy as np
 from analysis.configuration import unique_object
 from analysis.data_integrity.checks import number
 from analysis.sample_io import read_sheet
+from analysis.sample_definitions import extraction_state
 
 
 def load_definitions(path):
@@ -61,13 +62,13 @@ def receipt(sample, visit, planned, cohort, as_of, d, control=False):
     basis = 'deadline' if timed else ('retrospective_inventory' if cohort == 'retrospective' else 'manual_or_id')
     if kind == 'present':
         status = 'received_early' if timed and as_of < start else 'received'
-    elif timed:
+    elif timed and kind == 'manual_na':
         status = ('not_yet_due' if as_of < start else
                   'pending' if as_of <= start + timedelta(hours=d['grace_hours']) else 'missed')
     elif cohort == 'retrospective' or control:
         status = {'manual_na': 'marked_na', 'unknown': 'unknown', 'absent': 'absent'}[kind]
     else:
-        status = 'missed' if kind == 'manual_na' else 'unassessed'
+        status = 'marked_na' if kind == 'manual_na' else 'unassessed'
     return dict(receipt=status, receipt_basis=basis, receipt_reason=(
         'deadline_elapsed' if status == 'missed' and timed else
         'manual_na' if status == 'missed' else status), id_state=kind)
@@ -84,7 +85,7 @@ def measurement(cell, extraction_status, d):
     if s in d['unknown_tokens']:
         return {'value': None, 'state': 'unknown'}
     if cell.value is None or s == '':
-        return {'value': None, 'state': 'not_applicable' if extraction_status == 'not_extracted' else 'blank'}
+        return {'value': None, 'state': 'not_applicable' if extraction_status == 'no' else 'blank'}
     if s in d['missing_tokens']:
         return {'value': None, 'state': 'not_applicable' if s in ('na', 'n/a') else 'missing_marker'}
     value, state = number(cell.value, d['missing_tokens'], d['unknown_tokens'])
@@ -129,8 +130,7 @@ def prepare(path, cohort, controls, as_of, d):
             specimen = specimen if specimen in d['specimens'] else 'unclassified'
             acid = token(val('nucleic_acid'))
             assay = acid if acid in ('cfdna', 'celdna') else 'not_recorded'
-            extraction = token(val('extraction_status'))
-            extraction = extraction if extraction in ('not_extracted', 'extracted', 'pending', 'unknown') else 'unclassified'
+            extraction = extraction_state(source.get(d['extraction_basis']), d['missing_tokens'], d['unknown_tokens'])
             item = dict(cohort=cohort, sheet=sheet_name, row=row, patient_id=pid,
                         subject_key=f'{cohort}:{sheet_name}:{pid}', center=center,
                         visit=visit, specimen=specimen, assay=assay, control=control,

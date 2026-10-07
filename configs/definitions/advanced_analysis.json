@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "canonical_missing_token": "na",
   "definition_version": "diagnosis-1",
   "timepoint": "diag",
   "outcome": "cfdna_ng_per_ml_plasma",
@@ -24,6 +25,7 @@
   },
   "units": {"sex": "recorded category", "age_diag": "years", "genetic_subtype": "recorded category", "gb_per_l": "x10^9/L", "peripheral_blast_percent": "percentage points", "tumor_fraction_percent": "percentage points"},
   "rules": {
+    "source_annotations": "Selected inventory/donor literal missing and unknown markers standardized to na; historical aliases remain readable. Clinical uncertain significance is unchanged.",
     "identity": "Recorded IDs, trimmed without case folding, qualified by cohort; no name fallback or cross-cohort linkage",
     "receipt": "Present sample ID required for outcome; missing/unknown tokens and formulas are not receipt evidence",
     "outcome": "Median of all numeric eligible diagnosis plasma measurements, including zeros; reject negatives; no endpoint substitution or recalculation",

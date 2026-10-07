@@ -22,7 +22,7 @@ ASOF='2026-10-05T12:00:00+02:00'
 def fixture(path,cohort='circall',controls=True,bad=False,names=False):
     from analysis.data_integrity.checks import load_rules
     rules=load_rules(ROOT/'configs/definitions/data_integrity.json')
-    headers=list(dict.fromkeys(rules['required']+['timepoint','sampling_plan','extraction_status','patient_id','circall_id','nucleic_acid','row']))
+    headers=list(dict.fromkeys(rules['required']+['timepoint','sampling_plan','extraction_status','dna_id','patient_id','circall_id','nucleic_acid','row']))
     if names:
         headers.remove('patient_id');headers+=['anonymization','lastname','firstname','dob','private_note']
     book=Workbook();book.remove(book.active)
@@ -30,7 +30,7 @@ def fixture(path,cohort='circall',controls=True,bad=False,names=False):
     for name in sheets:
         ws=book.create_sheet(name);ws.append(headers)
         records=[dict(sample_id='SYNTHETIC-SAMPLE',specimen_type='plasma',timepoint='diag',patient_id='RETRO-0001',circall_id='001-9999-X-Z',
-                      nucleic_acid='cfDNA',sampling_plan=datetime(2026,10,1),dna_concentration_ng_per_ul=2,
+                      dna_id='SYNTHETIC-DNA',nucleic_acid='cfDNA',sampling_plan=datetime(2026,10,1),dna_concentration_ng_per_ul=2,
                       elution_volume_ul=50,dna_total_ng=100,dna_ng_per_ml_plasma=50,extraction_input_volume_ml=2,
                       cfdna_fraction=.5,cfdna_concentration_ng_per_ul=1,cfdna_total_ng=50,cfdna_ng_per_ml_plasma=25,cfdna_avg_size_bp=170)]
         if name!='cohorte_control':
@@ -49,21 +49,36 @@ class RulesTests(unittest.TestCase):
         return core.receipt(sample,visit,planned,cohort,core.assessment(asof),D)
 
     def test_receipt_boundary_and_fallback(self):
-        for sample in (None,'na','?'):
+        for sample in ('na',):
             for asof,expected in [('2026-09-30T23:59:59+02:00','not_yet_due'),('2026-10-01T00:00:00+02:00','pending'),('2026-10-04T00:00:00+02:00','pending'),('2026-10-04T00:00:01+02:00','missed')]:
                 with self.subTest(sample=sample,asof=asof):self.assertEqual(self.classify(sample,asof=asof)['receipt'],expected)
         self.assertEqual(self.classify('SYNTHETIC',asof='2026-09-30T12:00:00+02:00')['receipt'],'received_early')
         for visit,plan in [('tp2',date(2026,1,1)),('tp1',None),('tp1','01/10/2026')]:
-            self.assertEqual(self.classify('na',visit,plan)['receipt'],'missed')
+            self.assertEqual(self.classify('na',visit,plan)['receipt'],'marked_na')
             self.assertEqual(self.classify(None,visit,plan)['receipt'],'unassessed')
             self.assertEqual(self.classify('?',visit,plan)['receipt'],'unassessed')
             self.assertEqual(self.classify('SYNTHETIC',visit,plan)['receipt'],'received')
         self.assertEqual(self.classify('na',cohort='retrospective')['receipt'],'marked_na')
+        for sample in (None, '', '?', 'sk'):
+            self.assertEqual(self.classify(sample)['receipt'], 'unassessed')
+
+    def test_only_explicit_overdue_missingness_enters_denominator(self):
+        rows=[]
+        for sample, planned in [(None,date(2026,10,1)),('?',date(2026,10,1)),('na',None),
+                                ('na',date(2026,10,1)),('SYNTHETIC',date(2026,10,1))]:
+            rows.append(dict(subject_key='SYNTHETIC',patient_id='SYNTHETIC',center='RDB',visit='tp1',
+                             specimen='plasma',control=False,extraction_status='no',measurements={},sheet='synthetic',row=2,
+                             **self.classify(sample,planned=planned)))
+        tables=core.aggregate(rows,{**D,'metrics':{}})
+        overall=[r for r in tables['receipt'] if r['view']=='overall']
+        self.assertTrue(all(r['classified_denominator']==2 for r in overall if r['basis']=='deadline'))
+        self.assertEqual(len(tables['missed']),1)
+        self.assertTrue(all(r['classified_percentage'] is None for r in overall if r['status'] in ('unassessed','marked_na')))
 
     def test_dst_elapsed_not_wall_time(self):
         for start,at,after in [(date(2026,3,28),'2026-03-31T01:00:00+02:00','2026-03-31T01:00:01+02:00'),(date(2026,10,24),'2026-10-26T23:00:00+01:00','2026-10-26T23:00:01+01:00')]:
-            self.assertEqual(self.classify(planned=start,asof=at)['receipt'],'pending')
-            self.assertEqual(self.classify(planned=start,asof=after)['receipt'],'missed')
+            self.assertEqual(self.classify('na',planned=start,asof=at)['receipt'],'pending')
+            self.assertEqual(self.classify('na',planned=start,asof=after)['receipt'],'missed')
         with self.assertRaises(ValueError):core.assessment('2026-10-05T12:00:00')
 
     def test_measurements(self):
@@ -89,6 +104,7 @@ class WorkflowTests(unittest.TestCase):
     def test_available_volume_independent_of_extraction(self):
         book=load_workbook(self.retro);ws=book['Inventaire'];headers=[c.value for c in ws[1]]
         ws.cell(2,headers.index('extraction_status')+1,'not_extracted')
+        ws.cell(2,headers.index('dna_id')+1).value=None
         ws.cell(2,headers.index('extraction_input_volume_ml')+1).value=None
         ws.cell(2,headers.index('elution_volume_ul')+1).value=None
         book.save(self.retro);book.close()

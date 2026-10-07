@@ -2,6 +2,13 @@
 
 Layer 2 describes inventory samples and received-sample measurements. It does not
 run associations, tests, MRD or kinetics. Existing analysis profiles remain unchanged.
+
+The [October 7 shared amendment](workflow_contracts.md#shared-sample-annotations-and-receipt-revision--october-7-2026)
+defines current extraction (yes/no from DNA-ID presence), canonical literal `na`,
+and receipt logic. Only explicit `na` with applicable timing can become overdue;
+blank IDs remain unassessed. Undated `na` is marked missing with lateness
+unassessed and excluded from received/overdue percentages. Historical acceptance
+records retain their original source/rule hashes.
 The scientific decision table in [workflow_contracts.md](workflow_contracts.md#layer-2-descriptive-statistics--october-6-2026)
 is authoritative. Definitions are in `configs/definitions/sample_statistics.json`;
 v1 accepts that approved definition set, not arbitrary new pooling policies.

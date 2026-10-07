@@ -10,6 +10,7 @@ from openpyxl.formula import Tokenizer
 from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
 
 from analysis.sample_io import read_sheet, SourceReadError
+from analysis.sample_definitions import extraction_state
 
 RULE_IDS = frozenset('file_unavailable file_unreadable sheet_missing header_missing header_duplicate unheaded_data whitespace category number_text numeric_text number_invalid date_text excel_error broken_reference self_reference identifier_reference cross_row_reference formula_unassessed cache_missing arithmetic denominator missing_operands false_zero missing_result extraction_state_conflict workflow_annotation aliquot_annotation unit_annotation'.split())
 
@@ -25,6 +26,8 @@ def load_rules(path):
     try:
         rules = json.loads(Path(path).read_text(), object_pairs_hook=unique)
         if rules['schema_version'] != 1 or set(rules['rules']) != RULE_IDS:
+            raise ValueError()
+        if rules['extraction_basis'] != 'dna_id':
             raise ValueError()
         if set(rules['rule_categories'])!=RULE_IDS or any(v not in ('Structure','Formatting','Interpretation','Formula','Logic') for v in rules['rule_categories'].values()):
             raise ValueError()
@@ -183,17 +186,22 @@ def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):
         counts = Counter(h for h in headers.values() if h)
         index = {h:col for col,h in headers.items() if h and counts[h]==1}
         def not_extracted(row):
-            col=index.get('extraction_status')
-            return col is not None and str(row[col-1].value).strip().casefold()=='not_extracted'
+            col=index.get(rules['extraction_basis'])
+            return extraction_state(row[col-1] if col is not None else None, missing, unknown)=='no'
+        dna_col=index.get(rules['extraction_basis'])
+        states=Counter(extraction_state(row[dna_col-1] if dna_col is not None else None,missing,unknown) for row in sheet.rows)
+        for state,n in sorted(states.items()):
+            cover(sheet_name,'extraction_status','dna_id_presence',assessed=n if state!='unavailable' else 0,
+                  unavailable=n if state=='unavailable' else 0,reason='derived_'+state)
         for row in sheet.rows:
             context=[]
             if cohort=='circall' and sheet_name=='cohorte_lal' and 'sample_id' in index:
                 sample=row[index['sample_id']-1].value
                 if sample is None or str(sample).strip()=='':
-                    context.append('Blank sample ID; future visit under the cohort convention')
+                    context.append('Blank sample ID; receipt unclassified')
                 elif str(sample).strip().casefold()=='na':
                     context.append('Sample explicitly not received')
-            if not_extracted(row):context.append('Explicitly not extracted')
+            if not_extracted(row):context.append('No DNA ID; not extracted')
             row_contexts[sheet_name,row[0].row]=context
         safe = lambda col: headers[col] if headers[col] in known else f'column_{col}'
         required = rules['required'] + (rules['patient_required'] if sheet_name!='cohorte_control' else [])
@@ -241,6 +249,12 @@ def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):
                 if definition is None:
                     continue
                 value = cell.value
+                if definition.get('specimens') is not None:
+                    specimen_col=index.get('specimen_type')
+                    specimen=row[specimen_col-1].value if specimen_col is not None else None
+                    if specimen not in definition['specimens']:
+                        skipped['specimen_not_applicable']+=1
+                        continue
                 if value is not None and str(value).strip().casefold() in unknown:
                     skipped['explicit_unknown']+=1
                     continue
@@ -250,6 +264,11 @@ def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):
                 assessed += 1
                 if isinstance(value,str) and (value != value.strip() or '\u00a0' in value):
                     emit(sheet_name,field,'whitespace',cell.coordinate)
+                if raw_field=='extraction_status':
+                    dna_col=index.get(rules['extraction_basis'])
+                    derived=extraction_state(row[dna_col-1] if dna_col is not None else None,missing,unknown)
+                    if value in ('yes','no') and derived in ('yes','no') and value!=derived:
+                        emit(sheet_name,field,'extraction_state_conflict',cell.coordinate)
                 kind = definition['type']
                 annotation = str(value).strip().casefold()
                 if kind in ('number','date') and annotation in {v.casefold() for v in rules['workflow_annotations']}:

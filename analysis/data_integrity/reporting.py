@@ -115,8 +115,8 @@ def write_workbook(path, result, rules, source_hash):
     definitions += [['Setting','Arithmetic tolerance','rtol / atol',f"{rules['rtol']} / {rules['atol']}"],
                     ['Setting','Reference threshold','occurrences','All references for 1–9; none for 10+.'],
                     ['Setting','Identifier handling','deferred','No identifier validation, normalization, matching or exports.'],
-                    ['Setting','Explicit unknown','?','Unknown differs from blank, zero and not applicable; see Coverage.'],
-                    ['Setting','Not extracted','extraction_status','Dependent calculations are not applicable; preserved contradictory values remain logic errors requiring resolution.'],
+                    ['Setting','Missing annotations','na','Canonical literal marker; blanks and formulas preserved. Historical unknown/missing aliases remain readable.'],
+                    ['Setting','Extraction','dna_id','Actual DNA ID means yes; blank/missing DNA ID means no; unavailable ID columns/formulas/errors remain unassessed. Dependent calculations are inapplicable for no; preserved contradictions remain logic errors.'],
                     ['Setting','Measurement basis','volume','extraction_input_volume_ml records available plasma/CSF volume independently of extraction status; the whole recorded volume is used when extracted.']]
     table(wb,'Definitions',['Kind','Field / rule','Unit / severity / operation','Definition'],definitions,[18,40,28,90])
     wb.properties.title='Data integrity — '+result['cohort']

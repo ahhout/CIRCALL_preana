@@ -1,5 +1,9 @@
 # Workflow scientific contracts — version 2
 
+The [October 7 shared sample annotation amendment](#shared-sample-annotations-and-receipt-revision--october-7-2026)
+supersedes earlier extraction-state, missing-marker and receipt definitions for
+Layers 1–4. Earlier acceptance counts remain evidence for their recorded hashes.
+
 The current canonical and association contracts include the investigator-approved
 statistical simplification below. Normalized kinetics retains its version-1 methods. Integration preserves each engine's preparation. All active engines now use the
 shared pre_analysis environment; see [consolidation evidence](repository_cleanup.md).
@@ -761,3 +765,36 @@ Rollback restores only reviewed changed implementation/documentation files after
 checking subsequent edits; profiles and clinical sources are unchanged. Planned
 longitudinal, correlation and combined-panel migrations remain outstanding as
 recorded in [replacement coverage](replacement_coverage.md).
+
+## Shared sample annotations and receipt revision — October 7, 2026
+
+During the layer-by-layer review, the investigator requested deriving extraction
+from DNA-ID presence, simplifying missing annotations, restricting available volume
+to plasma/CSF and reversing receipt deadline logic. These are project-specific
+scientific definitions. The request to make these adjustments includes the
+preceding cross-layer corrections; statistical models remain unchanged.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Extraction basis | An actual filled `dna_id` means yes; blank or a recognized missing/unknown marker means no. Missing DNA-ID columns, formula IDs and Excel errors remain unassessed. Recorded `extraction_status` is refreshed to yes/no in selected sheets and derived again during Layers 1/2; explicit conflicting yes/no labels are logic errors. No inference from measurement values. | Investigator: “you just check if dna_id is filled” |
+| Extraction applicability | For derived no, extraction-dependent recorded values remain logic errors and arithmetic checks are inapplicable. Available plasma/CSF volume remains independent of extraction. Preserve measurements rather than deciding which conflicting entry is correct. Donors without DNA IDs have unavailable extraction classification. | Revised basis and retained contradiction-preservation rule |
+| Canonical annotations | Exact literal `na`, `n/a`, `none`, `nan`, `-`, `sk`, `?`, including case/outer-whitespace variants, become `na` in selected inventories/template/controls and donors. Blanks, numeric values, formulas and caches remain unchanged; names/DOB and actual IDs are preserved. This intentionally collapses literal unknown and missing annotations in adopted sources; original distinctions remain recoverable from backups. Historical parser aliases stay readable. Other clinical annotations, including MRD uncertain significance and unsupported positive-NQ categories, remain unchanged. | Investigator requested “na” for all selected markers |
+| Receipt evidence | Actual sample ID means received. Literal `na` alone establishes explicit missingness. Blank or other noncanonical unavailable IDs remain unassessed; an elapsed deadline alone cannot establish missingness. After adoption, previous literal missing/unknown markers become explicit `na` under this convention. | Investigator requested missingness first, then timing |
+| Overdue window | Only explicit `na` on CIRCALL diag/D4/D8/D15/TP1 rows with a real planned date becomes missed after more than 72 elapsed hours from midnight Europe/Paris. Exactly 72 remains pending; before the planned date it is not yet due. An inapplicable/unavailable date leaves `na` marked missing with lateness unassessed. Retrospective retains ID-based counts without scheduled receipt rates. | Requested reversal; existing visit scope, clock and boundary retained |
+| Receipt denominator | Received + overdue missed within classification basis. Undated marked missing, blank/unknown, pending, future and early receipt remain visible but outside that denominator. No pooled receipt percentage. Formula-quality checks remain independent. | Consequence of revised missingness rule and retained denominator convention |
+| Specimen volume | Available volume applies only to plasma and CSF in integrity semantics and descriptive measurements. Other specimen rows remain preserved and their volume checks are unavailable. Plasma ng/mL calculations still apply only to plasma. | Investigator: “this should only be for csf and plasma” |
+| Total amount | `cfdna_total_ng` is total amount of cfDNA in the extract, in ng; retain fraction × total DNA amount. Definitions change, not values or units. | Investigator clarification |
+| Later layers | Layers 3/4 receive amended integrity gates and canonical source markers; their outcome receipt, MRD selection, models, units and hold remain as defined. No sample-receipt/extraction filter is added to clinical MRD. | Cross-layer scope request and retained clinical eligibility |
+| Preservation and Git | Verify explicit sources; prepare original backups and all patched copies before adoption. Reverse patches reproduce original ZIP members. Keep clinical files/results/archive outside Git; preserve dirty tracked/untracked implementation before edits. No reset/clean or remote publication. | Repository safeguards and investigator request to verify Git use |
+
+The pre-change implementation checkpoint is
+`archive/migrations/shared_rules_before_20261007T081707606067Z/`, containing 195
+code/configuration/documentation/test/environment files with hashes, HEAD, status
+and tracked/staged diffs, excluding clinical data, credentials and outputs.
+Use `conda run -n pre_analysis python -m analysis.sample_annotations
+--retrospective <inventory.xlsx> --circall <circall.xlsx> --donors <donors.xlsx>
+--output-dir <fresh-migration-folder> [--adopt]` with the explicit versioned
+`configs/definitions/sample_annotations.json` selection. Originals are separately
+backed up under that destination. Rollback requires reviewing later edits and
+restoring only affected implementation/source files from their checkpoints.
+Retain existing results and migration evidence.

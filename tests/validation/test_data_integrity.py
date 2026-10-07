@@ -257,7 +257,7 @@ class IntegrityTests(unittest.TestCase):
     def test_explicit_unknown_and_not_extracted_conflicts(self):
         blank={h:None for h in self.rules['extraction_dependent_fields']}
         fixture(self.source,[{**blank,'elution_volume_ul':'?','extraction_date':'?','cfdna_avg_size_bp':'?'},
-                             {**blank,'extraction_status':'not_extracted','extraction_input_volume_ml':2,'elution_volume_ul':50}])
+                             {**blank,'dna_id':None,'extraction_status':'no','extraction_input_volume_ml':2,'elution_volume_ul':50}])
         result=self.inspect()
         self.assertFalse(any(i['rule'] in ['date_text','number_text','missing_result'] for i in result['findings']))
         conflicts=[i for i in result['findings'] if i['rule']=='extraction_state_conflict']
@@ -277,7 +277,7 @@ class IntegrityTests(unittest.TestCase):
         group=next(g for g in result['groups'] if g['rule']=='false_zero')
         self.assertEqual(group['severity'],'error')
         self.assertEqual(group['category'],'Formula')
-        self.assertEqual(group['context_counts'],{'Blank sample ID; future visit under the cohort convention':1})
+        self.assertEqual(group['context_counts'],{'Blank sample ID; receipt unclassified':1})
         self.assertGreater(result['summary']['error_cells'],0)
 
     def test_annotations_are_described_by_meaning(self):

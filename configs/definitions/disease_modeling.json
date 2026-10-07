@@ -1,5 +1,6 @@
 {
   "schema_version": 1,
+  "canonical_missing_token": "na",
   "definition_version": "disease-tracking-1",
   "missing_tokens": ["", "na", "n/a", "nan", "none", "-", "sk"],
   "unknown_tokens": ["?"],
@@ -40,6 +41,7 @@
   "colors": {"retrospective": "#4C78A8", "circall": "#F58518"},
   "default_jitter_seed": 42,
   "rules": {
+    "source_annotations": "Selected inventory/donor literal missing and unknown markers standardized to na; historical aliases remain readable. Clinical uncertain significance is unchanged.",
     "scope": "Descriptive disease tracking only; normalized modeling disabled",
     "integrity": "Whole-cohort inventory gate, selected controls included; additional clinical/count errors block affected cohort; reviews permit execution",
     "identity": "Recorded patient_id/circall_id for inventory MRD; isolated legacy surname basis for retrospective counts; no name fallback or cross-modality/cohort linkage",

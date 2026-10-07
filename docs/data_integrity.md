@@ -5,6 +5,12 @@ them. It creates one Excel workbook per cohort, with CIRCALL patient and control
 sheets kept distinct. It does not fit models, normalize identifiers, merge samples,
 recalculate Excel or apply analytical exclusions.
 
+Current extraction and annotation rules follow the
+[October 7 shared amendment](workflow_contracts.md#shared-sample-annotations-and-receipt-revision--october-7-2026):
+derive yes/no from `dna_id`; use canonical literal `na`; blank sample IDs mean
+receipt unclassified; available volume applies only to plasma/CSF. Earlier
+acceptance sections describe their historical source/rule versions.
+
 ## Commands and selection
 
 Use the existing Conda `pre_analysis` environment. Each Layer 1 invocation creates
@@ -113,16 +119,17 @@ Decimal-comma numeric text is interpretable, but still reported because Excel's
 and text dates remain review findings. Dates are never guessed from ambiguous
 strings. Unassessed clinical fields are identified explicitly in Coverage.
 
-The investigator confirmed `?` as an **explicit unknown** marker. Coverage counts
-it separately; it does not trigger malformed-number/date review findings.
-`extraction_status = not_extracted` makes dependent calculations inapplicable.
+Historical `?` inputs remain readable as explicit unknowns; adopted October 7
+sources standardize that literal marker to `na`. Original distinctions survive
+in the source backups. DNA-ID-derived extraction state **no** makes calculations inapplicable.
 Recorded numbers or methods on those rows produce findings without being discarded.
 Under the investigator's subsequent clarification, these contradictions are
 classified as **logic errors**, while retaining the numbers
-and leaving the correct replacement unresolved. The initial status migration moved 51 explicit date notes
+and leaving the correct replacement unresolved. Historically, the initial status migration moved 51 explicit date notes
 into this column, cleared incompatible text, and preserved all 13 conflicting
-numeric volumes for manual review. Unclassified extraction statuses remain blank;
-there is no inference from identifiers or measurement availability.
+numeric volumes for manual review. Current extraction status is yes for an actual
+filled DNA ID and no for a blank/missing DNA ID; unavailable columns, formula IDs
+and errors remain unassessed. Measurements do not establish extraction.
 
 Future-visit formula defects remain errors. Their row context explains why results
 are unavailable; it does not excuse artificial zeros, division errors or incorrect

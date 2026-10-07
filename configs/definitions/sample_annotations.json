@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "authorization": "Investigator requested DNA-ID-derived extraction and canonical na annotations on October 7, 2026.",
+  "canonical_missing_token": "na",
+  "replace_tokens": ["na", "n/a", "none", "nan", "-", "sk", "?"],
+  "protected_fields": ["lastname", "firstname", "dob"],
+  "selected_sheets": {
+    "retrospective": ["Inventaire"],
+    "circall": ["cohorte_lal", "cohorte_control", "template"],
+    "donors": ["Feuil1"]
+  },
+  "extraction": {"identity": "dna_id", "status": "extraction_status", "present": "yes", "absent": "no"}
+}

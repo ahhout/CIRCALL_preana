@@ -158,7 +158,7 @@ It does not import `analysis/sample_analysis`, `analysis/blast_kinetics`,
 `analysis/cfdna_associations`, `analysis/advanced_analysis`, or `analysis/sample_statistics`.
 Its standalone completion validator is local; the master uses a lazy Layer 4 dispatch.
 
-Retain the shared infrastructure: `sample_io.py`, `data_integrity/checks.py`,
+Retain the shared infrastructure: `sample_io.py`, `sample_definitions.py`, `data_integrity/checks.py`,
 `retrospective_controls.py` for its integrity-only function, `figure_layout.py`,
 `provenance.py`, `outputs.py`, and package `__init__.py` files. For master execution,
 retain `run.py`, `cli.py`, `pipeline.py`, `worker.py` and `configuration.py`. The Layer 4 code-hash list
