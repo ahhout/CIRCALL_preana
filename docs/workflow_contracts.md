@@ -878,3 +878,17 @@ The pre-change code/test/contract snapshot is
 `archive/migrations/circall_oct7_repair_before_20261007T115811Z/` and excludes
 clinical data and outputs. The original workbook and correction evidence are
 retained separately under the source repair destination, outside Git.
+
+## Layered CIRCALL inventory selection — October 7, 2026
+
+The investigator explicitly selected `input/inventaire_CIRCALL_07102026.xlsx`
+for the four-layer rerun. After the older October 5 file was removed locally,
+`./run_all_layers.sh` still selected its missing path. The combined layered
+profile and four individual layer profiles now explicitly select the requested
+October 7 workbook, preserving combined/individual parity. The October 7-specific
+profile remains reproducible; earlier manifests and runs remain unchanged.
+Retrospective, donors and count sources, matching rules, models, thresholds,
+quality holds and output policies remain as defined. No modification-time source
+selection or quality-gate bypass is introduced. The scoped pre-change profile/
+documentation checkpoint is
+`archive/migrations/layered_inventory_selection_before_20261007T120922Z/`.

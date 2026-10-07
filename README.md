@@ -15,6 +15,10 @@ Run all implemented layers (currently Layers 1–4):
 
 Both `./run_all_layers.sh` and `python run.py` select `configs/pipeline_layers.json`
 through the integrated runner.
+The combined and individual layered profiles explicitly select
+`input/inventaire_CIRCALL_07102026.xlsx`, the investigator's updated CIRCALL
+inventory. Retrospective, donor and blood-count sources retain their selected
+versions. The previous October 5 CIRCALL path is no longer used by these profiles.
 Each invocation preflights all four layers, then executes them in order under one
 fresh `outputs/layered/run_<timestamp>/` root with `01_data_integrity/`,
 `02_sample_statistics/`, `03_advanced_analysis/`, `04_disease_modeling/` and `.audit/`.

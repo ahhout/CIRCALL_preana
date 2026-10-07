@@ -4,7 +4,7 @@
     "name": "sample_statistics",
     "options": {
       "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-      "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+      "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
       "cohort": "all",
       "include-controls": true,
       "donors": "../input/cfDNA_donors.xlsx",

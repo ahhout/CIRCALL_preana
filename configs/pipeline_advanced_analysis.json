@@ -4,7 +4,7 @@
     "name": "advanced_analysis",
     "options": {
       "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-      "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+      "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
       "donors": "../input/cfDNA_donors.xlsx",
       "cohort": "all",
       "include-controls": true,

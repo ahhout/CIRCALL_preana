@@ -5,7 +5,7 @@
       "name": "data_integrity",
       "options": {
         "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
         "cohort": "all",
         "include-controls": true,
         "donors": "../input/cfDNA_donors.xlsx",
@@ -16,7 +16,7 @@
       "name": "sample_statistics",
       "options": {
         "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
         "cohort": "all",
         "include-controls": true,
         "donors": "../input/cfDNA_donors.xlsx",
@@ -28,7 +28,7 @@
       "name": "advanced_analysis",
       "options": {
         "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
         "donors": "../input/cfDNA_donors.xlsx",
         "cohort": "all",
         "include-controls": true,
@@ -46,7 +46,7 @@
       "name": "disease_modeling",
       "options": {
         "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_05102026.xlsx",
+        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
         "blood-counts": "../input/CIRCALL_wbc_blast_count_01102026.xlsx",
         "retrospective-blasts": "../input/retrospective_blast_count_01102026.xlsx",
         "donors": "../input/cfDNA_donors.xlsx",
