@@ -82,9 +82,12 @@ class RulesTests(unittest.TestCase):
         with self.assertRaises(ValueError):core.assessment('2026-10-05T12:00:00')
 
     def test_measurements(self):
-        for value,state,expected in [(0,'available',0),('0,5','available',.5),('?','unknown',None),('na','not_applicable',None),('2 aliquots','qualified_or_invalid',None),('50%','qualified_or_invalid',None),(None,'blank',None)]:
+        for value,state,expected in [(0,'available',0),('0,5','available',.5),('?','unknown',None),('na','missing_marker',None),('2 aliquots','qualified_or_invalid',None),('50%','qualified_or_invalid',None),(None,'blank',None)]:
             c=SourceCell('A2',2,1,value,value,'n','n','General',None)
             self.assertEqual(core.measurement(c,'unclassified',D),{'value':expected,'state':state})
+        c=SourceCell('A2',2,1,'na','na','s','s','General',None)
+        self.assertEqual(core.measurement(c,'no',D)['state'],'not_applicable')
+        self.assertEqual(core.measurement(c,'yes',D)['state'],'missing_marker')
         for kind,state in [('str','intentional_empty'),('n','cache_unavailable')]:
             c=SourceCell('A2',2,1,'=IF(1,"",0)',None,'f',kind,'General','=IF(1,"",0)')
             self.assertEqual(core.measurement(c,'unclassified',D)['state'],state)

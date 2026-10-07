@@ -787,6 +787,11 @@ preceding cross-layer corrections; statistical models remain unchanged.
 | Later layers | Layers 3/4 receive amended integrity gates and canonical source markers; their outcome receipt, MRD selection, models, units and hold remain as defined. No sample-receipt/extraction filter is added to clinical MRD. | Cross-layer scope request and retained clinical eligibility |
 | Preservation and Git | Verify explicit sources; prepare original backups and all patched copies before adoption. Reverse patches reproduce original ZIP members. Keep clinical files/results/archive outside Git; preserve dirty tracked/untracked implementation before edits. No reset/clean or remote publication. | Repository safeguards and investigator request to verify Git use |
 
+Canonical `na` denotes an unavailable value; it alone does not establish
+measurement inapplicability. Layer 2 derives inapplicability from extraction or
+specimen context, including keeping unavailable available-volume entries missing
+independently of extraction status.
+
 The pre-change implementation checkpoint is
 `archive/migrations/shared_rules_before_20261007T081707606067Z/`, containing 195
 code/configuration/documentation/test/environment files with hashes, HEAD, status

@@ -87,7 +87,7 @@ def measurement(cell, extraction_status, d):
     if cell.value is None or s == '':
         return {'value': None, 'state': 'not_applicable' if extraction_status == 'no' else 'blank'}
     if s in d['missing_tokens']:
-        return {'value': None, 'state': 'not_applicable' if s in ('na', 'n/a') else 'missing_marker'}
+        return {'value': None, 'state': 'not_applicable' if extraction_status == 'no' else 'missing_marker'}
     value, state = number(cell.value, d['missing_tokens'], d['unknown_tokens'])
     return {'value': value, 'state': 'available' if state in ('number', 'text') else 'qualified_or_invalid'}
 

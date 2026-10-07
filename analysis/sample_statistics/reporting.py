@@ -18,7 +18,7 @@ NOTES = [
     ('Retrospective', 'ID-based receipt counts only; no expected-sample rates. All retrospective samples are attributed to RDB.'),
     ('Assessment', 'Current workbook snapshot evaluated at the recorded assessment timestamp; not reconstructed historical receipt.'),
     ('Extraction', 'Derived from dna_id: filled actual ID means yes; blank/missing ID means no. Missing columns, formula IDs and Excel errors are unavailable. Recorded measurements do not substitute for a DNA ID.'),
-    ('Missing annotations', 'Canonical literal marker is na. Empty cells and formulas remain unchanged; historical aliases remain readable.'),
+    ('Missing annotations', 'Canonical literal marker na means unavailable. Applicability comes from extraction/specimen context. Empty cells and formulas remain unchanged; historical aliases remain readable.'),
     ('cfDNA total amount', 'cfdna_total_ng is the total amount of cfDNA in the extract, in ng.'),
     ('Quantities', 'Received samples only, including early arrivals. Genuine zero retained. No imputation or Excel recalculation.'),
     ('Volumes', 'The legacy extraction_input_volume_ml field records available plasma after centrifugation or available CSF, independently of extraction status. For extracted samples the entire recorded available volume was used. Plasma and CSF remain separate.'),
