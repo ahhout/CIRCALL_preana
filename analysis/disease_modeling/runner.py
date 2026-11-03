@@ -1,11 +1,8 @@
 """Read-only Layer 4 execution with cohort gates and aggregate-only evidence."""
 import argparse
-from copy import copy
-from datetime import datetime, timezone
 import json
 from pathlib import Path
 import re
-import sys
 from types import SimpleNamespace
 
 from analysis.data_integrity.checks import load_rules
@@ -16,12 +13,9 @@ from .common import ClinicalError, clean, load_definitions
 from . import counts, mrd, reporting
 
 
-def default_output_dir():
-    return ROOT/'outputs/layer4_disease_modeling'/('run_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
-
-
 def arguments(argv=None):
     p = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    p.add_argument('--pdf-output', action=argparse.BooleanOptionalAction, default=True, help='Save PDF figures alongside PNGs (default: enabled)')
     p.add_argument('--workflow', choices=['disease_modeling'], default='disease_modeling')
     for field in ('inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts', 'output-dir'):
         p.add_argument('--'+field, type=Path)
@@ -102,7 +96,7 @@ def settings(args):
 def code_files():
     """Only this workflow and retained infrastructure belong to its method evidence."""
     shared = ['run.py', 'analysis/__init__.py', 'analysis/cli.py', 'analysis/pipeline.py', 'analysis/worker.py',
-              'analysis/configuration.py', 'analysis/outputs.py', 'analysis/provenance.py', 'analysis/sample_io.py', 'analysis/sample_definitions.py', 'analysis/figure_layout.py',
+              'analysis/configuration.py', 'analysis/layer_configuration.py', 'analysis/outputs.py', 'analysis/provenance.py', 'analysis/sample_io.py', 'analysis/sample_definitions.py', 'analysis/figure_layout.py', 'analysis/plot_style.py',
               'analysis/retrospective_controls.py', 'analysis/data_integrity/__init__.py', 'analysis/data_integrity/checks.py']
     return [ROOT/p for p in shared]+sorted((ROOT/'analysis/disease_modeling').glob('*.py'))
 
@@ -235,7 +229,7 @@ def run(args):
                 for early in (False, True):
                     fig = reporting.count_figure(prepared['counts'], 'blast', args, d, early=early, comparison=True)
                     if fig is not None:
-                        reporting.save(fig, native/'figures/blood_counts'/f'blast_{"early_window" if early else "full_range"}')
+                        reporting.save(fig, native/'figures/blood_counts'/f'blast_{"early_window" if early else "full_range"}', pdf_output=getattr(args, 'pdf_output', True))
             else:
                 reporting.figures(native/'figures', scope, prepared, result, args, d)
         reporting.workbook(native/'disease_modeling.xlsx', result, d, settings(args))
@@ -307,35 +301,3 @@ def validate_results(output, record):
             raise ValueError('Invalid execution failure evidence')
     verify_inputs(record['inputs'])
     verify_source_states(record['source_states'])
-
-
-def completion(output):
-    """Standalone validation does not import the master or legacy dispatch helpers."""
-    record = json.loads((Path(output)/'run_manifest.json').read_text())
-    if record.get('workflow') != 'disease_modeling' or record.get('status') != 'complete' or record.get('schema_version') != 1:
-        raise ValueError('Invalid disease completion metadata')
-    validate_results(output, record)
-    return record
-
-
-def main(argv=None):
-    args = arguments(argv)
-    try:
-        if args.output_dir is not None and (args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir, *args.output_dir.parents))):
-            raise ValueError('Fresh output destination required')
-        evidence = preflight(args)
-        if args.validate_only:
-            print('Layer 4 preflight: '+', '.join(c+'='+r['status'] for c, r in evidence['cohort_preflight'].items()))
-            return int(evidence['validation_quality'] == 'errors_found')
-        args.output_dir = args.output_dir or default_output_dir()
-        from analysis.outputs import run_standalone
-        def execute(native):
-            verify_inputs(evidence['inputs'])
-            verify_source_states(evidence['source_states'])
-            worker = copy(args)
-            worker.output_dir = native
-            return run(worker)
-        return run_standalone('disease_modeling', args.output_dir, evidence['resolved_settings'], execute, completion)
-    except (ValueError, OSError) as error:
-        print(f'Layer 4 unavailable ({type(error).__name__}); check configuration and fresh destination', file=sys.stderr)
-        return 1

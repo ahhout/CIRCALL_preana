@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "workflows": [
+    {
+      "name": "canonical",
+      "options": {
+        "circall": "../../input/inventaire_CIRCALL_01102026.xlsx",
+        "inventory": "../../input/cfDNA_inventaire_retrospective.xlsx",
+        "donors": "../../input/cfDNA_donors.xlsx",
+        "extraction-protocols": "../sample_analysis/extraction_protocols.json",
+        "cohort": "all",
+        "pool-cohorts": true,
+        "pooled-timepoints": [
+          "diag",
+          "tp1",
+          "tp2"
+        ],
+        "mixed-random-slope-sensitivity": false,
+        "mixed-outlier-drop-n": 0,
+        "plot-diagnosis-as-d1": true,
+        "analysis": "longitudinal",
+        "trend-bootstrap-resamples": 10000,
+        "trend-bootstrap-seed": 42,
+        "trend-bootstrap-method": "percentile",
+        "longitudinal-followups": [
+          "tp1",
+          "tp2"
+        ],
+        "longitudinal-descriptive-visits": [
+          "circall:tp2"
+        ]
+      }
+    }
+  ]
+}

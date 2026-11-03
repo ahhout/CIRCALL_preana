@@ -1,4 +1,6 @@
 """Synthetic Layer 3 source contracts and intentionally revised preparation."""
+
+from tests.fixtures.advanced_analysis import D, row, fixture
 import json
 
 import numpy as np
@@ -9,40 +11,10 @@ from analysis.advanced_analysis import preparation as prep
 from analysis.provenance import ROOT
 from analysis.sample_io import SourceCell
 
-D = prep.load_definitions(ROOT/'configs/definitions/advanced_analysis.json')
 
 
-def row(pid='P1', outcome=10, **changes):
-    result = dict(patient_id=pid, circall_id=pid if pid.startswith('001-') else '001-9999-X-Z', sample_id='PRIVATE_SAMPLE_'+pid,
-                  timepoint='diag', specimen_type='plasma', tube='Roche', nucleic_acid='cfDNA',
-                  cfdna_ng_per_ml_plasma=outcome, sex='F', age_diag=10, genetic_subtype='Subtype A',
-                  GB_per_L=3, cytology=.2, **{'cytospin_%': .3, 'diag_blood_wbc_x10*9/L':3,
-                  'diag_blood_blast_pct':.2, 'diag_bm_blast_pct':.7})
-    result.update(changes)
-    return result
 
 
-def fixture(path, cohort='retrospective', rows=None, *, controls=False, bad_controls=False, drop=(), duplicate=None):
-    rules = json.loads((ROOT/'configs/definitions/data_integrity.json').read_text())
-    headers = list(dict.fromkeys([*rules['required'], *row().keys(), 'lastname', 'firstname', 'dob', 'private_note']))
-    headers = [h for h in headers if h not in drop]
-    if duplicate:
-        headers.append(duplicate)
-    book = Workbook()
-    book.remove(book.active)
-    names = ['Inventaire'] if cohort == 'retrospective' else ['cohorte_lal']+(['cohorte_control'] if controls else [])
-    for name in names:
-        sheet = book.create_sheet(name)
-        sheet.append(headers)
-        selected = [row('001-8888-X-Z', 999)] if name == 'cohorte_control' else rows or [row()]
-        for record in selected:
-            r = record.copy()
-            r.update(lastname='PRIVATE_NAME_SENTINEL', firstname='PRIVATE_FIRST_SENTINEL', dob='PRIVATE_DOB_SENTINEL', private_note='PRIVATE_NOTE_SENTINEL')
-            if bad_controls and name == 'cohorte_control':
-                r['extraction_input_volume_ml'] = -1
-            sheet.append([r.get(h) for h in headers])
-    book.save(path)
-    book.close()
 
 
 def test_patient_id_diagnosis_receipt_filters_and_matching(tmp_path):
@@ -56,7 +28,7 @@ def test_patient_id_diagnosis_receipt_filters_and_matching(tmp_path):
     assert len(frame) == 3
     p = frame.loc[frame.available_outcome_sample_n.eq(2)].iloc[0]
     assert (p.cfdna_ng_per_ml, p.peripheral_blast_percent, p.age_diag) in [(0, 20, 10), (20, 40, 14)]
-    assert p.tumor_fraction_percent == pytest.approx(80)
+    assert np.isnan(p.tumor_fraction_percent)  # Retrospective marrow is outside the requested scope.
     assert p.outcome_sample_n == 1
     assert counts['patients_with_nonpositive_outcome'] == 1 + int(p.cfdna_ng_per_ml == 0)
     assert counts['unselected_numeric_outcome_samples'] == 1
@@ -97,7 +69,7 @@ def test_retrospective_discordance_and_circall_conflicts(tmp_path):
     assert prep.prepare(tmp_path/'circ.xlsx', 'circall', D)[3][0]['reason'] == 'conflicting_diagnosis_metadata'
 
 
-@pytest.mark.parametrize('changes', [dict(cytology=20), dict(cytology='malformed'), dict(GB_per_L=-1), dict(age_diag='bad'), dict(cfdna_ng_per_ml_plasma=-1)])
+@pytest.mark.parametrize('changes', [dict(cytology=20), dict(cytology='malformed'), {'diag_blood_wbc_max_x10*9/L':-1}, dict(age_diag='bad'), dict(cfdna_ng_per_ml_plasma=-1)])
 def test_invalid_selected_measurements_rejected(tmp_path, changes):
     path = tmp_path/'source.xlsx'
     fixture(path, rows=[row(**changes)])
@@ -106,7 +78,7 @@ def test_invalid_selected_measurements_rejected(tmp_path, changes):
 
 def test_unknown_clinical_annotations_and_unused_fallback(tmp_path):
     path = tmp_path/'source.xlsx'
-    fixture(path, rows=[row(cytology='?', GB_per_L='?', genetic_subtype='?', **{'cytospin_%': .4}),
+    fixture(path, rows=[row(cytology='?', genetic_subtype='?', **{'cytospin_%': .4, 'diag_blood_wbc_max_x10*9/L':'?'}),
                        row(cytology=.2, **{'cytospin_%': 'unused qualified annotation'})])
     frame, _, _, issues = prep.prepare(path, 'retrospective', D)
     assert not issues and frame.peripheral_blast_percent.iat[0] in (20, 40)
@@ -127,6 +99,29 @@ def test_invalid_identity_no_names_fallback(tmp_path):
     assert frame.empty and issues[0]['reason'] == 'invalid_participant_id'
 
 
+def test_empty_unreceived_diagnosis_rows_do_not_block(tmp_path):
+    path = tmp_path/'circall.xlsx'
+    template = dict(circall_id=None, sample_id=None, timepoint='diag', specimen_type='plasma')
+    fixture(path, 'circall', [row(), template, dict(template, circall_id='na', sample_id='na')])
+    frame, counts, _, issues = prep.prepare(path, 'circall', D)
+    assert not issues and len(frame) == 1
+    assert counts['excluded_empty_unreceived_diagnosis_rows'] == 2
+    assert counts['excluded_invalid_participant_id'] == 0
+
+
+@pytest.mark.parametrize('evidence', [dict(sample_id='SYNTHETIC_SAMPLE'), dict(dna_id='SYNTHETIC_DNA'),
+    dict(cfdna_ng_per_ml_plasma=0), dict(dna_total_ng=5), dict(diag_blood_blast_pct=.2),
+    dict(genetic_subtype='Subtype A'), dict(circall_id='malformed'), dict(sample_id='=1+1')])
+def test_orphaned_diagnosis_records_still_block(tmp_path, evidence):
+    path = tmp_path/'circall.xlsx'
+    record = dict(circall_id=None, sample_id=None, timepoint='diag', specimen_type='plasma')
+    record.update(evidence)
+    fixture(path, 'circall', [record])
+    _, counts, _, issues = prep.prepare(path, 'circall', D)
+    assert counts['excluded_empty_unreceived_diagnosis_rows'] == 0
+    assert any(i['reason'] == 'invalid_participant_id' for i in issues)
+
+
 @pytest.mark.parametrize('raw,value,kind,state', [('=A1', None, 'n', 'cache_unavailable'), ('=A1', None, 'str', 'intentional_empty'), ('<2', '<2', 's', 'qualified_text'), (0, 0, 'n', 'zero')])
 def test_raw_cached_measurement_states(raw, value, kind, state):
     cell = SourceCell('A2', 2, 1, raw, value, 'f' if isinstance(raw,str) and raw.startswith('=') else kind, kind, 'General', raw if isinstance(raw,str) and raw.startswith('=') else None)
@@ -135,7 +130,7 @@ def test_raw_cached_measurement_states(raw, value, kind, state):
 
 def test_cohort_qualified_case_sensitive_identity_and_optional_fields(tmp_path):
     path = tmp_path/'source.xlsx'
-    fixture(path, rows=[row('P1'), row('p1')], drop=['sex', 'GB_per_L'])
+    fixture(path, rows=[row('P1'), row('p1')], drop=['sex', 'diag_blood_wbc_max_x10*9/L'])
     frame, _, _, issues = prep.prepare(path, 'retrospective', D)
     assert not issues and len(frame) == 2 and frame.sex.isna().all() and frame.gb_per_l.isna().all()
 

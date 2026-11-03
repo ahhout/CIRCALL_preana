@@ -1,0 +1,15 @@
+name: pre_analysis
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scipy
+  - openpyxl
+  - matplotlib
+  - pytz
+  - statsmodels
+  - seaborn=0.13.2
+  - pyyaml=6.0.3
+  - pytest=9.1.1

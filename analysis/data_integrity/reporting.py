@@ -73,7 +73,7 @@ def write_workbook(path, result, rules, source_hash):
     rows.extend([[],['Unique affected cells',summary['affected_cells']],['Unique cells with errors',summary['error_cells']],
                  ['Unique cells requiring review',summary['review_cells']],['Unique data rows with errors',summary['error_rows']],
                  ['Unique data rows requiring review',summary['review_rows']],
-                 ['Context','Future-visit rows remain subject to formula checks. A conflicting extraction status is a logic error even if the correct replacement is not yet known.']])
+                 ['Context','Future-visit rows remain subject to formula checks. Measurement contradictions with DNA-ID-derived extraction remain logic errors; the legacy extraction_status column is ignored.']])
     for source in result.get('additional_sources',[]):
         rows.extend([['Additional control source',source['source']],['Control source SHA-256',source.get('sha256') or 'Unavailable']])
     for r,values in enumerate(rows,1):

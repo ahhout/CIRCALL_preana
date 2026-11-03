@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "date": "2026-10-08",
+  "snapshot": "archive/migrations/workflow_retirement_before_20261008",
+  "archive": "archive/retired/older_workflows_20261008",
+  "archive_inventory_sha256": "868ca5b6659d419614fcb63d8bc664932e9eb57af9e749f8e4e487f82fd04cb6",
+  "baseline_head": "92044beb31b7609a09b473e64603be34da582c2d",
+  "baseline_tests": {
+    "passed": 508,
+    "subtests": 123
+  },
+  "retained_tests": {
+    "passed": 352,
+    "subtests": 82
+  },
+  "comparisons": {
+    "synthetic_success": {
+      "status": "passed",
+      "compared": {
+        "json": 36,
+        "csv": 2,
+        "workbooks": 24,
+        "png": 87,
+        "pdf": 72
+      },
+      "baseline_integrity": {
+        "indexed": 225,
+        "publications": 84,
+        "privacy_exports": 31,
+        "code_hashes": 387
+      },
+      "candidate_integrity": {
+        "indexed": 225,
+        "publications": 84,
+        "privacy_exports": 31,
+        "code_hashes": 239
+      },
+      "exclusions": [
+        "Excel ZIP/core timestamps",
+        "PDF CreationDate",
+        "artifacts",
+        "code_dirty",
+        "code_revision",
+        "code_sha256",
+        "command",
+        "finished_utc",
+        "publications",
+        "resolved_settings_sha256",
+        "run_id",
+        "scientific_contract.sha256",
+        "started_utc"
+      ],
+      "limitations": [
+        "Workbook cells, formats and sheet structure compared; Excel visual rendering not available.",
+        "PNG pixels and PDF content compared; independent PDF rasterization not available."
+      ]
+    },
+    "synthetic_blocked": {
+      "status": "passed",
+      "compared": {
+        "json": 36,
+        "csv": 2,
+        "workbooks": 24,
+        "png": 69,
+        "pdf": 54
+      },
+      "baseline_integrity": {
+        "indexed": 189,
+        "publications": 66,
+        "privacy_exports": 31,
+        "code_hashes": 387
+      },
+      "candidate_integrity": {
+        "indexed": 189,
+        "publications": 66,
+        "privacy_exports": 31,
+        "code_hashes": 239
+      },
+      "exclusions": [
+        "Excel ZIP/core timestamps",
+        "PDF CreationDate",
+        "artifacts",
+        "code_dirty",
+        "code_revision",
+        "code_sha256",
+        "command",
+        "finished_utc",
+        "publications",
+        "resolved_settings_sha256",
+        "run_id",
+        "scientific_contract.sha256",
+        "started_utc"
+      ],
+      "limitations": [
+        "Workbook cells, formats and sheet structure compared; Excel visual rendering not available.",
+        "PNG pixels and PDF content compared; independent PDF rasterization not available."
+      ]
+    },
+    "clinical_current": {
+      "status": "passed",
+      "compared": {
+        "json": 36,
+        "csv": 2,
+        "workbooks": 24,
+        "png": 389,
+        "pdf": 0
+      },
+      "baseline_integrity": {
+        "indexed": 455,
+        "publications": 139,
+        "privacy_exports": 31,
+        "code_hashes": 387
+      },
+      "candidate_integrity": {
+        "indexed": 455,
+        "publications": 139,
+        "privacy_exports": 31,
+        "code_hashes": 239
+      },
+      "exclusions": [
+        "Excel ZIP/core timestamps",
+        "PDF CreationDate",
+        "artifacts",
+        "code_dirty",
+        "code_revision",
+        "code_sha256",
+        "command",
+        "finished_utc",
+        "publications",
+        "resolved_settings_sha256",
+        "run_id",
+        "scientific_contract.sha256",
+        "started_utc"
+      ],
+      "limitations": [
+        "Workbook cells, formats and sheet structure compared; Excel visual rendering not available.",
+        "PNG pixels and PDF content compared; independent PDF rasterization not available."
+      ]
+    }
+  },
+  "execution": {
+    "synthetic_success": {
+      "preflight_returncode": 0,
+      "execution_returncode": 0,
+      "status": "complete",
+      "quality": {
+        "data_integrity": "review_needed",
+        "sample_statistics": "no_issues_detected",
+        "advanced_analysis": "review_needed",
+        "disease_modeling": "no_issues_detected"
+      }
+    },
+    "synthetic_blocked": {
+      "preflight_returncode": 1,
+      "execution_returncode": 1,
+      "status": "failed",
+      "quality": {
+        "data_integrity": "review_needed",
+        "sample_statistics": "no_issues_detected",
+        "advanced_analysis": "review_needed",
+        "disease_modeling": "errors_found"
+      }
+    },
+    "clinical_current": {
+      "preflight_returncode": 1,
+      "execution_returncode": 1,
+      "status": "failed",
+      "quality": {
+        "data_integrity": "review_needed",
+        "sample_statistics": "no_issues_detected",
+        "advanced_analysis": "review_needed",
+        "disease_modeling": "errors_found"
+      }
+    }
+  }
+}

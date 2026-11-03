@@ -146,12 +146,12 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
     for name in ('retrospective', 'circall', 'donors'):
         parser.add_argument('--'+name, type=Path, required=True)
-    parser.add_argument('--config', type=Path, default=ROOT/'configs/definitions/sample_annotations.json')
+    parser.add_argument('--config', type=Path, default=ROOT/'configs/maintenance/sample_annotations.json')
     parser.add_argument('--output-dir', type=Path, required=True)
     parser.add_argument('--adopt', action='store_true', help='Back up originals and adopt verified copies at the explicit source paths')
     args = parser.parse_args(argv)
     config = json.loads(args.config.read_text(), object_pairs_hook=unique_object)
-    if config != json.loads((ROOT/'configs/definitions/sample_annotations.json').read_text()):
+    if config != json.loads((ROOT/'configs/maintenance/sample_annotations.json').read_text()):
         parser.error('Unsupported annotation settings')
     sources = {name: getattr(args, name).resolve() for name in config['selected_sheets']}
     if args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir, *args.output_dir.parents)):

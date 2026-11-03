@@ -1,12 +1,10 @@
-"""Independently runnable Layer 2 with an explicit per-cohort integrity gate."""
+"""Internal Layer 2 engine with an explicit per-cohort integrity gate."""
 import argparse
 from copy import copy
-from datetime import datetime, timezone
 import json
 import hashlib
 import os
 from pathlib import Path
-import sys
 
 from analysis.retrospective_controls import inspect_with_controls
 from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
@@ -14,14 +12,13 @@ from analysis.data_integrity.checks import inspect_cohort, load_rules
 from analysis.source_state import capture_sources, sources, verify_source_states
 from .core import load_definitions, assessment, prepare, aggregate
 from .reporting import workbook, validate_workbook, figures
-
-
-def default_output_dir():
-    return ROOT/'outputs/layer2_sample_statistics'/('run_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
+from .comparisons import compare
+from .calendar_volumes import calendar_coverage, validate_calendar_dates
 
 
 def arguments(argv=None):
     p=argparse.ArgumentParser(description=__doc__,allow_abbrev=False)
+    p.add_argument('--pdf-output', action=argparse.BooleanOptionalAction, default=True, help='Save PDF figures alongside PNGs (default: enabled)')
     p.add_argument('--workflow',choices=['sample_statistics'],default='sample_statistics')
     p.add_argument('--inventory',type=Path)
     p.add_argument('--circall',type=Path)
@@ -69,6 +66,7 @@ def run(args):
     d=record['resolved_settings']['statistics_definition']
     rules=record['resolved_settings']['rules_definition']
     successful={}
+    pending=[]
     def publish_scope(scope, result, rows):
         native=output/scope
         native.mkdir(exist_ok=True)
@@ -80,18 +78,26 @@ def run(args):
                 if row.get('overdue',False):item['patient_id']=row['patient_id']
                 sanitized.append(item)
             write_json(native/'observations.json',sanitized)
+        if result['status']=='complete':
+            coverage = calendar_coverage(rows, d) if scope != 'pooled' else []
+            if coverage:
+                result['calendar_volume_coverage'] = coverage
         write_json(native/'statistics.json',result)
         workbook(native/'statistics.xlsx',result,d)
         if result['status']=='complete':
-            figures(native/'figures', [r for r in rows if not r['control']], d, pooled=scope=='pooled')
+            references=[r for cohort_rows in successful.values() for r in cohort_rows if r['control']] if args.include_controls else []
+            figures(native/'figures', [r for r in rows if not r['control']], d, pooled=scope=='pooled',
+                    reference_controls=references, comparisons=result.get('comparisons',[]), pdf_output=args.pdf_output)
             if scope!='pooled' and args.include_controls:
-                figures(native/'figures'/'controls',[r for r in rows if r['control']],d,controls=True)
+                figures(native/'figures'/'controls',[r for r in rows if r['control']],d,controls=True,pdf_output=args.pdf_output)
         validate_workbook(native/'statistics.xlsx',result,d)
-        record['cohorts'].append({'cohort':scope,'report_status':'complete','statistics_status':result['status']})
+        record['cohorts'].append({'cohort':scope,'report_status':'complete','statistics_status':result['status'], 'integrity_reviews':result['metadata'].get('integrity_reviews',0)})
         for path in sorted(native.rglob('*')):
             if path.is_file():record['artifacts'].append({'path':str(path.relative_to(output)),'sha256':digest(path)})
+    # Prepare independent cohorts before rendering so every scope can display
+    # validated control references without adding them to patient observations.
     for cohort,path in sources(args).items():
-        result=dict(scope=cohort,status='blocked',include_controls=args.include_controls,blocking=[],tables={},
+        result=dict(scope=cohort,status='blocked',include_controls=args.include_controls,blocking=[],tables={},comparisons=[],
                     metadata=dict(cohort=cohort,assessment_time=args.assessment_time,source_sha256=record['source_states'][cohort]['sha256'],
                                   rules_sha256=digest(args.rules),definitions_sha256=digest(args.definitions)))
         try:
@@ -117,12 +123,21 @@ def run(args):
                     result['status']='complete'
                     result['tables']=aggregate([r for r in rows if not r['control']],d)
                     if args.include_controls:result['controls']=aggregate([r for r in rows if r['control']],d)
+                    result['comparisons']=compare(rows,d,cohort)
                     successful[cohort]=rows
             result['metadata']['statistics_status']=result['status']
-            publish_scope(cohort,result,rows)
         except Exception as error:
             # Do not propagate source/library text, which may contain identifiers.
-            result.update(status='execution_failed',blocking=[{'reason':type(error).__name__}],tables={})
+            result.update(status='execution_failed',blocking=[{'reason':type(error).__name__}],tables={},comparisons=[])
+            result['metadata']['statistics_status']='execution_failed'
+            successful.pop(cohort,None)
+            rows=[]
+        pending.append((cohort,result,rows))
+    for cohort,result,rows in pending:
+        try:
+            publish_scope(cohort,result,rows)
+        except Exception as error:
+            result.update(status='execution_failed',blocking=[{'reason':type(error).__name__}],tables={},comparisons=[])
             result['metadata']['statistics_status']='execution_failed'
             successful.pop(cohort,None)
             try:publish_scope(cohort,result,[])
@@ -136,12 +151,15 @@ def run(args):
                     metadata=dict(cohort='pooled',assessment_time=args.assessment_time,statistics_status='complete' if ready else 'blocked',
                                   source_sha256={k:v['sha256'] for k,v in record['source_states'].items()},rules_sha256=digest(args.rules),definitions_sha256=digest(args.definitions)),
                     blocking=[] if ready else [{'reason':'both_patient_cohorts_must_pass'}],
-                    tables=aggregate(rows,d,pooled=True) if ready else {})
-        try:publish_scope('pooled',result,rows if ready else [])
+                    tables=aggregate(rows,d,pooled=True) if ready else {},comparisons=[])
+        try:
+            if ready:
+                result['comparisons']=compare([r for cohort_rows in successful.values() for r in cohort_rows],d,'pooled')
+            publish_scope('pooled',result,rows if ready else [])
         except Exception as error:record['cohorts'].append({'cohort':'pooled','report_status':'failed','statistics_status':'execution_failed','error_code':type(error).__name__})
     verify_inputs(record['inputs']);verify_source_states(record['source_states'])
     record.update(status='complete' if any(c['report_status']=='complete' for c in record['cohorts']) else 'failed',
-                  quality_status='no_issues_detected' if all(c['statistics_status']=='complete' for c in record['cohorts']) else 'errors_found',
+                  quality_status='errors_found' if any(c['statistics_status']!='complete' for c in record['cohorts']) else 'review_needed' if any(c.get('integrity_reviews',0) for c in record['cohorts']) else 'no_issues_detected',
                   report_generation_status='complete' if all(c['report_status']=='complete' for c in record['cohorts']) else 'partial',finished_utc=utc_now())
     write_json(output/'run_manifest.json',record)
     return 0 if record['status']=='complete' else 1
@@ -164,30 +182,19 @@ def validate_results(output,record):
             validate_workbook(native/'statistics.xlsx',result,d)
             if result['status']=='complete':
                 rows=json.loads((native/'observations.json').read_text())
+                if cohort['cohort'] == 'circall':
+                    validate_calendar_dates(rows, d, record['source_states']['circall']['path'])
+                expected_calendar = calendar_coverage(rows, d) if cohort['cohort'] != 'pooled' else []
+                if result.get('calendar_volume_coverage', []) != expected_calendar:
+                    raise ValueError('Calendar volume coverage does not reconcile with audit observations')
                 if aggregate([r for r in rows if not r['control']],d,pooled=cohort['cohort']=='pooled') != result['tables']:
                     raise ValueError('Statistics tables do not reconcile with audit observations')
                 if 'controls' in result and aggregate([r for r in rows if r['control']],d)!=result['controls']:
                     raise ValueError('Control tables do not reconcile')
+                comparison_rows=rows
+                if cohort['cohort']=='pooled':
+                    comparison_rows=[r for name in ('circall','retrospective')
+                                     for r in json.loads((output/name/'observations.json').read_text())]
+                if compare(comparison_rows,d,cohort['cohort'])!=result.get('comparisons'):
+                    raise ValueError('Comparison results do not reconcile')
     verify_inputs(record['inputs']);verify_source_states(record['source_states'])
-
-
-def main(argv=None):
-    args=arguments(argv)
-    try:
-        if args.output_dir is not None and (args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir,*args.output_dir.parents))):raise ValueError('Fresh output destination required')
-        evidence=preflight(args)
-        if args.validate_only:
-            print('Statistics preflight complete; integrity and identity gates run during execution')
-            return 0
-        args.output_dir=args.output_dir or default_output_dir()
-        from analysis.outputs import run_standalone
-        from analysis.worker import completion
-        def execute(native):
-            verify_inputs(evidence['inputs']);verify_source_states(evidence['source_states'])
-            worker=copy(args);worker.output_dir=native
-            return run(worker)
-        return run_standalone('sample_statistics',args.output_dir,evidence['resolved_settings'],execute,
-                              lambda native:completion({'name':'sample_statistics','options':{}},native))
-    except (OSError,ValueError) as error:
-        print(f'Statistics execution unavailable ({type(error).__name__}); check configuration and destination',file=sys.stderr)
-        return 1

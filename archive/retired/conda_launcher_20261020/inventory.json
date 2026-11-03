@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "original": "run_all_layers.sh",
+      "archived": "archive/retired/conda_launcher_20261020/run_all_layers.sh",
+      "sha256": "6a22e811f986b723f67b28a701b941b27803603dcb907978f09937b5cf15d278"
+    }
+  ]
+}

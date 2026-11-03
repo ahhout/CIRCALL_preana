@@ -1,30 +1,154 @@
 {
   "schema_version": 1,
   "canonical_missing_token": "na",
-  "definition_version": "diagnosis-2",
+  "definition_version": "diagnosis-4",
   "timepoint": "diag",
   "outcome": "cfdna_ng_per_ml_plasma",
   "outcome_unit": "ng/mL plasma",
-  "missing_tokens": ["", "na", "n/a", "none", "nan", "-", "sk"],
-  "unknown_tokens": ["?"],
+  "missing_tokens": [
+    "",
+    "na",
+    "n/a",
+    "none",
+    "nan",
+    "-",
+    "sk"
+  ],
+  "unknown_tokens": [
+    "?"
+  ],
   "cohorts": {
     "retrospective": {
-      "sheet": "Inventaire", "identity": "patient_id",
-      "required": ["patient_id", "sample_id", "timepoint", "specimen_type", "nucleic_acid", "tube", "cfdna_ng_per_ml_plasma"],
-      "outcome_filters": {"specimen_type": "plasma", "nucleic_acid": "cfDNA", "tube": "Roche"},
-      "sources": {"sex": ["sex"], "age_diag": ["age_diag"], "genetic_subtype": ["genetic_subtype"], "gb_per_l": ["GB_per_L"], "peripheral_blast_percent": ["cytology", "cytospin_%"], "tumor_fraction_percent": ["cytology", "cytospin_%"]},
-      "aggregation": {"sex": "selected diagnosis plasma sample; no fallback", "age_diag": "selected diagnosis plasma sample; no fallback", "genetic_subtype": "first nonmissing diagnosis", "gb_per_l": "selected diagnosis plasma sample; no fallback", "peripheral_blast_percent": "selected diagnosis plasma sample; cytology then cytospin", "tumor_fraction_percent": "median diagnosis bone marrow; join by patient_id"}
+      "sheet": "Inventaire",
+      "identity": "patient_id",
+      "required": [
+        "patient_id",
+        "sample_id",
+        "timepoint",
+        "specimen_type",
+        "nucleic_acid",
+        "tube",
+        "cfdna_ng_per_ml_plasma"
+      ],
+      "outcome_filters": {
+        "specimen_type": "plasma",
+        "nucleic_acid": "cfDNA",
+        "tube": "Roche"
+      },
+      "sources": {
+        "sex": [
+          "sex"
+        ],
+        "age_diag": [
+          "age_diag"
+        ],
+        "genetic_subtype": [
+          "genetic_subtype"
+        ],
+        "gb_per_l": [
+          "diag_blood_wbc_max_x10*9/L"
+        ],
+        "peripheral_blast_percent": [
+          "cytology",
+          "cytospin_%"
+        ],
+        "extraction_input_volume_ml": [
+          "extraction_input_volume_ml"
+        ],
+        "dna_concentration_ng_per_ul": [
+          "dna_concentration_ng_per_ul"
+        ],
+        "Hb_g_per_dL": [
+          "Hb_g_per_dL"
+        ],
+        "platelets_10e9_per_L": [
+          "platelets_10e9_per_L"
+        ]
+      },
+      "aggregation": {
+        "sex": "selected diagnosis plasma sample; no fallback",
+        "age_diag": "selected diagnosis plasma sample; no fallback",
+        "genetic_subtype": "first nonmissing diagnosis plasma; no other specimen matching",
+        "gb_per_l": "selected diagnosis plasma sample; no fallback",
+        "peripheral_blast_percent": "selected diagnosis plasma sample; cytology then cytospin",
+        "extraction_input_volume_ml": "selected diagnosis plasma sample; no fallback",
+        "dna_concentration_ng_per_ul": "selected diagnosis plasma sample; no fallback",
+        "Hb_g_per_dL": "selected diagnosis plasma sample; no fallback",
+        "platelets_10e9_per_L": "selected diagnosis plasma sample; no fallback"
+      }
     },
     "circall": {
-      "sheet": "cohorte_lal", "identity": "circall_id",
-      "required": ["circall_id", "sample_id", "timepoint", "specimen_type", "cfdna_ng_per_ml_plasma"],
-      "outcome_filters": {"specimen_type": "plasma"},
-      "sources": {"sex": [], "age_diag": [], "genetic_subtype": ["genetic_subtype"], "gb_per_l": ["diag_blood_wbc_x10*9/L"], "peripheral_blast_percent": ["diag_blood_blast_pct"], "tumor_fraction_percent": ["diag_bm_blast_pct"]},
-      "aggregation": {"sex": "unavailable; not derived", "age_diag": "unavailable; not derived", "genetic_subtype": "concordant diagnosis metadata", "gb_per_l": "concordant diagnosis metadata", "peripheral_blast_percent": "concordant diagnosis metadata", "tumor_fraction_percent": "concordant diagnosis metadata"}
+      "sheet": "cohorte_lal",
+      "identity": "circall_id",
+      "required": [
+        "circall_id",
+        "sample_id",
+        "timepoint",
+        "specimen_type",
+        "cfdna_ng_per_ml_plasma"
+      ],
+      "outcome_filters": {
+        "specimen_type": "plasma"
+      },
+      "sources": {
+        "genetic_subtype": [
+          "genetic_subtype"
+        ],
+        "gb_per_l": [
+          "diag_blood_wbc_max_x10*9/L"
+        ],
+        "peripheral_blast_percent": [
+          "diag_blood_blast_pct"
+        ],
+        "tumor_fraction_percent": [
+          "diag_bm_blast_pct"
+        ],
+        "corticoide_pre_tt": [
+          "corticoide_pre_tt"
+        ],
+        "sampling_time": [
+          "sampling_time"
+        ],
+        "elution_volume_ul": [
+          "elution_volume_ul"
+        ],
+        "extraction_input_volume_ml": [
+          "extraction_input_volume_ml"
+        ],
+        "dna_concentration_ng_per_ul": [
+          "dna_concentration_ng_per_ul"
+        ]
+      },
+      "aggregation": {
+        "genetic_subtype": "concordant diagnosis metadata",
+        "gb_per_l": "concordant diagnosis metadata",
+        "peripheral_blast_percent": "concordant diagnosis metadata",
+        "tumor_fraction_percent": "concordant diagnosis metadata",
+        "corticoide_pre_tt": "selected diagnosis plasma sample; no fallback",
+        "sampling_time": "selected diagnosis plasma sample; no fallback",
+        "elution_volume_ul": "selected diagnosis plasma sample; no fallback",
+        "extraction_input_volume_ml": "selected diagnosis plasma sample; no fallback",
+        "dna_concentration_ng_per_ul": "selected diagnosis plasma sample; no fallback"
+      }
     }
   },
-  "units": {"sex": "recorded category", "age_diag": "years", "genetic_subtype": "recorded category", "gb_per_l": "x10^9/L", "peripheral_blast_percent": "percentage points", "tumor_fraction_percent": "percentage points"},
+  "units": {
+    "sex": "recorded category",
+    "age_diag": "years",
+    "genetic_subtype": "recorded category",
+    "gb_per_l": "x10^9/L",
+    "peripheral_blast_percent": "percentage points",
+    "tumor_fraction_percent": "percentage points",
+    "corticoide_pre_tt": "recorded category",
+    "sampling_time": "morning before 12:00; afternoon from 12:00",
+    "elution_volume_ul": "µL",
+    "extraction_input_volume_ml": "mL",
+    "dna_concentration_ng_per_ul": "ng/µL",
+    "Hb_g_per_dL": "g/dL",
+    "platelets_10e9_per_L": "x10^9/L"
+  },
   "rules": {
+    "log_x_predictors": ["gb_per_l", "tumor_fraction_percent", "dna_concentration_ng_per_ul"],
     "source_annotations": "Selected inventory/donor literal missing and unknown markers standardized to na; historical aliases remain readable. Clinical uncertain significance is unchanged.",
     "identity": "Recorded IDs, trimmed without case folding, qualified by cohort; no name fallback or cross-cohort linkage",
     "receipt": "Present sample ID required for outcome; missing/unknown tokens and formulas are not receipt evidence",
@@ -35,12 +159,187 @@
     "clinical_validation": "Unknown/missing markers remain unavailable; malformed numeric clinical annotations or values outside approved ranges block the cohort",
     "blast_conversion": "Source fractions in [0,1] multiplied by 100 exactly once",
     "categorical_discordance": "Retrospective sex from selected sample, subtype first nonmissing diagnosis, with discordance counts retained; CIRCALL conflicting metadata block the cohort",
-    "inference": "Separate log10(cfDNA) OLS; existing HC3 continuous uncertainty, categorical omnibus, ordinary 95% intervals and estimability checks",
-    "correction": "BH within cohort over configured predictors; unavailable tests enter adjustment as p=1 and remain unavailable",
+    "inference": "Separate log10(recorded outcome) OLS for each requested pair; HC3 continuous uncertainty, categorical omnibus, ordinary 95% intervals; no multiplicity adjustment.",
+    "correction": "None, investigator requested unadjusted primary p-values; report the number of requested comparisons; no BH or other multiplicity adjustment.",
     "sensitivity": "Selected peripheral-blast Spearman only; two-sided asymptotic unadjusted secondary analysis",
-    "pooling": "Descriptive only; both cohorts and comparable confirmed units per predictor; cohort colors; no controls or pooled inference",
+    "pooling": "Descriptive only for requested pairs shared by both cohorts with comparable confirmed units; no controls or pooled inference.",
     "volume": "Legacy extraction_input_volume_ml is available specimen volume; entire volume used when extracted; retain recorded ng/mL endpoint; never use blood_volume_ml",
-    "unavailable": "Absolute peripheral/marrow blasts and hematocrit unavailable; no WBC-times-fraction derivation; Hb is not hematocrit",
-    "jitter_seed": 123
+    "unavailable": "Unavailable requested values/tests retain explicit coverage and skipped reasons; do not substitute follow-up values.",
+    "jitter_seed": 123,
+    "empty_diagnosis_rows": "Skip and count unassigned diagnosis rows only when participant/sample/DNA IDs and clinical/extraction measurements are unavailable; actual records with invalid IDs still block.",
+    "outcomes": "Read all five recorded endpoints from the same selected plasma row; preserve cfDNA-based sample selection and log10 positive-outcome analysis; no recalculation, pseudocount or endpoint-specific redraw.",
+    "sampling_time": "Morning before 12:00, afternoon from 12:00; recorded local clock time, no timezone inference or processing-delay derivation.",
+    "sampling_time_cutoff_hour": 12,
+    "scope": "Only the investigator-requested pairs: 31 CIRCALL and 30 retrospective; cytology then cytospin remains one predictor; no retrospective marrow or unrequested coverage rows.",
+    "retrospective_scope": "Diagnosis plasma only; no matching or metadata borrowing from blood-pellet, marrow or follow-up rows. Blood counts on other specimen rows do not supply missing plasma values.",
+    "comparison_switches": "Each cohort/outcome/predictor has a JSON true/false switch. False removes its testing, descriptions and figures; pooling requires both cohort switches enabled. Preparation, sample selection and integrity checks remain unchanged. All switches may be false; settings remain in audit and workbook Definitions."
+  },
+  "outcomes": {
+    "dna_total_ng": {
+      "label": "Total extracted DNA",
+      "unit": "ng",
+      "transform": "log10"
+    },
+    "dna_ng_per_ml_plasma": {
+      "label": "DNA per mL plasma",
+      "unit": "ng/mL plasma",
+      "transform": "log10"
+    },
+    "cfdna_total_ng": {
+      "label": "Total cfDNA",
+      "unit": "ng",
+      "transform": "log10"
+    },
+    "cfdna_ng_per_ml_plasma": {
+      "label": "cfDNA concentration",
+      "unit": "ng/mL plasma",
+      "transform": "log10"
+    },
+    "cfdna_fraction": {
+      "label": "cfDNA fraction",
+      "unit": "fraction (0–1)",
+      "transform": "log10"
+    }
+  },
+  "predictors": {
+    "sex": {
+      "label": "Sex",
+      "kind": "categorical"
+    },
+    "age_diag": {
+      "label": "Age at diagnosis",
+      "kind": "continuous"
+    },
+    "genetic_subtype": {
+      "label": "Genetic subtype",
+      "kind": "categorical"
+    },
+    "gb_per_l": {
+      "label": "Maximum diagnosis blood WBC (×10⁹/L)",
+      "kind": "continuous"
+    },
+    "peripheral_blast_percent": {
+      "label": "Peripheral blood blasts (%)",
+      "kind": "continuous"
+    },
+    "tumor_fraction_percent": {
+      "label": "Bone marrow blasts (%)",
+      "kind": "continuous"
+    },
+    "corticoide_pre_tt": {
+      "label": "Corticosteroid exposure before treatment",
+      "kind": "categorical"
+    },
+    "sampling_time": {
+      "label": "Sampling time of day",
+      "kind": "categorical"
+    },
+    "elution_volume_ul": {
+      "label": "Elution volume (µL)",
+      "kind": "continuous"
+    },
+    "extraction_input_volume_ml": {
+      "label": "Available plasma volume (mL)",
+      "kind": "continuous"
+    },
+    "dna_concentration_ng_per_ul": {
+      "label": "DNA concentration (ng/µL)",
+      "kind": "continuous"
+    },
+    "Hb_g_per_dL": {
+      "label": "Hemoglobin (g/dL)",
+      "kind": "continuous"
+    },
+    "platelets_10e9_per_L": {
+      "label": "Platelets (×10⁹/L)",
+      "kind": "continuous"
+    }
+  },
+  "comparisons": {
+    "circall": {
+      "dna_total_ng": {
+        "tumor_fraction_percent": true,
+        "peripheral_blast_percent": true,
+        "gb_per_l": true,
+        "corticoide_pre_tt": true,
+        "sampling_time": true,
+        "genetic_subtype": true
+      },
+      "dna_ng_per_ml_plasma": {
+        "tumor_fraction_percent": true,
+        "peripheral_blast_percent": true,
+        "gb_per_l": true,
+        "corticoide_pre_tt": true,
+        "sampling_time": true,
+        "elution_volume_ul": true,
+        "genetic_subtype": true
+      },
+      "cfdna_total_ng": {
+        "tumor_fraction_percent": true,
+        "peripheral_blast_percent": true,
+        "gb_per_l": true,
+        "corticoide_pre_tt": true,
+        "sampling_time": true,
+        "elution_volume_ul": true,
+        "genetic_subtype": true
+      },
+      "cfdna_ng_per_ml_plasma": {
+        "tumor_fraction_percent": true,
+        "peripheral_blast_percent": true,
+        "gb_per_l": true,
+        "corticoide_pre_tt": true,
+        "sampling_time": true,
+        "elution_volume_ul": true,
+        "genetic_subtype": true
+      },
+      "cfdna_fraction": {
+        "elution_volume_ul": true,
+        "extraction_input_volume_ml": true,
+        "sampling_time": true,
+        "dna_concentration_ng_per_ul": true
+      }
+    },
+    "retrospective": {
+      "dna_total_ng": {
+        "genetic_subtype": true,
+        "sex": true,
+        "age_diag": true,
+        "gb_per_l": true,
+        "Hb_g_per_dL": true,
+        "platelets_10e9_per_L": true,
+        "peripheral_blast_percent": true
+      },
+      "dna_ng_per_ml_plasma": {
+        "genetic_subtype": true,
+        "sex": true,
+        "age_diag": true,
+        "gb_per_l": true,
+        "Hb_g_per_dL": true,
+        "platelets_10e9_per_L": true,
+        "peripheral_blast_percent": true
+      },
+      "cfdna_total_ng": {
+        "genetic_subtype": true,
+        "sex": true,
+        "age_diag": true,
+        "gb_per_l": true,
+        "Hb_g_per_dL": true,
+        "platelets_10e9_per_L": true,
+        "peripheral_blast_percent": true
+      },
+      "cfdna_ng_per_ml_plasma": {
+        "genetic_subtype": true,
+        "sex": true,
+        "age_diag": true,
+        "gb_per_l": true,
+        "Hb_g_per_dL": true,
+        "platelets_10e9_per_L": true,
+        "peripheral_blast_percent": true
+      },
+      "cfdna_fraction": {
+        "extraction_input_volume_ml": true,
+        "dna_concentration_ng_per_ul": true
+      }
+    }
   }
 }

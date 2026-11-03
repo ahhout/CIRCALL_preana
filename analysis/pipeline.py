@@ -3,6 +3,7 @@ import argparse
 from contextlib import redirect_stderr
 from datetime import datetime, timezone
 import io
+import importlib
 import json
 import math
 import os
@@ -13,49 +14,41 @@ import sys
 from uuid import uuid4
 
 from analysis.configuration import unique_object as _unique_object
-from analysis.provenance import ROOT, artifact_index, digest, envelope, utc_now, verify_inputs, write_json
+from analysis.layer_configuration import LAYERS, read_profile, expand_layers, select_layers
+from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
 
 from .outputs import DIRECTORIES, audit_directory, publish, finish_run, LAYOUT_VERSION, publication_directory
 
-REGISTRY = {'canonical': 'pre_analysis', 'cfdna_associations': 'pre_analysis',
-            'blast_kinetics': 'pre_analysis', 'data_integrity': 'pre_analysis', 'sample_statistics': 'pre_analysis',
-            'advanced_analysis': 'pre_analysis', 'disease_modeling': 'pre_analysis'}
-LAYERED_WORKFLOWS = ('data_integrity', 'sample_statistics', 'advanced_analysis', 'disease_modeling')
-PATH_OPTIONS = {'inventory', 'circall', 'donors', 'blood-counts', 'extraction-protocols', 'retrospective-blasts', 'rules', 'definitions'}
-STATISTICS = {'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions', 'assessment-time'}
-ADVANCED = {'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions',
+LAYERED_WORKFLOWS = LAYERS
+REGISTRY = dict.fromkeys(LAYERED_WORKFLOWS, 'pre_analysis')
+PATH_OPTIONS = {'inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts', 'rules', 'definitions'}
+STATISTICS = {'pdf-output', 'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions', 'assessment-time'}
+ADVANCED = {'comparison-switches', 'pdf-output', 'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules', 'definitions',
             'predictors', 'pool-cohorts', 'spearman-sensitivity', 'retrospective-wbc-unit', 'sample-selection-seed'}
-DISEASE = {'inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts', 'cohort', 'analysis',
+DISEASE = {'pdf-output', 'inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts', 'cohort', 'analysis',
            'include-controls', 'pool-mrd', 'rules', 'definitions', 'blood-count-unit', 'retrospective-blast-unit',
            'baseline-day-max', 'baseline-selection', 'overlay-max-day', 'kinetics-y-scale',
            'mrd-unknown-level', 'mrd-negative-level', 'mrd-positive-nq-level', 'retrospective-mrd-duplicate-policy', 'jitter-seed'}
 INTEGRITY = {'inventory', 'circall', 'donors', 'cohort', 'include-controls', 'rules'}
-CANONICAL = {'inventory', 'circall', 'donors', 'blood-counts', 'extraction-protocols', 'cohort', 'analysis',
-             'mixed-random-slope-sensitivity', 'mixed-outlier-drop-n', 'pool-cohorts', 'pooled-timepoints',
-             'pool-mrd', 'mrd-unknown-level', 'mrd-negative-level', 'mrd-positive-nq-level', 'retrospective-mrd-tissue', 'retrospective-mrd-duplicate-policy', 'baseline-day-max', 'baseline-selection',
-             'overlay-max-day', 'kinetics-y-scale', 'plot-diagnosis-as-d1', 'retrospective-blasts', 'retrospective-blast-unit',
-             'trend-bootstrap-resamples', 'trend-bootstrap-seed', 'trend-bootstrap-method',
-             'longitudinal-followups', 'longitudinal-descriptive-visits'}
-ASSOCIATIONS = {'inventory', 'sheet', 'phase', 'blood-tissue', 'marrow-tissue', 'nucleic-acid', 'tube', 'log-level', 'predictors', 'circall', 'pool-cohorts', 'spearman-sensitivity', 'retrospective-wbc-unit'}
-BOOLEANS = {'spearman-sensitivity', 'pool-mrd', 'pool-cohorts', 'plot-diagnosis-as-d1', 'mixed-random-slope-sensitivity', 'include-controls'}
-INTEGERS = {'mixed-outlier-drop-n', 'baseline-day-max', 'overlay-max-day', 'trend-bootstrap-resamples', 'trend-bootstrap-seed', 'jitter-seed', 'sample-selection-seed'}
+BOOLEANS = {'pdf-output', 'spearman-sensitivity', 'pool-mrd', 'pool-cohorts', 'include-controls'}
+INTEGERS = {'baseline-day-max', 'overlay-max-day', 'jitter-seed', 'sample-selection-seed'}
 FLOATS = {'mrd-unknown-level', 'mrd-negative-level', 'mrd-positive-nq-level'}
 
 
 def option_argv(options):
     argv = []
     for key, value in options.items():
-        if key in BOOLEANS:
+        if key == 'comparison-switches':
+            if not isinstance(value, dict):
+                raise ValueError('comparison-switches must be an object')
+            argv.extend(['--comparison-switches', json.dumps(value, allow_nan=False)])
+        elif key in BOOLEANS:
             if type(value) is not bool:
                 raise ValueError(f'{key} must be Boolean')
-            if key == 'mixed-random-slope-sensitivity':
-                if value:
-                    argv.append('--' + key)
-            else:
-                argv.append(('--' if value else '--no-') + key)
-        elif key in ('pooled-timepoints', 'longitudinal-followups', 'longitudinal-descriptive-visits', 'predictors'):
-            if not isinstance(value, list) or (not value and key != 'longitudinal-descriptive-visits') or not all(isinstance(v, str) for v in value) or len(set(value)) != len(value):
-                raise ValueError(f'{key} must contain unique labels; only descriptive visits may be empty')
+            argv.append(('--' if value else '--no-') + key)
+        elif key == 'predictors':
+            if not isinstance(value, list) or not value or not all(isinstance(v, str) for v in value) or len(set(value)) != len(value):
+                raise ValueError(f'{key} must contain unique labels')
             argv.extend(['--' + key, *value])
         else:
             if key in INTEGERS:
@@ -71,7 +64,7 @@ def option_argv(options):
 
 
 def workflow_args(entry, output=None):
-    from analysis.cli import arguments
+    arguments = importlib.import_module('analysis.' + entry['name'] + '.runner').arguments
     argv = ['--workflow', entry['name'], *option_argv(entry['options'])]
     if output is not None:
         argv.extend(['--output-dir', str(output)])
@@ -83,14 +76,11 @@ def workflow_args(entry, output=None):
 
 
 def load_config(path):
-    path = Path(path).expanduser().resolve()
-    if not path.is_file():
-        raise ValueError('Pipeline configuration file is missing')
-    try:
-        config = json.loads(path.read_text(), object_pairs_hook=_unique_object,
-                            parse_constant=lambda _: (_ for _ in ()).throw(ValueError('Nonfinite JSON value')))
-    except (ValueError, UnicodeError):
-        raise ValueError('Pipeline configuration must be valid JSON with unique keys and finite numbers') from None
+    config, path, selections, _ = read_profile(path)
+    if config.get('schema_version') == 2:
+        config = expand_layers(config, {
+            'data_integrity': INTEGRITY, 'sample_statistics': STATISTICS,
+            'advanced_analysis': ADVANCED, 'disease_modeling': DISEASE})
     if (not isinstance(config, dict) or not {'schema_version', 'workflows'}.issubset(config)
             or set(config) - {'schema_version', 'workflows', 'output-dir', 'validate-only'}
             or type(config['schema_version']) is not int or config['schema_version'] != 1):
@@ -107,43 +97,41 @@ def load_config(path):
     seen = set()
     for entry in config['workflows']:
         if not isinstance(entry, dict) or not isinstance(entry.get('name'), str) or entry['name'] not in REGISTRY:
-            raise ValueError('Unknown registered workflow')
+            raise ValueError('Unknown or retired workflow; only the four layers are supported')
         name = entry['name']
         if name in seen:
             raise ValueError('A workflow may appear only once per run')
         seen.add(name)
-        if name == 'blast_kinetics':
-            if set(entry) != {'name', 'profile'} or not isinstance(entry['profile'], str) or not entry['profile'].strip():
-                raise ValueError('blast_kinetics requires name and profile only')
-            entry['profile'] = str((path.parent / Path(entry['profile']).expanduser()).resolve())
-            if not Path(entry['profile']).is_file():
-                raise ValueError('Kinetics profile file is missing')
-        else:
-            if set(entry) != {'name', 'options'} or not isinstance(entry['options'], dict):
-                raise ValueError(f'{name} requires name and options only')
-            allowed = {'canonical': CANONICAL, 'cfdna_associations': ASSOCIATIONS, 'data_integrity': INTEGRITY, 'sample_statistics': STATISTICS,
-                       'advanced_analysis': ADVANCED, 'disease_modeling': DISEASE}[name]
-            if not set(entry['options']).issubset(allowed):
-                raise ValueError(f'Unknown {name} options')
-            if name == 'canonical' and 'circall' not in entry['options']:
-                raise ValueError('canonical requires an explicitly configured circall workbook')
-            for key in entry['options'].keys() & PATH_OPTIONS:
-                value = entry['options'][key]
-                if not isinstance(value, str) or not value.strip():
-                    raise ValueError(f'{key} must be a nonempty path')
-                entry['options'][key] = str((path.parent / Path(value).expanduser()).resolve())
-            workflow_args(entry)
-    return config
+        if set(entry) != {'name', 'options'} or not isinstance(entry['options'], dict):
+            raise ValueError(f'{name} requires name and options only')
+        allowed = {'data_integrity': INTEGRITY, 'sample_statistics': STATISTICS,
+                   'advanced_analysis': ADVANCED, 'disease_modeling': DISEASE}[name]
+        if not set(entry['options']).issubset(allowed):
+            raise ValueError(f'Unknown {name} options')
+        for key in entry['options'].keys() & PATH_OPTIONS:
+            value = entry['options'][key]
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f'{key} must be a nonempty path')
+            entry['options'][key] = str((path.parent / Path(value).expanduser()).resolve())
+        workflow_args(entry)
+    for selection in selections:
+        config = select_layers(config, selection)
+    return select_layers(config, [1, 2, 3, 4])
 
 
 def arguments(argv=None):
-    parser = argparse.ArgumentParser(description='Run isolated workflows from a version-1 JSON configuration', allow_abbrev=False)
+    parser = argparse.ArgumentParser(description='Run the layered pipeline from its master configuration', allow_abbrev=False)
     parser.add_argument('--config', default=ROOT / 'configs/pipeline_layers.json', type=Path,
-                        help='Pipeline JSON (default: repository configs/pipeline_layers.json; compatibility: configs/pipeline_all.json)')
+                        help='Pipeline JSON (default: repository configs/pipeline_layers.json)')
     parser.add_argument('--output-dir', type=Path, help='Fresh destination; existing directories are refused')
+    parser.add_argument('--pdf-output', action=argparse.BooleanOptionalAction, default=None,
+                        help='Override PDF figure output for Layers 2–4; PNGs are always saved')
     parser.add_argument('--validate-only', action=argparse.BooleanOptionalAction, default=None,
                         help='Validate all sources, headers and environments without publishing results')
-    args = parser.parse_args(argv)
+    supplied = sys.argv[1:] if argv is None else argv
+    if any(arg.split('=')[0] in ('--layers', '--workflow') for arg in supplied):
+        parser.error('Partial layer execution is retired; use python3 run.py for all four layers')
+    args = parser.parse_args(supplied)
     args.config = args.config.expanduser().resolve()
     if args.output_dir is not None:
         args.output_dir = args.output_dir.expanduser().absolute()
@@ -213,10 +201,7 @@ def preflight(config, output):
                     reason = details.get('error_code', 'worker_failed')
                 except ValueError:
                     reason = 'worker_unavailable'
-                if reason == 'CatalogHashMismatch':
-                    errors.append(f'{name}: workbook hash differs from configs/source_catalog.json; review the workbook revision and update its pin, or explicitly select --inventory PATH')
-                else:
-                    errors.append(f'{name}: {reason}; verify environment, configuration, sources and headers')
+                errors.append(f'{name}: {reason}; verify environment, configuration, sources and headers')
                 continue
             record = json.loads(result.stdout)
             if record.get('status') != 'complete' or record.get('workflow') != name or record.get('schema_version') != 1 or record.get('environment_name') != REGISTRY[name] or not isinstance(record.get('inputs'), dict):
@@ -234,28 +219,17 @@ def preflight(config, output):
 
 def run(args):
     try:
-        configuration_source = {'configuration': {'path': str(args.config), 'sha256': digest(args.config)}}
+        configuration_paths = read_profile(args.config)[3]
+        configuration_source = {('configuration' if i == 0 else f'configuration_{i}'):
+                                {'path': str(path), 'sha256': digest(path)}
+                                for i, path in enumerate(configuration_paths)}
         config = load_config(args.config)
-        layered = tuple(entry['name'] for entry in config['workflows']) == LAYERED_WORKFLOWS
+        if getattr(args, 'pdf_output', None) is not None:
+            for entry in config['workflows']:
+                if entry['name'] != 'data_integrity':
+                    entry['options']['pdf-output'] = args.pdf_output
         if args.output_dir is None:
-            if config.get('output-dir'):
-                args.output_dir = Path(config['output-dir'])
-            elif layered:
-                args.output_dir = ROOT / 'outputs/layered' / datetime.now(timezone.utc).strftime('run_%Y%m%dT%H%M%S%fZ')
-            elif [entry['name'] for entry in config['workflows']] == ['disease_modeling']:
-                from analysis.disease_modeling.runner import default_output_dir
-                args.output_dir = default_output_dir()
-            elif [entry['name'] for entry in config['workflows']] == ['advanced_analysis']:
-                from analysis.advanced_analysis.runner import default_output_dir
-                args.output_dir = default_output_dir()
-            elif [entry['name'] for entry in config['workflows']] == ['sample_statistics']:
-                from analysis.sample_statistics.runner import default_output_dir
-                args.output_dir = default_output_dir()
-            elif [entry['name'] for entry in config['workflows']] == ['data_integrity']:
-                from analysis.data_integrity.runner import default_output_dir
-                args.output_dir = default_output_dir()
-            else:
-                args.output_dir = ROOT / 'output' / datetime.now(timezone.utc).strftime('run_%Y-%m-%d_%H-%M-%S.%f_UTC')
+            args.output_dir = Path(config['output-dir']) if config.get('output-dir') else ROOT / 'outputs/layered' / datetime.now(timezone.utc).strftime('run_%Y%m%dT%H%M%S%fZ')
         if args.validate_only is None:
             args.validate_only = config.get('validate-only', False)
         evidence = preflight(config, args.output_dir)
@@ -278,17 +252,14 @@ def run(args):
     (output / '.audit/logs').mkdir(parents=True)
     (output / '.audit/workflows').mkdir()
     code = [ROOT / 'run.py', *sorted((ROOT / 'analysis').rglob('*.py'))]
-    if layered:
-        code.append(ROOT / 'run_all_layers.sh')
-    manifest = envelope('pipeline', config, {'configuration': args.config}, code)
-    if layered:
-        manifest.update(run_id=uuid4().hex, pipeline_kind='layered', failure_policy={
-            'preflight_infrastructure': 'abort_before_execution',
-            'workflow_failure': 'continue_independent_workflows',
-            'cohort_quality': 'preserve_gates_and_publish_independent_reports',
-            'source_change': 'invalidate_affected_workflows',
-            'interruption': 'stop_and_mark_remaining_not_run',
-        })
+    manifest = envelope('pipeline', config, {key: value['path'] for key, value in configuration_source.items()}, code)
+    manifest.update(run_id=uuid4().hex, pipeline_kind='layered', failure_policy={
+        'preflight_infrastructure': 'abort_before_execution',
+        'workflow_failure': 'continue_independent_workflows',
+        'cohort_quality': 'preserve_gates_and_publish_independent_reports',
+        'source_change': 'invalidate_affected_workflows',
+        'interruption': 'stop_and_mark_remaining_not_run',
+    })
     manifest['workflows'] = [{'name': e['name'], 'environment_name': REGISTRY[e['name']], 'status': 'pending',
                               'preflight': evidence[e['name']]} for e in config['workflows']]
     manifest.update(output_layout_version=LAYOUT_VERSION, publications=[])
@@ -303,7 +274,7 @@ def run(args):
             state.update(status='running', started_utc=utc_now(), output_dir=str(publication_directory(output,name).relative_to(output)), audit_dir=str(destination.relative_to(output)),
                          command=worker_command(name, output=destination))
             write_json(path, manifest)
-            label = f'Layer {LAYERED_WORKFLOWS.index(name) + 1} ({name})' if layered else name
+            label = f'Layer {LAYERED_WORKFLOWS.index(name) + 1} ({name})'
             print(f'Running {label}', flush=True)
             try:
                 verify_inputs(manifest['inputs'])

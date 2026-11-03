@@ -38,10 +38,5 @@ def test_methods_match_frozen_reference(case):
                 assert actual[key] == expected
 
 
-def test_predictor_configuration_and_compatibility_exports():
-    from analysis.cfdna_associations import analyze_blast_cfdna as compatibility
+def test_predictor_configuration_matches_frozen_reference():
     assert [asdict(p) for p in methods.PREDICTORS] == REFERENCE['predictors']
-    for name in ('PredictorConfig', 'PREDICTORS', 'DEFAULT_PREDICTORS', 'select_predictors',
-                 'add_predictor_argument', 'prepare_analysis_data', 'fit_regression',
-                 'model_diagnostics', 'plot_assumptions', 'spearman_sensitivity'):
-        assert getattr(compatibility, name) is getattr(methods, name)

@@ -43,7 +43,10 @@ def prepare(path, cohort, d, *, baseline_day_max, baseline_selection, overlay_ma
                 seen.add((key, day))
             elif state == 'invalid':
                 raise ClinicalError('invalid_count_cell', sheet=sheet, cell=cell.coordinate)
-            records.append(dict(cohort=cohort, subject_hash=key, measurement=sheet, day=day,
+            from analysis.plot_style import center_from_id
+            records.append(dict(cohort=cohort, subject_hash=key,
+                                center=center_from_id(row[config['identity']].value, cohort),
+                                measurement=sheet, day=day,
                                 value=value, source_state=state, selected_for_plot=value is not None,
                                 display_day=baseline_day_max if day is not None and day <= baseline_day_max else day,
                                 source_sheet=sheet, source_row=cell.row,

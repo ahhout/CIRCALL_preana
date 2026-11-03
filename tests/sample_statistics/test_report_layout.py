@@ -1,4 +1,6 @@
 """Presentation checks against independent saved aggregates, without refitting."""
+
+from tests.fixtures.sample_statistics import saved_result
 from copy import deepcopy
 import json
 
@@ -10,29 +12,6 @@ from analysis.sample_statistics.core import load_definitions
 from analysis.sample_statistics.reporting import inventory_records, workbook, validate_workbook
 
 
-def saved_result():
-    summary = dict(view='overall', samples=10, patients=3, received_samples=7, received_patients=3)
-    receipt = [dict(view='overall', basis='deadline', status=status, samples=count, patients=3,
-                    overdue_samples=2 if status == 'marked_missing' else 0,
-                    classified_samples=classified, classified_denominator=7,
-                    classified_percentage=classified / 7 if classified else None)
-               for status, count, classified in [('received', 5, 5), ('marked_missing', 2, 2), ('unassessed', 1, 0)]]
-    receipt.append(dict(view='overall', basis='manual', status='received', samples=2, patients=1,
-                        overdue_samples=0, classified_samples=None, classified_denominator=None,
-                        classified_percentage=None))
-    measurement = dict(view='visit', field='dna_total_ng', unit='ng', specimen='plasma', assay='plasma DNA',
-                       visit='diag', received_samples=7, available_patients=3, unavailable_samples=2,
-                       n=5, mean=4., sd=1.5811388300841898, median=4., q1=3., q3=5., minimum=2., maximum=6., total=20.)
-    return dict(scope='circall', status='complete', include_controls=True, blocking=[],
-                metadata=dict(cohort='circall', assessment_time='2026-10-07T12:00:00+00:00'),
-                tables=dict(summary=[summary], receipt=receipt, measurements=[measurement],
-                            availability=[dict(view='overall', field='extraction_status', state='yes', count=6),
-                                          dict(view='overall', field='extraction_status', state='no', count=4)],
-                            missed=[dict(patient_id='=SYNTHETIC_PSEUDONYM', center='RDB', visit='diag',
-                                         specimen='plasma', sheet='synthetic', row=2, receipt_reason='Overdue')],
-                            audit_detail={'summary': [{'center': 'AUDIT_ONLY_CENTER'}]}),
-                controls=dict(summary=[dict(summary, samples=2, patients=2, received_samples=2)],
-                              measurements=[dict(measurement, n=2)], receipt=[], availability=[]))
 
 
 def rows(sheet, header=5):
@@ -64,20 +43,22 @@ def test_layout_saved_values_hidden_details_and_identifier_safety(tmp_path):
     assert result == original
     book = load_workbook(path)
     try:
-        assert book.sheetnames == ['Inventory', 'Measurements', 'Controls', 'Overdue', 'Reference']
+        assert book.sheetnames == ['Inventaire', 'Mesures', 'Témoins', 'Retards', 'Reference']
         assert book['Reference'].sheet_state == 'hidden'
-        assert book.active.title == 'Inventory'
-        inventory = rows(book['Inventory'])[0]
-        assert inventory['Receipt rate'] == pytest.approx(5 / 7)
-        assert book['Inventory']['J6'].number_format == '0.0%'
-        assert '5 due received / 7 assessed samples' in book['Inventory']['J6'].comment.text
-        measurement = rows(book['Measurements'])[0]
-        assert measurement['Median'] == 4 and measurement['Measured samples'] == 5
-        assert measurement['Missing samples'] == 2 and measurement['Visit'] == 'Diagnosis'
-        assert book['Measurements'].column_dimensions['K'].hidden
-        assert rows(book['Overdue'])[0]['Patient'] == '=SYNTHETIC_PSEUDONYM'
-        assert book['Overdue']['A6'].data_type == 's'
-        assert book['Overdue'].column_dimensions['F'].hidden
+        assert book.active.title == 'Inventaire'
+        inventory = rows(book['Inventaire'])[0]
+        assert inventory['Taux de réception'] == pytest.approx(5 / 7)
+        assert book['Inventaire']['K6'].number_format == '0.0%'
+        assert book['Inventaire']['K6'].comment is None
+        assert inventory['Reçus éligibles au taux'] == 5 and inventory['Dénominateur planifié'] == 7
+        assert all(cell.comment is None for row in book['Inventaire'] for cell in row)
+        measurement = rows(book['Mesures'])[0]
+        assert measurement['Médiane'] == 4 and measurement['Échantillons mesurés'] == 5
+        assert measurement['Mesure indisponible'] == 2 and measurement['Timepoint'] == 'Diagnostic'
+        assert book['Mesures'].column_dimensions['K'].hidden
+        assert rows(book['Retards'])[0]['Patient'] == '=SYNTHETIC_PSEUDONYM'
+        assert book['Retards']['A6'].data_type == 's'
+        assert book['Retards'].column_dimensions['F'].hidden
         reference = rows(book['Reference'])
         for section in ('summary', 'receipt', 'measurements', 'availability'):
             expected = result['tables'][section]
@@ -123,9 +104,9 @@ def test_blocked_report_never_presents_saved_numbers_as_valid_results(tmp_path):
     path = tmp_path/'blocked.xlsx'
     workbook(path, result, definitions)
     book = load_workbook(path)
-    assert rows(book['Inventory'])[0]['Reason'] == 'Invalid value'
-    assert rows(book['Measurements'])[0]['Status'].startswith('Blocked:')
-    assert rows(book['Overdue'])[0]['Status'].startswith('Blocked:')
+    assert rows(book['Inventaire'])[0]['Motif'] == 'Valeur invalide'
+    assert rows(book['Mesures'])[0]['Statut'].startswith('Bloqué :')
+    assert rows(book['Retards'])[0]['Statut'].startswith('Bloqué :')
     book.close()
 
 
@@ -134,3 +115,131 @@ def test_mismatched_denominators_are_rejected():
     result['tables']['receipt'][1]['classified_denominator'] = 8
     with pytest.raises(ValueError, match='denominators disagree'):
         inventory_records(result['tables'])
+
+
+def test_centers_and_late_checklist_reconcile_without_changing_receipt_rates(tmp_path):
+    from datetime import date
+    from analysis.sample_statistics.core import receipt, aggregate, assessment
+    from analysis.sample_statistics.reporting import display_order
+    d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
+    observations=[]
+    for i,(center,pid,sample) in enumerate([('RDB','P1','RECEIVED'),('RDB','P1','na'),
+                                          ('RDB','P1',None),('TRS','P2','RECEIVED'),('TRS','P3','?')]):
+        observations.append(dict(center=center,subject_key=pid,patient_id=pid,visit='tp1',
+                                 specimen='plasma',control=False,extraction_status='no',measurements={},
+                                 sheet='synthetic',row=i+2,
+                                 **receipt(sample,'tp1',date(2026,10,1),'circall',
+                                           assessment('2026-10-05T12:00:00+02:00'),d)))
+    tables=aggregate(observations,{**d,'metrics':{}})
+    inventory=display_order(inventory_records(tables),d)
+    assert [r['Center'] for r in inventory[:3]]==['All centers','RDB','TRS']
+    assert all(r['Specimen']=='All specimens' and r['Timepoint']=='All timepoints' for r in inventory[:3])
+    assert [r['Inventory samples'] for r in inventory[:3]]==[5,3,2]
+    assert [r['Patients'] for r in inventory[:3]]==[3,1,2]
+    assert [r['Overdue'] for r in inventory[:3]]==[3,2,1]
+    assert [r['Marked missing'] for r in inventory[:3]]==[1,1,0]
+    assert [r['Receipt rate'] for r in inventory[:3]]==[pytest.approx(2/3),.5,1.]
+    result=saved_result()
+    result.update(tables=tables,include_controls=False)
+    path=tmp_path/'late.xlsx'
+    workbook(path,result,d)
+    validate_workbook(path,result,d)
+    book=load_workbook(path)
+    try:
+        checklist=rows(book['Retards'])
+        assert [r['Statut'] for r in checklist]==['En retard','En retard','Signalé manquant']
+        assert 'Motif' not in checklist[0] and 'Visit' not in checklist[0]
+        assert all(r['Timepoint']=='TP1' for r in checklist)
+        for sheet in book:
+            if sheet.sheet_state=='visible':
+                import re
+                assert not any(re.search(r'\bvisits?\b',v,re.I) for row in sheet.values for v in row if isinstance(v,str))
+        assert book['Inventaire']['K6'].number_format=='0.0%'
+        assert book['Inventaire']['K6'].comment is None
+        assert all(cell.comment is None for row in book['Inventaire'] for cell in row)
+    finally:
+        book.close()
+
+
+def test_unknown_center_is_retained_in_its_own_inventory_row():
+    result=saved_result()
+    detail=result['tables']['audit_detail']
+    detail['summary'].append(dict(view='center',center='unknown',samples=1,patients=1,
+                                  received_samples=0,received_patients=0))
+    inventory=inventory_records(result['tables'])
+    unknown=next(r for r in inventory if r['Center']=='Unknown')
+    assert unknown['Inventory samples']==1 and unknown['Receipt rate'] is None
+
+
+def test_french_tables_match_headers_and_preserve_native_evidence(tmp_path):
+    result=saved_result()
+    d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
+    path=tmp_path/'francais.xlsx'
+    workbook(path,result,d)
+    book=load_workbook(path)
+    for sheet in book:
+        if sheet.sheet_state=='hidden':continue
+        assert sheet['A1'].value.startswith('CIRCALL · ')
+        assert sheet['A2'].value.startswith('Statut : terminé | Évaluation : ')
+        for table in sheet.tables.values():
+            from openpyxl.utils.cell import range_boundaries
+            left,top,right,_=range_boundaries(table.ref)
+            assert [column.name for column in table.tableColumns]==[
+                sheet.cell(top,column).value for column in range(left,right+1)]
+    assert book['Retards']['A6'].value=='=SYNTHETIC_PSEUDONYM'
+    assert book['Retards']['A6'].data_type=='s'
+    assert book['Reference'].sheet_state=='hidden'
+    book.close()
+
+
+def test_circall_inventory_adds_tissue_totals_without_summing_patient_counts(tmp_path):
+    result=saved_result()
+    tables=result['tables']
+    tables['summary'] += [dict(view='specimen_visit',specimen='plasma',visit=visit,
+                              samples=n,patients=2,received_samples=n,received_patients=2)
+                          for visit,n in [('diag',2),('tp1',3)]]
+    # A participant can occur at multiple timepoints; use the existing distinct total.
+    tables['audit_detail']['summary'].append(dict(view='specimen',specimen='plasma',
+                            samples=5,patients=2,received_samples=5,received_patients=2))
+    d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
+    path=tmp_path/'totaux.xlsx'
+    workbook(path,result,d)
+    book=load_workbook(path)
+    tissue=[r for r in rows(book['Inventaire']) if r['tissue']=='plasma']
+    assert [r['Timepoint'] for r in tissue]==['Tous les temps','Diagnostic','TP1']
+    assert tissue[0]['Échantillons inventoriés']==5
+    assert tissue[0]['Patients']==2
+    assert tissue[0]['Reçus']==5
+    book.close()
+
+
+def test_tissue_subtotals_show_all_centers_rdb_and_trs_with_distinct_patients(tmp_path):
+    from datetime import date
+    from analysis.sample_statistics.core import receipt, aggregate, assessment
+    d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
+    observations=[]
+    for center,pid,specimen,visit,sample in [
+        ('RDB','P1','plasma','diag','RECEIVED'),('RDB','P1','plasma','tp1','na'),
+        ('TRS','P2','plasma','diag','RECEIVED'),('TRS','P2','plasma','tp1',None),
+        ('RDB','P1','CSF','diag','RECEIVED')]:
+        observations.append(dict(center=center,subject_key=pid,patient_id=pid,visit=visit,
+            specimen=specimen,control=False,extraction_status='no',measurements={},
+            sheet='synthetic',row=len(observations)+2,
+            **receipt(sample,visit,date(2026,10,1),'circall',
+                      assessment('2026-10-05T12:00:00+02:00'),d)))
+    result=saved_result()
+    result.update(tables=aggregate(observations,{**d,'metrics':{}}),include_controls=False)
+    path=tmp_path/'centres.xlsx'
+    workbook(path,result,d)
+    book=load_workbook(path)
+    inventory=rows(book['Inventaire'])
+    for tissue,expected in [('plasma',[(4,2),(2,1),(2,1)]),('LCR',[(1,1),(1,1),(0,0)])]:
+        records=[r for r in inventory if r['tissue']==tissue]
+        totals=records[:3]
+        assert [r['Centre'] for r in totals]==['Tous les centres','RDB','TRS']
+        assert all(r['Timepoint']=='Tous les temps' for r in totals)
+        assert [(r['Échantillons inventoriés'],r['Patients']) for r in totals]==expected
+    plasma=[r for r in inventory if r['tissue']=='plasma'][:3]
+    assert [r['Taux de réception'] for r in plasma]==[pytest.approx(2/3),.5,1.]
+    assert [r['Hors délai'] for r in plasma]==[2,1,1]
+    book.close()

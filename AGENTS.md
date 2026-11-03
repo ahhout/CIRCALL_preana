@@ -4,15 +4,19 @@
 
 - This repository covers CIRCALL sample handling and inventory, DNA recovery,
   longitudinal summaries, cfDNA associations, and normalized blast kinetics.
-- Layers 1–4 are the default through `python run.py` or `./run_all_layers.sh`,
-  selecting `configs/pipeline_layers.json`. Older workflows remain explicit
-  compatibility interfaces pending validated migrations. Each workflow retains
-  its scientific rules; all active workflows use the shared pre_analysis Conda environment.
+- Layers 1–4 are the default through the sole `python3 run.py` launcher, which enters Conda automatically,
+  selecting `configs/pipeline_layers.json`. Only complete four-layer execution is public; per-layer modules are internal.
+  The four layered workflows are active. Older scientific packages, profiles, validators and instructions are
+  archived under archive/retired/older_workflows_20261008/. Preserve the accepted
+  layered behavior; older-only capabilities require separate scope.
+  All active workflows use the shared pre_analysis Conda environment.
 - Before changing a workflow, read README.md, its contract in
   docs/workflow_contracts.md, and any applicable nested AGENTS.md.
-- Operational guidance is in docs/analysis_guide.md, docs/audit_guide.md, and
-  docs/blast_kinetics.md. Follow workflow-specific safeguards, including stricter
-  identifier and row-export restrictions in analysis/blast_kinetics/AGENTS.md.
+- Operational guidance is in docs/configuration.md, docs/results.md, and
+  docs/audit_guide.md; the retirement boundary and reproduction instructions are
+  in docs/replacement_coverage.md.
+  Follow workflow-specific safeguards, including Layer 4 aggregate-export restrictions
+  in docs/layers/disease_modeling.md and docs/workflow_contracts.md.
 - Do not interpret layout or maintenance work as authorization to change
   scientific behavior.
 
@@ -44,15 +48,18 @@
 
 ## Entry points and repository structure
 
-- Use `python run.py` or `./run_all_layers.sh` for the four-layer pipeline.
-  Combined runs publish under `outputs/layered/`; individual-layer profiles keep
-  their own destinations. Quality holds preserve independent results but produce
-  a nonzero overall exit; the CIRCALL MRD hold must not be bypassed.
-- Use `--config configs/pipeline_all.json` for the former combined default.
-  Explicit `python -m analysis.blast_kinetics` remains available as documented.
-- Preserve active run.py flags and JSON names canonical, cfdna_associations, and
-  blast_kinetics. Legacy execution was retired by user request. Do not restore former
-  scripts or kinetics_pipeline module entrypoints without a compatibility decision.
+- Use `python3 run.py` for the four-layer pipeline; it launches the existing
+  pre_analysis Conda environment itself. The former shell launcher is archived.
+  Every new run publishes under `outputs/layered/`; public partial-layer commands
+  and selector profiles are retired. Historical single-layer results remain readable. Quality holds preserve independent results but produce
+  a nonzero overall exit; CIRCALL MRD clinical gates must not be bypassed.
+  The approved October 8 NQ/sensitivity contract amendment defines current category scope.
+- Keep dispatch limited to data_integrity, sample_statistics, advanced_analysis and
+  disease_modeling, requiring all four in retained schema-1 configurations and schema-2 masters/references.
+  Legacy enabled switches may be omitted or true; false and partial selections fail.
+  Canonical, cfdna_associations, blast_kinetics and their five compatibility profiles
+  are retired; old commands must fail without selecting another workflow.
+  Do not restore archived entrypoints or migrate older-only methods without a separate decision.
 - Keep active code in analysis/, configuration in configs/, environment
   definitions in environments/, and documentation in docs/.
 - Treat archive/ and earlier outputs as retained evidence.
@@ -98,9 +105,8 @@
 
 ## Execution, provenance, and results
 
-- Use integrated --validate-only preflight before integrated execution. Follow
-  each entry point's documented validation behavior: standalone kinetics
-  --validate-only can fit models.
+- Use integrated --validate-only preflight before execution. Internal layer
+  preflights retain their documented scientific depth; they are not public commands.
 - Use the existing audit mechanism to record input hashes, resolved settings,
   command, code version/hashes, environment lock, and actual package versions.
 - Preserve the audit schema's ISO 8601 started_utc and finished_utc fields.
@@ -149,6 +155,15 @@
 
 ## Validation and documentation
 
+- Follow the documentation ownership table in README.md. Put routine layered run
+  commands and destinations there, shared validation/publication behavior in
+  docs/audit_guide.md, and report interpretation in the relevant workflow guide.
+- Link to profiles/definitions for current sources and option values instead of
+  copying complete configurations into multiple guides. Update the owning document
+  and its links when behavior changes; avoid appending duplicate explanations.
+- Keep dated acceptance records and original plans historical. Preserve executed
+  commands, source versions and findings; label superseded guidance and unresolved
+  evidence paths rather than presenting them as current instructions.
 - Use relevant checks from docs/audit_guide.md and applicable workflow instructions.
   Match validation to the concrete risk; reuse successful checks when appropriate.
 - Report exact validation commands and limitations. Software tests alone do not

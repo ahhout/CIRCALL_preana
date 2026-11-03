@@ -1,0 +1,15 @@
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+................................................................... [ 41%]
+................................................................. [ 54%]
+.......................................................................................................... [ 75%]
+..................................................... [ 85%]
+.........................................................................                  [100%]
+=============================== warnings summary ===============================
+tests/sample_analysis/test_statistical_plots.py::StatisticalPlotTests::test_welch_uses_adjusted_p_and_validates_counts
+tests/sample_analysis/test_statistical_plots.py::StatisticalPlotTests::test_welch_uses_adjusted_p_and_validates_counts
+  /home/arnohoutman/projects/pre_analysis/analysis/sample_analysis/statistical_plots.py:63: PendingDeprecationWarning: vert: bool will be deprecated in a future version. Use orientation: {'vertical', 'horizontal'} instead.
+    ax.boxplot([values], positions=[i], vert=False, widths=.45, patch_artist=True,
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+508 passed, 2 warnings, 123 subtests passed in 272.14s (0:04:32)

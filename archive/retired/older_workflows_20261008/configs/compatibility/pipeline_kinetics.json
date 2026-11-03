@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "workflows": [
+    {
+      "name": "canonical",
+      "options": {
+        "circall": "../../input/inventaire_CIRCALL_01102026.xlsx",
+        "donors": "../../input/cfDNA_donors.xlsx",
+        "blood-counts": "../../input/CIRCALL_wbc_blast_count_01102026.xlsx",
+        "extraction-protocols": "../sample_analysis/extraction_protocols.json",
+        "cohort": "all",
+        "analysis": "kinetics",
+        "pool-cohorts": false,
+        "baseline-day-max": 1,
+        "baseline-selection": "latest",
+        "overlay-max-day": 8,
+        "kinetics-y-scale": "log",
+        "mrd-unknown-level": 1e-06,
+        "mrd-negative-level": 1e-08,
+        "retrospective-blasts": "../../input/retrospective_blast_count_01102026.xlsx",
+        "retrospective-blast-unit": "x10^9/L",
+        "inventory": "../../input/cfDNA_inventaire_retrospective.xlsx",
+        "retrospective-mrd-tissue": "Moelle",
+        "retrospective-mrd-duplicate-policy": "worst",
+        "pool-mrd": true
+      }
+    }
+  ]
+}

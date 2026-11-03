@@ -1,12 +1,9 @@
 """Independent Layer 3 diagnosis associations with whole-cohort integrity gates."""
 import argparse
-from copy import copy
-from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import re
-import sys
 from types import SimpleNamespace
 
 import pandas as pd
@@ -19,14 +16,12 @@ from analysis.retrospective_controls import inspect_with_controls
 from .preparation import load_definitions, prepare
 from .reporting import workbook, validate_workbook, figures
 from .statistics import analyze, clean
-
-
-def default_output_dir():
-    return ROOT/'outputs/layer3_advanced_analysis'/('run_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
+from .schema import observation_columns, with_comparison_switches
 
 
 def arguments(argv=None):
     p = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    p.add_argument('--pdf-output', action=argparse.BooleanOptionalAction, default=True, help='Save PDF figures alongside PNGs (default: enabled)')
     p.add_argument('--workflow', choices=['advanced_analysis'], default='advanced_analysis')
     for field in ('inventory', 'circall', 'donors', 'output-dir'):
         p.add_argument('--'+field, type=Path)
@@ -37,14 +32,23 @@ def arguments(argv=None):
     p.add_argument('--pool-cohorts', action=argparse.BooleanOptionalAction, default=True, help='Compatible pooled descriptions; no pooled inference')
     p.add_argument('--retrospective-wbc-unit', choices=['unknown', 'x10^9/L'], default='unknown')
     p.add_argument('--validate-only', action='store_true')
+    p.add_argument('--comparison-switches', type=json.loads,
+                   help='JSON comparison matrix; the master profile supplies these switches')
     p.add_argument('--sample-selection-seed', type=int, default=123, help='Reproducible selection of one numeric diagnosis sample per patient')
-    engine.add_predictor_argument(p)
+    definitions = load_definitions(ROOT/'configs/definitions/advanced_analysis.json')
+    p.add_argument('--spearman-sensitivity', action=argparse.BooleanOptionalAction, default=True,
+                   help='Secondary unadjusted peripheral-blast Spearman for each selected outcome')
+    p.add_argument('--predictors', nargs='+', choices=['requested', *definitions['predictors']], default=['requested'],
+                   help='Test all requested pairs, or restrict testing to these predictors within the requested matrix')
     a = p.parse_args(argv)
+    if a.comparison_switches is not None:
+        try:
+            with_comparison_switches(load_definitions(a.definitions), a.comparison_switches)
+        except ValueError as error:
+            p.error(str(error))
     if a.sample_selection_seed < 0:
         p.error('Sample selection seed must be nonnegative')
-    try:
-        engine.select_predictors(a.predictors)
-    except ValueError:
+    if len(set(a.predictors)) != len(a.predictors) or ('requested' in a.predictors and len(a.predictors) != 1):
         p.error('Predictors must be a nonempty unique selection')
     for cohort, field in [('retrospective', 'inventory'), ('circall', 'circall')]:
         if a.cohort in ('all', cohort) and getattr(a, field) is None:
@@ -57,7 +61,8 @@ def arguments(argv=None):
 
 def preflight(args):
     rules = load_rules(args.rules)
-    definitions = load_definitions(args.definitions)
+    definitions = with_comparison_switches(load_definitions(args.definitions),
+                                          getattr(args, 'comparison_switches', None))
     definitions['rules']['sample_selection_seed'] = args.sample_selection_seed
     inputs, states = capture_sources(args)
     inputs['definitions'] = args.definitions
@@ -102,7 +107,8 @@ def run(args):
                 if model is not None:
                     diagnostics = native/'diagnostics'/variable
                     diagnostics.mkdir(parents=True)
-                    engine.plot_assumptions(model, diagnostics)
+                    outcome = variable.split('/')[0]
+                    engine.plot_assumptions(model, diagnostics, outcome_label=d['outcomes'][outcome]['label'], cohort=scope)
             figures(native/'figures', frame, result, models, args, d)
         workbook(native/'associations.xlsx', result, d)
         validate_workbook(native/'associations.xlsx', result, d)
@@ -198,8 +204,7 @@ def validate_results(output, record):
         validate_workbook(native/'associations.xlsx', result, d)
         if result['status'] == 'complete':
             rows = json.loads((native/'observations.json').read_text())
-            columns = ['subject_hash', 'cohort', 'cfdna_ng_per_ml', 'outcome_sample_n', 'eligible_sample_n', 'available_outcome_sample_n',
-                       *[p.variable for p in engine.PREDICTORS], *[p.variable+'_sample_n' for p in engine.PREDICTORS]]
+            columns = observation_columns(d)
             frame = pd.DataFrame(rows, columns=columns)
             if any(set(r) != set(columns) for r in rows):
                 raise ValueError('Unexpected Layer 3 row-export columns')
@@ -218,28 +223,3 @@ def validate_results(output, record):
                 frames[result['scope']] = frame
     verify_inputs(record['inputs'])
     verify_source_states(record['source_states'])
-
-
-def main(argv=None):
-    args = arguments(argv)
-    try:
-        if args.output_dir is not None and (args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir, *args.output_dir.parents))):
-            raise ValueError('Fresh output destination required')
-        evidence = preflight(args)
-        if args.validate_only:
-            print('Layer 3 preflight complete; whole-cohort integrity gates run during execution')
-            return 0
-        args.output_dir = args.output_dir or default_output_dir()
-        from analysis.outputs import run_standalone
-        from analysis.worker import completion
-        def execute(native):
-            verify_inputs(evidence['inputs'])
-            verify_source_states(evidence['source_states'])
-            worker = copy(args)
-            worker.output_dir = native
-            return run(worker)
-        return run_standalone('advanced_analysis', args.output_dir, evidence['resolved_settings'], execute,
-                              lambda native: completion({'name': 'advanced_analysis', 'options': {}}, native))
-    except (ValueError, OSError) as error:
-        print(f'Layer 3 unavailable ({type(error).__name__}); check configuration, sources and destination', file=sys.stderr)
-        return 1

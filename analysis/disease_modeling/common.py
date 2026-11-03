@@ -8,20 +8,14 @@ import re
 
 import numpy as np
 
+from analysis.configuration import unique_object
 from analysis.provenance import ROOT
 from analysis.sample_io import read_sheet
 
 
 def load_definitions(path):
-    def unique(pairs):
-        obj = {}
-        for key, value in pairs:
-            if key in obj:
-                raise ValueError('Duplicate definition key')
-            obj[key] = value
-        return obj
     try:
-        d = json.loads(Path(path).read_text(), object_pairs_hook=unique)
+        d = json.loads(Path(path).read_text(), object_pairs_hook=unique_object)
         expected = json.loads((ROOT/'configs/definitions/disease_modeling.json').read_text())
         if d != expected:
             raise ValueError()

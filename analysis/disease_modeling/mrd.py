@@ -10,6 +10,7 @@ STATUSES = ('normalized_baseline', 'quantified', 'positive_nonquantifiable',
 
 
 def parse_annotation(value, cohort, d):
+    """Return status, measurement and reported limit (CIRCALL sensitivity or retrospective bound)."""
     label = ' '.join(token(value).split())
     if label in d['missing_tokens'] + d['unknown_tokens']:
         return 'missing', None, None
@@ -19,8 +20,10 @@ def parse_annotation(value, cohort, d):
         if cohort != 'circall':
             raise ClinicalError('unconfirmed_retrospective_mrd_category')
         return 'unknown_significance', None, None
-    if cohort == 'retrospective':
-        match = re.fullmatch(r'pos\s+nq(?:\s*<\s*(.+))?', label)
+    if cohort in ('retrospective', 'circall'):
+        labels = d['mrd']['circall_positive_nq']['labels'] if cohort == 'circall' else ['pos nq']
+        prefix = '|'.join(re.escape(v).replace(r'\ ', r'\s+') for v in labels)
+        match = re.fullmatch(r'(?:'+prefix+r')(?:\s*<\s*(.+))?', label)
         if match:
             bound = None
             if match[1] is not None:
@@ -53,6 +56,7 @@ def prepare(path, cohort, d, *, duplicate_policy):
     rows = source_rows(path, config['sheet'], required)
     people = defaultdict(lambda: defaultdict(dict))
     represented = set()
+    centers = {}
     counters = Counter(source_rows=len(rows), selected_source_rows=0, identified_source_patients=0,
                        resolved_disagreements=0, excluded_other_specimen_or_visit=0)
     states = Counter()
@@ -72,6 +76,8 @@ def prepare(path, cohort, d, *, duplicate_policy):
         key = identity(row[config['identity']], cohort, 'mrd', d)
         if key is None:
             raise ClinicalError('invalid_mrd_participant_id', sheet=config['sheet'], cell=row[config['identity']].coordinate)
+        from analysis.plot_style import center_from_id
+        centers[key] = center_from_id(row[config['identity']].value, cohort)
         represented.add(key)
         counters['selected_source_rows'] += 1
         for visit, field in fields.items():
@@ -104,14 +110,15 @@ def prepare(path, cohort, d, *, duplicate_policy):
             else:
                 status, fraction, bound = 'missing', None, None
             counters['resolved_disagreements'] += int(len(values) > 1)
-            records.append(dict(cohort=cohort, subject_hash=key, visit=visit, status=status,
-                                measured_fraction=fraction, upper_bound_fraction=bound,
+            records.append(dict(cohort=cohort, subject_hash=key, center=centers[key], visit=visit, status=status,
+                                measured_fraction=fraction, upper_bound_fraction=bound if cohort == 'retrospective' else None,
+                                reported_sensitivity_fraction=bound if cohort == 'circall' else None,
                                 measured_log10_reduction=-math.log10(fraction) if fraction is not None else None,
                                 distinct_annotations=len(values), resolved_disagreement=len(values) > 1,
                                 contributing_source_entries=sum(len(c) for c in values.values())))
         if cohort == 'circall':
-            records.append(dict(cohort=cohort, subject_hash=key, visit='Diagnosis', status='normalized_baseline',
-                                measured_fraction=None, upper_bound_fraction=None, measured_log10_reduction=None,
+            records.append(dict(cohort=cohort, subject_hash=key, center=centers[key], visit='Diagnosis', status='normalized_baseline',
+                                measured_fraction=None, upper_bound_fraction=None, reported_sensitivity_fraction=None, measured_log10_reduction=None,
                                 distinct_annotations=0, resolved_disagreement=False, contributing_source_entries=0))
     counters.update(identified_source_patients=len(represented), retained_patients=len({r['subject_hash'] for r in records}),
                     retained_patient_visits=len(records), patients_without_any_clinical_result=len(represented)-len({r['subject_hash'] for r in records}))
@@ -125,11 +132,15 @@ def summary(records, visits, *, fixed=False):
         group = [r for r in records if r['visit'] == visit]
         counts = Counter(r['status'] for r in group)
         measured = [r['measured_fraction'] for r in group if r['measured_fraction'] is not None]
+        sensitivities = Counter(r['reported_sensitivity_fraction'] for r in group
+                                if r.get('reported_sensitivity_fraction') is not None)
         import numpy as np
         rows.append(dict(visit=visit, patients=len(group), patients_with_result=sum(counts[s] for s in STATUSES if s not in ('missing', 'normalized_baseline')),
                          **{s: counts[s] for s in STATUSES}, quantified_median=float(np.median(measured)) if measured else None,
                          quantified_min=min(measured) if measured else None, quantified_max=max(measured) if measured else None,
                          positive_nq_with_bound=sum(r['upper_bound_fraction'] is not None for r in group),
+                         positive_nq_with_sensitivity=sum(sensitivities.values()),
+                         reported_sensitivity_counts=[dict(fraction=value, patients=count) for value, count in sorted(sensitivities.items())],
                          resolved_disagreements=sum(r['resolved_disagreement'] for r in group),
                          denominator_basis='Fixed retained MRD population' if fixed else 'Source-specific represented patient/visit population',
                          retrospective_patients=sum(r['cohort'] == 'retrospective' for r in group),
@@ -147,7 +158,7 @@ def pool(cohorts, d):
             if record is None:
                 record = dict(cohort=cohort, subject_hash=key, visit=visit,
                               status='normalized_baseline' if visit == 'Diagnosis' else 'missing', measured_fraction=None,
-                              upper_bound_fraction=None, measured_log10_reduction=None, distinct_annotations=0,
+                              upper_bound_fraction=None, reported_sensitivity_fraction=None, measured_log10_reduction=None, distinct_annotations=0,
                               resolved_disagreement=False, contributing_source_entries=0)
             result.append(record)
     return result

@@ -1,10 +1,14 @@
+from tests.fixtures.execution import layer_main
 """Synthetic acceptance coverage; no clinical fixtures or source identifiers."""
+
+from tests.fixtures.sample_statistics import fixture, D, ASOF
 from contextlib import redirect_stdout, redirect_stderr
 from datetime import date, datetime, timedelta, timezone
 from io import StringIO
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from collections import Counter
 import unittest
 from unittest.mock import patch
 from zipfile import ZipFile
@@ -15,33 +19,8 @@ from analysis.provenance import ROOT, digest
 from analysis.sample_io import SourceCell
 from analysis.sample_statistics import core, runner
 
-D=core.load_definitions(ROOT/'configs/definitions/sample_statistics.json')
-ASOF='2026-10-05T12:00:00+02:00'
 
 
-def fixture(path,cohort='circall',controls=True,bad=False,names=False):
-    from analysis.data_integrity.checks import load_rules
-    rules=load_rules(ROOT/'configs/definitions/data_integrity.json')
-    headers=list(dict.fromkeys(rules['required']+['timepoint','sampling_plan','extraction_status','dna_id','patient_id','circall_id','nucleic_acid','row']))
-    if names:
-        headers.remove('patient_id');headers+=['anonymization','lastname','firstname','dob','private_note']
-    book=Workbook();book.remove(book.active)
-    sheets=['Inventaire'] if cohort=='retrospective' else ['cohorte_lal']+(['cohorte_control'] if controls else [])
-    for name in sheets:
-        ws=book.create_sheet(name);ws.append(headers)
-        records=[dict(sample_id='SYNTHETIC-SAMPLE',specimen_type='plasma',timepoint='diag',patient_id='RETRO-0001',circall_id='001-9999-X-Z',
-                      dna_id='SYNTHETIC-DNA',nucleic_acid='cfDNA',sampling_plan=datetime(2026,10,1),dna_concentration_ng_per_ul=2,
-                      elution_volume_ul=50,dna_total_ng=100,dna_ng_per_ml_plasma=50,extraction_input_volume_ml=2,
-                      cfdna_fraction=.5,cfdna_concentration_ng_per_ul=1,cfdna_total_ng=50,cfdna_ng_per_ml_plasma=25,cfdna_avg_size_bp=170)]
-        if name!='cohorte_control':
-            records.append(dict(sample_id='na',specimen_type='plasma',timepoint='tp1',patient_id='RETRO-0001',circall_id='001-9999-X-Z',sampling_plan=datetime(2026,9,1)))
-        if bad:records[0]['dna_total_ng']=999
-        for i,record in enumerate(records,2):
-            if names:record.update(anonymization='PRIVATE-OLD',lastname='PRIVATE_SURNAME_SENTINEL',firstname='PRIVATE_FIRST_SENTINEL',dob=datetime(1990,1,1),private_note=None)
-            ws.append([record.get(h) for h in headers])
-        ws.cell(40,headers.index('row')+1,40)
-        ws.cell(50,1).number_format='@'
-    book.save(path);book.close()
 
 
 class RulesTests(unittest.TestCase):
@@ -80,11 +59,34 @@ class RulesTests(unittest.TestCase):
         tables=core.aggregate(rows,{**D,'metrics':{}})
         overall=[r for r in tables['receipt'] if r['view']=='overall']
         self.assertTrue(all(r['classified_denominator']==2 for r in overall if r['basis']=='deadline'))
-        self.assertEqual(len(tables['missed']),1)
+        self.assertEqual(len(tables['missed']),3)
+        self.assertEqual(Counter(r['status'] for r in tables['missed']),{'late':2,'marked_missing':1})
         self.assertTrue(all(r['classified_percentage'] is None for r in overall if r['status']=='unassessed' or r['basis']=='manual_or_id'))
         received=next(r for r in overall if r['status']=='received')
         self.assertEqual(received['samples'],2);self.assertEqual(received['classified_samples'],1)
         self.assertEqual(received['classified_percentage'],.5)
+        self.assertEqual(sum(r['overdue_samples'] for r in overall),3)
+        self.assertEqual(next(r for r in overall if r['status']=='unassessed')['overdue_samples'],2)
+
+    def test_late_is_unmarked_absence_after_the_same_deadline(self):
+        for sample in (None, '', '?', 'sk'):
+            for asof, timing in [('2026-09-30T23:59:59+02:00','not_yet_due'),
+                                 ('2026-10-01T00:00:00+02:00','pending'),
+                                 ('2026-10-04T00:00:00+02:00','pending'),
+                                 ('2026-10-04T00:00:01+02:00','late')]:
+                with self.subTest(sample=sample,asof=asof):
+                    result=self.classify(sample,asof=asof)
+                    self.assertEqual(result['receipt'],'unassessed')
+                    self.assertEqual(result['receipt_timing'],timing)
+                    self.assertEqual(result['overdue'],timing=='late')
+                    self.assertEqual(result['overdue_status'],'late' if timing=='late' else None)
+        self.assertEqual(self.classify('na')['overdue_status'],'marked_missing')
+        for kwargs in [dict(sample='SYNTHETIC'),dict(sample=None,visit='tp2'),
+                       dict(sample=None,planned=None),dict(sample='?',planned='01/10/2026'),
+                       dict(sample=None,cohort='retrospective')]:
+            self.assertFalse(self.classify(**kwargs)['overdue'])
+        self.assertFalse(core.receipt(None,'tp1',date(2026,10,1),'circall',
+                                     core.assessment('2026-10-05T00:00:00+02:00'),D,control=True)['overdue'])
 
     def test_dst_elapsed_not_wall_time(self):
         for start,at,after in [(date(2026,3,28),'2026-03-31T01:00:00+02:00','2026-03-31T01:00:01+02:00'),(date(2026,10,24),'2026-10-26T23:00:00+01:00','2026-10-26T23:00:01+01:00')]:
@@ -178,14 +180,33 @@ class WorkflowTests(unittest.TestCase):
             with patch('analysis.sample_statistics.runner.figures',return_value=[]):runner.run(self.args(out,'circall',include))
             self.assertEqual(json.loads((out/'run_manifest.json').read_text())['quality_status'],expected)
 
+    def test_reference_controls_reach_all_scopes_without_entering_patient_rows(self):
+        donors=self.root/'donors.xlsx'
+        book=Workbook();sheet=book.active;sheet.title='Feuil1'
+        sheet.append(['Donor','Conc ng/mL  plasma  ','Conc ng'])
+        sheet.append(['SYNTHETIC-DONOR',2.5,None]);book.save(donors);book.close()
+        for include in (True,False):
+            destination=self.root/f'reference-{include}'
+            args=self.args(destination,controls=include);args.donors=donors
+            with patch('analysis.sample_statistics.runner.figures',return_value=[]) as plots:
+                runner.run(args)
+            patient_calls=[call for call in plots.call_args_list if not call.kwargs.get('controls')]
+            self.assertEqual(len(patient_calls),3)
+            for call in patient_calls:
+                self.assertTrue(all(not r['control'] for r in call.args[1]))
+                refs=call.kwargs['reference_controls']
+                self.assertEqual(bool(refs),include)
+                self.assertTrue(all(r['control'] for r in refs))
+                self.assertEqual({r['cohort'] for r in refs},{'circall','retrospective'} if include else set())
+
     def test_missing_source_and_standalone_nonzero(self):
         self.retro.unlink()
         out=self.root/'standalone'
         with patch('analysis.sample_statistics.runner.figures',return_value=[]),redirect_stdout(StringIO()),redirect_stderr(StringIO()):
-            result=runner.main(['--inventory',str(self.retro),'--circall',str(self.circall),'--assessment-time',ASOF,'--output-dir',str(out)])
+            result=layer_main('sample_statistics', ['--inventory',str(self.retro),'--circall',str(self.circall),'--assessment-time',ASOF,'--output-dir',str(out)])
         self.assertEqual(result,1)
         self.assertTrue((out/'circall/statistics.xlsx').is_file())
-        with redirect_stdout(StringIO()),redirect_stderr(StringIO()):self.assertEqual(runner.main(['--circall',str(self.circall),'--cohort','circall','--output-dir',str(out)]),1)
+        with redirect_stdout(StringIO()),redirect_stderr(StringIO()):self.assertEqual(layer_main('sample_statistics', ['--circall',str(self.circall),'--cohort','circall','--output-dir',str(out)]),1)
 
     def test_failed_figures_are_not_published(self):
         from analysis.outputs import deliverables

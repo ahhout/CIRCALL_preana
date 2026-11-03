@@ -1,0 +1,82 @@
+{
+  "recorded_utc": "2026-10-20T08:58:16.178970+00:00",
+  "original_run": "outputs/layered/run_20261020T081546968775Z",
+  "new_run": "outputs/layered/run_20261020T085404919171Z",
+  "assessment": "Calendar collection-date volume views; existing run preserved",
+  "verification": {
+    "original": {
+      "publications": 148,
+      "native_artifacts": 315
+    },
+    "new": {
+      "publications": 150,
+      "native_artifacts": 317
+    }
+  },
+  "unchanged_existing_circall_pngs": 32,
+  "added_circall_pngs": [
+    "CSF/extraction_input_volume_ml_by_collection_date.png",
+    "plasma/extraction_input_volume_ml_by_collection_date.png"
+  ],
+  "numerical_comparison": {
+    "circall": {
+      "tables": true,
+      "comparisons": true
+    },
+    "retrospective": {
+      "tables": true,
+      "comparisons": true
+    },
+    "pooled": {
+      "tables": true,
+      "comparisons": true
+    }
+  },
+  "calendar_volume_coverage": [
+    {
+      "cohort": "circall",
+      "specimen": "CSF",
+      "date_field": "sampling_date",
+      "unit": "mL available specimen",
+      "received_samples": 51,
+      "numeric_volume_samples": 43,
+      "unavailable_volume_samples": 8,
+      "numeric_volume_without_date": 0,
+      "plotted_samples": 43,
+      "plotted_participants": 17,
+      "collection_date_states": {
+        "recorded_date": 43
+      }
+    },
+    {
+      "cohort": "circall",
+      "specimen": "plasma",
+      "date_field": "sampling_date",
+      "unit": "mL available specimen",
+      "received_samples": 121,
+      "numeric_volume_samples": 95,
+      "unavailable_volume_samples": 26,
+      "numeric_volume_without_date": 0,
+      "plotted_samples": 95,
+      "plotted_participants": 19,
+      "collection_date_states": {
+        "recorded_date": 95
+      }
+    }
+  ],
+  "visual_inspection": "Both exported PNGs inspected; date axes, units and exclusion legends readable; no sample or participant labels",
+  "quality_status": "All four workflows complete, review_needed retained",
+  "tests": [
+    {
+      "command": "conda run --no-capture-output -n pre_analysis python -B -m pytest -q -p no:cacheprovider tests/sample_statistics --tb=short",
+      "passed": 87,
+      "subtests_passed": 70
+    },
+    {
+      "command": "conda run --no-capture-output -n pre_analysis python -B -m pytest -q -p no:cacheprovider tests/orchestration/test_outputs.py tests/orchestration/test_audit_regressions.py tests/orchestration/test_pdf_output.py tests/orchestration/test_master_configuration.py --tb=short",
+      "passed": 47
+    }
+  ],
+  "execution_record": "archive/migrations/longitudinal_volumes_before_20261020/execution.json",
+  "limitations": "Descriptive available-volume scatter; no trend test or adjustment for visit and participant mix. PDFs disabled in selected configuration."
+}

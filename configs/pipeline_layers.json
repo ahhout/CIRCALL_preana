@@ -1,61 +1,130 @@
 {
-  "schema_version": 1,
-  "workflows": [
-    {
-      "name": "data_integrity",
-      "options": {
-        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
-        "cohort": "all",
-        "include-controls": true,
-        "donors": "../input/cfDNA_donors.xlsx",
-        "rules": "definitions/data_integrity.json"
-      }
+  "schema_version": 2,
+  "sources": {
+    "inventory": "../input/cfDNA_inventaire_retrospective_21102026.xlsx",
+    "circall": "../input/inventaire_CIRCALL_22102026.xlsx",
+    "donors": "../input/cfDNA_donors.xlsx",
+    "blood-counts": "../input/CIRCALL_wbc_blast_count_01102026.xlsx",
+    "retrospective-blasts": "../input/retrospective_blast_count_01102026.xlsx"
+  },
+  "defaults": {
+    "cohort": "all",
+    "include-controls": true,
+    "rules": "definitions/data_integrity.json",
+    "pdf-output": false
+  },
+  "layers": {
+    "data_integrity": {
+      "options": {}
     },
-    {
-      "name": "sample_statistics",
+    "sample_statistics": {
       "options": {
-        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
-        "cohort": "all",
-        "include-controls": true,
-        "donors": "../input/cfDNA_donors.xlsx",
-        "rules": "definitions/data_integrity.json",
         "definitions": "definitions/sample_statistics.json"
       }
     },
-    {
-      "name": "advanced_analysis",
+    "advanced_analysis": {
       "options": {
-        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
-        "donors": "../input/cfDNA_donors.xlsx",
-        "cohort": "all",
-        "include-controls": true,
-        "rules": "definitions/data_integrity.json",
         "definitions": "definitions/advanced_analysis.json",
         "predictors": [
-          "peripheral_blast_percent"
+          "requested"
         ],
         "retrospective-wbc-unit": "x10^9/L",
         "spearman-sensitivity": true,
         "sample-selection-seed": 123,
-        "pool-cohorts": true
+        "pool-cohorts": true,
+        "comparison-switches": {
+          "circall": {
+            "dna_total_ng": {
+              "tumor_fraction_percent": true,
+              "peripheral_blast_percent": true,
+              "gb_per_l": true,
+              "corticoide_pre_tt": true,
+              "sampling_time": true,
+              "genetic_subtype": true
+            },
+            "dna_ng_per_ml_plasma": {
+              "tumor_fraction_percent": true,
+              "peripheral_blast_percent": true,
+              "gb_per_l": true,
+              "corticoide_pre_tt": true,
+              "sampling_time": true,
+              "elution_volume_ul": true,
+              "genetic_subtype": true
+            },
+            "cfdna_total_ng": {
+              "tumor_fraction_percent": true,
+              "peripheral_blast_percent": true,
+              "gb_per_l": true,
+              "corticoide_pre_tt": true,
+              "sampling_time": true,
+              "elution_volume_ul": true,
+              "genetic_subtype": true
+            },
+            "cfdna_ng_per_ml_plasma": {
+              "tumor_fraction_percent": true,
+              "peripheral_blast_percent": true,
+              "gb_per_l": true,
+              "corticoide_pre_tt": true,
+              "sampling_time": true,
+              "elution_volume_ul": true,
+              "genetic_subtype": true
+            },
+            "cfdna_fraction": {
+              "elution_volume_ul": true,
+              "extraction_input_volume_ml": true,
+              "sampling_time": true,
+              "dna_concentration_ng_per_ul": true
+            }
+          },
+          "retrospective": {
+            "dna_total_ng": {
+              "genetic_subtype": true,
+              "sex": true,
+              "age_diag": true,
+              "gb_per_l": true,
+              "Hb_g_per_dL": true,
+              "platelets_10e9_per_L": true,
+              "peripheral_blast_percent": true
+            },
+            "dna_ng_per_ml_plasma": {
+              "genetic_subtype": true,
+              "sex": true,
+              "age_diag": true,
+              "gb_per_l": true,
+              "Hb_g_per_dL": true,
+              "platelets_10e9_per_L": true,
+              "peripheral_blast_percent": true
+            },
+            "cfdna_total_ng": {
+              "genetic_subtype": true,
+              "sex": true,
+              "age_diag": true,
+              "gb_per_l": true,
+              "Hb_g_per_dL": true,
+              "platelets_10e9_per_L": true,
+              "peripheral_blast_percent": true
+            },
+            "cfdna_ng_per_ml_plasma": {
+              "genetic_subtype": true,
+              "sex": true,
+              "age_diag": true,
+              "gb_per_l": true,
+              "Hb_g_per_dL": true,
+              "platelets_10e9_per_L": true,
+              "peripheral_blast_percent": true
+            },
+            "cfdna_fraction": {
+              "extraction_input_volume_ml": true,
+              "dna_concentration_ng_per_ul": true
+            }
+          }
+        }
       }
     },
-    {
-      "name": "disease_modeling",
+    "disease_modeling": {
       "options": {
-        "inventory": "../input/cfDNA_inventaire_retrospective_05102026.xlsx",
-        "circall": "../input/inventaire_CIRCALL_07102026.xlsx",
-        "blood-counts": "../input/CIRCALL_wbc_blast_count_01102026.xlsx",
-        "retrospective-blasts": "../input/retrospective_blast_count_01102026.xlsx",
-        "donors": "../input/cfDNA_donors.xlsx",
-        "cohort": "all",
         "analysis": "all",
-        "include-controls": true,
         "pool-mrd": true,
-        "rules": "definitions/data_integrity.json",
         "definitions": "definitions/disease_modeling.json",
         "blood-count-unit": "x10^9/L",
         "retrospective-blast-unit": "x10^9/L",
@@ -70,5 +139,5 @@
         "jitter-seed": 42
       }
     }
-  ]
+  }
 }

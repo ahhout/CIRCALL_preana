@@ -8,7 +8,7 @@ from analysis.data_integrity.checks import load_rules
 from analysis.retrospective_controls import inspect_with_controls,observations
 from analysis.sample_statistics.core import load_definitions,aggregate
 from analysis.sample_statistics.runner import arguments,run,validate_results
-from tests.sample_statistics.test_statistics import fixture,ASOF
+from tests.fixtures.sample_statistics import fixture,ASOF
 import json
 
 class DonorTests(unittest.TestCase):

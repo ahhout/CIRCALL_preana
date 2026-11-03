@@ -1,0 +1,753 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "original": "analysis/sample_analysis/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/adapters.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/adapters.py",
+      "sha256": "f7761e578035a35b2a48d9a0d7aeb742556646619ecbdc26a7c09bd2255114a5",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/analyses.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/analyses.py",
+      "sha256": "892b6be84287e2a9a7eca4fca3e984cccf8e1e774ae1cdea701a95ad0c59afab",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/blood_counts.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/blood_counts.py",
+      "sha256": "86eaba192dc4be5848abe39231bec617a28e6b17977a8959e6c3a613ce82a827",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/extraction.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/extraction.py",
+      "sha256": "2599563abf2fd6aa5c8860459f51a37ddb32f5670c17278c26a23c2e911e8c60",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/longitudinal_trends.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/longitudinal_trends.py",
+      "sha256": "77ad0e6c80bfcc22840d3dd3e68cae4552a55b5f65483666791f28a2bdbecca3",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/migrate_retrospective_blasts.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/migrate_retrospective_blasts.py",
+      "sha256": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/mrd.py",
+      "sha256": "8e3633ba235a87c03a334768d5171b5e56126550b76dc01ea51cfce11e9e3f7c",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/policies.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/policies.py",
+      "sha256": "6580818fe8d7fb6bcd45ca6e9fbd772d300608113c1d9fd837407f3ee819d19d",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/pooled.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/pooled.py",
+      "sha256": "a09fb72a5b7ef9d599d74ead8f786caf6494350e702ab8a282823c70b69d2a74",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/pooled_mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/pooled_mrd.py",
+      "sha256": "2c7fa2e3801d8b065d4cfb1efae1ac698794de785b77326d53a298e61fa3660d",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/pooled_trend.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/pooled_trend.py",
+      "sha256": "3ad95a3bc6b782185c0a04de3b9a890c261bab09579316230484f29199586f5b",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/preparation.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/preparation.py",
+      "sha256": "f57db1be4b319e9a9025736fdfd591ae4a80bb539e7bf4ebd43adcc456d5c3cb",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/reporting.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/reporting.py",
+      "sha256": "2bdc0ad86be8d986d64ca423da1e2dfdf9059fcaab310f53f78c43a4e1e02fa3",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/retrospective_blasts.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/retrospective_blasts.py",
+      "sha256": "6fc19a6804a2896d5c4fbcd4d8314e78f57ca5d807fbda467ee08190ee3da967",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/retrospective_mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/retrospective_mrd.py",
+      "sha256": "c94db2d23203ebaaf1042da33dce7f85fd0ae54dd4139e1104ac704ad27a3895",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/runner.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/runner.py",
+      "sha256": "ac6c122b50782fd19e9b687c327db4bac7f4cf5b6d8b7b8f0ec49020d1b2cf8d",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/statistical_plots.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/statistical_plots.py",
+      "sha256": "7d6fa48feb58f81efe2ffd3550c9ed2406685238c9a670deea27f75913223cd7",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/statistics.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/statistics.py",
+      "sha256": "0b450753f191f15c9624171b19d354353a90a36625a1591c2205d062a2cf3302",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/stats_workbooks.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/stats_workbooks.py",
+      "sha256": "d6ce9e787e7d9f8cd4c0d4c2331e840981a1192800b0df3c94ea5597e92d3c58",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/sample_analysis/yield_wbc_panel.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/sample_analysis/yield_wbc_panel.py",
+      "sha256": "8f64c8ef4c1ecbae018cbdd63e7e6cf012434155491d935f968127ad716f82e9",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/__init__.py",
+      "sha256": "3fb8fc0e68b42b1457467eaa1f30e221df9592413b24c979c230e59e417266ba",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/analyze_blast_cfdna.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/analyze_blast_cfdna.py",
+      "sha256": "053cbf193ca3294c29e820736fd457ad045a7ac67de713481d9d7f02ceaab139",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/diagnosis.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/diagnosis.py",
+      "sha256": "5d73007b23f909d623d805f1fa72d09214b55d2cbaf440fa438e5c394129e5b1",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/import_provenance.json",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/import_provenance.json",
+      "sha256": "bcf3b372fc968ae62f0ab551ecc2d026dc9dd9d8b53eac81823926025efc798c",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/runner.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/runner.py",
+      "sha256": "32def0c02053ba9f5a8e9bf6d74a451e660bf1390bfd4ed7452b0058ebf2358a",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/cfdna_associations/worker.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cfdna_associations/worker.py",
+      "sha256": "931b7be198a53e7e32aca46c218fc7366bba69ffe26d8c20d803770a4f70241e",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/AGENTS.md",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/AGENTS.md",
+      "sha256": "c470831447134ce8793ef098381c97e615beba403d3965af40a16dfd96c333ff",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/__init__.py",
+      "sha256": "e52feeb40379c66e1ff9f8a85161ef00f606f95fef0dfbd2dacc56875e5754f5",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/__main__.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/__main__.py",
+      "sha256": "1b26d8d3aae35aafccfda56d5dd1e33bc66a8b938c6eabf7bba1b657b31cca5d",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/cli.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/cli.py",
+      "sha256": "583450876c7bd2681624628d45a5541389c4c0239c66dc967101063a9c201936",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/config.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/config.py",
+      "sha256": "b4cc0c52ac3a7a03fc4ef2d552b9978eed0f1f9ad1d2dcf332debe2e20955be2",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/data_io.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/data_io.py",
+      "sha256": "34e87aaf3a3397b63b4b08a3c95f277056bef5161072c97278510c2f86cddefc",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/outputs.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/outputs.py",
+      "sha256": "efa6de3a9ee0ceec2b2f81e984f47798b37b657709dece98eb6af82b010c0511",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/pipeline.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/pipeline.py",
+      "sha256": "3350a02fc8172af1ac8aee6768983741bb63c3d624d55144f89de93d6ed19888",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/plotting.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/plotting.py",
+      "sha256": "fb42163d97d9764d1a98404322b3d27bd72ae8dfa24abbd6ee3376bc15901171",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/preprocessing.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/preprocessing.py",
+      "sha256": "2dc2508e0b62120a7e2a4245d61918fd31a9c27c34f4856256b5996f5d544eef",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/blast_kinetics/statistics.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/blast_kinetics/statistics.py",
+      "sha256": "6687f4fb340ae8ecf56234b5144c8dd91ffe1a3e804f2f9a91c102593583a14b",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/compatibility/pipeline_all.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/compatibility/pipeline_all.json",
+      "sha256": "f08c9e504fd271565d7539c2b5bab3055738c591b19620e490a53b16c7378fb4",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/compatibility/pipeline_cfdna_spearman.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/compatibility/pipeline_cfdna_spearman.json",
+      "sha256": "3436cfeb336e7481d3b70e01a125b8bc51f39e31b24d20fb9d90f9f81489143e",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/compatibility/pipeline_kinetics.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/compatibility/pipeline_kinetics.json",
+      "sha256": "70e972435bc24d1ae832cc2c14a06fc3bbfeb129089f4323f03214b9f01f3c6c",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/compatibility/pipeline_longitudinal.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/compatibility/pipeline_longitudinal.json",
+      "sha256": "a67af59dd56d80779a1cdc46bb922113697dad60e1072a7e45fb12a847d99eee",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/compatibility/pipeline_mrd.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/compatibility/pipeline_mrd.json",
+      "sha256": "6035889afca326e72ced205676f99360b7930cba3237bc13f420f08d02ba1410",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/blast_kinetics/blast_kinetics.yml",
+      "archived": "archive/retired/older_workflows_20261008/configs/blast_kinetics/blast_kinetics.yml",
+      "sha256": "99df823acfce3eb17f2bb07ec83fad4cab00d1c96355848372660638a89ff4b8",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/blast_kinetics/raw_measurement_example.yml",
+      "archived": "archive/retired/older_workflows_20261008/configs/blast_kinetics/raw_measurement_example.yml",
+      "sha256": "73bf4fde257fe9ae5c95c1af25f8198fd80bde91463447ec17ea341494daf90d",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/sample_analysis/extraction_protocols.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/sample_analysis/extraction_protocols.json",
+      "sha256": "69703270717f4bd88eff734b64a8305ea5b2c6307cfa41fef57508e138ef3ba5",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/source_catalog.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/source_catalog.json",
+      "sha256": "e7a0bbfa441825bcab0e435bfcdd0aed20fafdf0db3bcb13ccd162e375821e4d",
+      "disposition": "moved"
+    },
+    {
+      "original": "docs/compatibility/README.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/compatibility/README.md",
+      "sha256": "96fed9a8dc9b6563e8fd81837bc1438f9f1cf64621c07dfb82d0f7d4742536f9",
+      "disposition": "moved"
+    },
+    {
+      "original": "docs/compatibility/blast_kinetics.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/compatibility/blast_kinetics.md",
+      "sha256": "c3db274704181356a05714a93d3304d96b4868592081924e46cb0b1e0f9b8a3a",
+      "disposition": "moved"
+    },
+    {
+      "original": "docs/compatibility/cfdna_associations.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/compatibility/cfdna_associations.md",
+      "sha256": "a72381dd9dea1b92ffdf9ae7e59bf6bc4b4c370cf05997bcbd7f0fa32c04beed",
+      "disposition": "moved"
+    },
+    {
+      "original": "docs/compatibility/sample_analysis.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/compatibility/sample_analysis.md",
+      "sha256": "b9511d091f7f8716049cbe2358826bb6ad05789c44a3d9f11b741a191c48a21c",
+      "disposition": "moved"
+    },
+    {
+      "original": "docs/compatibility/statistical_questions.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/compatibility/statistical_questions.md",
+      "sha256": "edae4c30af633728169110f0de7ff58e9275c3a68ad2aa8784c02dbb54bdf19c",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_blood_counts.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_blood_counts.py",
+      "sha256": "9236f9ea74cca1f1431e0f656981043431577c482f887b702898ef682b5a6048",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_canonical_runner.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_canonical_runner.py",
+      "sha256": "0b867a26d0707f8d9768ada660cb36ae1f42994975153ceb844be4f88a44c1d0",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_compartment_scope.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_compartment_scope.py",
+      "sha256": "f438e7dca46706ecff1efe57f33486d8a9de0555d1cc784990430c98d17e99ec",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_coverage.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_coverage.py",
+      "sha256": "8721548451653e0239e19e9d501a6bcb3fb39445c8d2096c588e6fcbd30234d6",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_csf_sites.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_csf_sites.py",
+      "sha256": "ccabb3b1d3a9263a400ab5c2053900b939d7cadbe4917b94366c295bb9d66777",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_extraction.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_extraction.py",
+      "sha256": "1803bfef9144ca4a285c5c3005067b800f49b2dcb825fe20ccef45529a98b8f7",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_longitudinal_trends.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_longitudinal_trends.py",
+      "sha256": "a6da140b2f7f7c834fd759c7851894f07e14ed7bf77ede7fd59231321b9a80bc",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_migrate_retrospective_blasts.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_migrate_retrospective_blasts.py",
+      "sha256": "c6a2d082ce8f77f79e530dfe5b75563e734c6852f4db0569b5c28d52a73cc402",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_missing_summaries.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_missing_summaries.py",
+      "sha256": "40d5e8b0d084daa36882471545e6fcef8af9ba70c6041b1dac5dd608844141ef",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_mrd.py",
+      "sha256": "3c4938a1ed2e559bb97914f44abe369da4f8253db554a5f7498d261dad988222",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_pooled.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_pooled.py",
+      "sha256": "feef124cfbaccc01f19b299fb249b4f4c0345c563e02d36067d50119e43da186",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_pooled_mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_pooled_mrd.py",
+      "sha256": "df4ac0188bb16d580d3b5655c2348fd54da672f00596bb3d0fdbee2426cafdd4",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_preparation.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_preparation.py",
+      "sha256": "bd7fdcceeb2e0419d5ebd4661d528d6396038dc329b6d15f32f5c25da294c7a7",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_reporting.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_reporting.py",
+      "sha256": "d4ec358d11fcf1952175102f47ab6cc6bcb5cffc7803a6674fb819f27df7840a",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_retrospective_blasts.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_retrospective_blasts.py",
+      "sha256": "e6a29621e7360fceae76ca8d9e3185fb16e05dfcddc4fb98a0bbee4516295b12",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_retrospective_mrd.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_retrospective_mrd.py",
+      "sha256": "4212677b0b25e010b195bc0ec79c6b665321e98ba2316ffdbfad08b68700f654",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_shared_analyses.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_shared_analyses.py",
+      "sha256": "cedf2eacb799b7679c063faa988352a0701218bca95987124fa3d703c7cd4692",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_simplified_statistics.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_simplified_statistics.py",
+      "sha256": "7efe214d3d9e4f5042aa83f421caa71a203dfeaf1452c35380ddaa3f7ce34a04",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_statistical_plots.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_statistical_plots.py",
+      "sha256": "ca97f47d85d9e87491d847a8ce2a44cbb06804421438e601d7c9524c7ea27dff",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/sample_analysis/test_yield_wbc_panel.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/sample_analysis/test_yield_wbc_panel.py",
+      "sha256": "637a5b3e4e6f729bebb819a7d984075ca5e85d6cf81cedd9714f940eb1d7a601",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/cfdna_associations/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/cfdna_associations/__init__.py",
+      "sha256": "311528c8131c19b7221f0a6eb66e390fcb7e6f1828c3d881fc3f9f00ac3ef002",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/cfdna_associations/test_analyze_blast_cfdna.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/cfdna_associations/test_analyze_blast_cfdna.py",
+      "sha256": "a66f553cd15a69c92d522f1b3c94987d03d78da2dc9dc042d461c408848aef23",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/cfdna_associations/test_diagnosis.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/cfdna_associations/test_diagnosis.py",
+      "sha256": "347db7daf49a1f45fba609cfe556348f0b87513cae0792a49bbf5d99afc8c2ef",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/cfdna_associations/test_worker.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/cfdna_associations/test_worker.py",
+      "sha256": "40415a5ea454a9add0f60d0622f883e99e92b0e08311f1af10d99f664daf3d1b",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/__init__.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/conftest.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/conftest.py",
+      "sha256": "cd5c3d16da33dd4a67be5821a831373825ca342a0b121c24dea3dfd36d61a48b",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_config_and_io.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_config_and_io.py",
+      "sha256": "24ab7c02ed2974086eeee1fe8ac5f57f737ba776094bedcf3de1bfdacc445152",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_outputs_and_cli.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_outputs_and_cli.py",
+      "sha256": "c93b465286d1d78b7be6724e40e3f09778a78e0e822f7736e4d087f68ce3bfc7",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_plotting_state.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_plotting_state.py",
+      "sha256": "09a75f8fd702b30360b802b68b9709a1faee11b7fccc282cba5ce79a82aeb416",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_preprocessing.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_preprocessing.py",
+      "sha256": "c602bf956046c1867ba64cd5dad278ffe9ce5fd18b58b7173b8c2af292a5f621",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_statistics.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_statistics.py",
+      "sha256": "0146605a33f332507ab51ce9ecd7dd8bcb1673d88016b83a92b653f2c144b828",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/blast_kinetics/test_workbook_integration.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/blast_kinetics/test_workbook_integration.py",
+      "sha256": "0dfefed6aea9bfe792f5e06f17647e64d7ab98eda4548951ed6a6c10fc26ad5e",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/fixtures/sample_analysis.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/fixtures/sample_analysis.py",
+      "sha256": "de740c31a0a8901fbefcb39283a4d60bf35925f81f9428d2b49e9685a067105e",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/orchestration/test_cfdna_dispatch.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/orchestration/test_cfdna_dispatch.py",
+      "sha256": "46bd37bb98154e486f83cc7b190fb2eb1f15ef13a8062a50129682870baa4d51",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/test_integrated_comparison.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/test_integrated_comparison.py",
+      "sha256": "1da3dfc86349adda9570ce0bd316c3ff9697b5dda6fd6eb919355f896f801e91",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/test_validation_baselines.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/test_validation_baselines.py",
+      "sha256": "235857429eb69a8044965d6bba88a3f93ccaf5960e3ed61abe37a6abada9e9e2",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/pipeline_all.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_all.json",
+      "sha256": "6e09b1fe97ced89bd152eb4bc2ad859ec134ed4e38a10684745d5b0d5b8e426f",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/pipeline_longitudinal.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_longitudinal.json",
+      "sha256": "c9bc415706a5fc39ff7dbac057f4fa78eb03dd9b4062b60f2031b5c56cb05891",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/pipeline_kinetics.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_kinetics.json",
+      "sha256": "dfac6d3b921f8df63ca7dbf8c4116136ac7848df026b1f86f4b8d65ed7f76c9a",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/pipeline_mrd.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_mrd.json",
+      "sha256": "74c0feb84077f9e35245cfdb2c949946457638d3113a0f27f3ef3485d7476ca4",
+      "disposition": "moved"
+    },
+    {
+      "original": "configs/pipeline_cfdna_spearman.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_cfdna_spearman.json",
+      "sha256": "37efca343e97b638b13b2665fdca790da4875be5b81ebabd28864ac1018e0c95",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/validation/compare_integrated.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/validation/compare_integrated.py",
+      "sha256": "28e66184aaca1190bd3a8f8e6fc0f746b2994d6eb696662d08faeedd4fdc3abb",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/compare_integrated.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/compare_integrated.py",
+      "sha256": "15fbb0cd7790860ba6b74c8c23114685324d640f9c44f59bd0aa0d77155b3d06",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/validation/validate_associations.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/validation/validate_associations.py",
+      "sha256": "09a2685cea2c2adf87da3bdf92af5a9b3a0bbccdd2c920bd4c21e2c9f6430d74",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/validate_associations.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/validate_associations.py",
+      "sha256": "49267d9fa3be5f9875b9d768ba9b61c99b236e28e24446de7de411dc408f10f9",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/validation/validate_canonical.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/validation/validate_canonical.py",
+      "sha256": "20069a45712f135fee822763c2863a16b60e6ee65b3cadbbec7022392b744874",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/validate_canonical.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/validate_canonical.py",
+      "sha256": "ece5dc8a994f0ec1b7939c63b479cbabb3b8332568a045a36c96df412e0479cc",
+      "disposition": "moved"
+    },
+    {
+      "original": "analysis/validation/validate_longitudinal_trends.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/validation/validate_longitudinal_trends.py",
+      "sha256": "e7be015d048e4de6ab1029e5268edef4358ea274568f5118bdbe73045cbd0b3c",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/validation/validate_longitudinal_trends.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/validation/validate_longitudinal_trends.py",
+      "sha256": "5eac238b28dc66ef198ba4712640e8e54840d3f56fe56a1fb33385c52dd7df48",
+      "disposition": "moved"
+    },
+    {
+      "original": "tests/orchestration/test_pipeline.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/orchestration/test_pipeline.py",
+      "sha256": "a1f8289620a1ca69a76aaa65d0f6ce73f3fc799ef62d3e00f69edffff5994c17",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "tests/orchestration/test_outputs.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/orchestration/test_outputs.py",
+      "sha256": "dcde911980e429fcce743b43049687eeacc172d29d736656c0e03a1aa456cc9b",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "tests/advanced_analysis/test_methods_reference.py",
+      "archived": "archive/retired/older_workflows_20261008/tests/advanced_analysis/test_methods_reference.py",
+      "sha256": "2231eb969a046cecf24c1e68559314e1598fe8056c30feda858456ced652f2e6",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/cli.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/cli.py",
+      "sha256": "723100b1657364b07e078b7a53c7eef7ad11af4c07157bc811cff474cb10993d",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/pipeline.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/pipeline.py",
+      "sha256": "971688449cc92088a2a4b1793fe35817c021807e16e3bda396632835be570d1d",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/worker.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/worker.py",
+      "sha256": "1c01842159404f984bbdf00b37019de76e7c92d01c16d72015bde58813b41f1a",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/outputs.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/outputs.py",
+      "sha256": "58b066f592d7fb670f44a77ab36d4767304c5428bb6b047b1d7ee086e8759978",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/artifacts.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/artifacts.py",
+      "sha256": "60d0a84221a780576c249840c6db6b1b094bbab9db1977f4effa5f1ac859f5b7",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "analysis/provenance.py",
+      "archived": "archive/retired/older_workflows_20261008/analysis/provenance.py",
+      "sha256": "5d500d7f9576c2f37bf4cabea6eecfd15dc7afbe1d744da157a6f484a5e2ab23",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "AGENTS.md",
+      "archived": "archive/retired/older_workflows_20261008/AGENTS.md",
+      "sha256": "81014f6718395ec0942a6e1aaaff598962c3fd8d37bd9a7bd8489e9da44f0071",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "docs/replacement_coverage.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/replacement_coverage.md",
+      "sha256": "7c3dc3887195113028177fec703867e4281d20755b1f8670b9563c21e965e728",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "environments/environment.yml",
+      "archived": "archive/retired/older_workflows_20261008/environments/environment.yml",
+      "sha256": "785ea639d64a29803b7c36f86925a2ddc4efacaa1e41b2d25e9e6f20174ff980",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "environments/conda-linux-64.lock",
+      "archived": "archive/retired/older_workflows_20261008/environments/conda-linux-64.lock",
+      "sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "configs/pipeline_layers.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/pipeline_layers.json",
+      "sha256": "1b7687073822facc77f9e34419b1bfb53eaa4b7ed5579d423cda092caa829e1c",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "configs/definitions/data_integrity.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/definitions/data_integrity.json",
+      "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "configs/definitions/sample_statistics.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/definitions/sample_statistics.json",
+      "sha256": "b67c27d8388135d942c1691d775a2452999785c287480c8537d3a2a1206d38cb",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "configs/definitions/advanced_analysis.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/definitions/advanced_analysis.json",
+      "sha256": "73b4bf2f9471f16c38afe26251f2b9097886b023d6835acd714878572682656b",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "configs/definitions/disease_modeling.json",
+      "archived": "archive/retired/older_workflows_20261008/configs/definitions/disease_modeling.json",
+      "sha256": "18d7d87a7f697ff06e3b85170f9713ccfded6976a2d92a2a4a03dac861d4f30a",
+      "disposition": "reference_copy"
+    },
+    {
+      "original": "docs/workflow_contracts.md",
+      "archived": "archive/retired/older_workflows_20261008/docs/workflow_contracts.md",
+      "sha256": "0c2f5d17db1997e7e6697d4af949d3cd4609a9dc8b471450c151a2ff203787d0",
+      "disposition": "reference_copy"
+    }
+  ],
+  "supporting_files": [
+    {
+      "path": "README.md",
+      "sha256": "6764b3bb9a1342f406349cfa198ea328a7be0fc1a67a49e4858103a996fae842"
+    },
+    {
+      "path": "capture_references.py",
+      "sha256": "bee9b12186289f62c577cbfa05ab2eb25e0e9ddc348f5a89b1947b99ae85ae00"
+    },
+    {
+      "path": "baseline_tests.txt",
+      "sha256": "d740945a8d4f5f0ff25bbc15dc307e58296c0cfc8be7d5ac392c8d84d11f1b10"
+    },
+    {
+      "path": "reference_provenance.json",
+      "sha256": "5ba5517ca7d8bb7d813fed27fc62848f3c19bb797ec850ce09c1620f71508d5f"
+    },
+    {
+      "path": "capture_driver_original.txt",
+      "sha256": "4537e114b2a71de5fe25f5de26a1824679ce1dcf1d2be9e050f3184b7afa4368"
+    }
+  ]
+}

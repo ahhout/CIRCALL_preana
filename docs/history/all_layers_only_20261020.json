@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "recorded_utc": "2026-10-20T07:51:27.768608+00:00",
+  "snapshot": "archive/migrations/all_layers_only_before_20261020",
+  "snapshot_files": 149,
+  "full_suite": {
+    "tests": 402,
+    "subtests": 98,
+    "warnings": 0,
+    "seconds": 443.6
+  },
+  "final_targeted_suite": {
+    "tests": 113,
+    "subtests": 23,
+    "warnings": 0,
+    "seconds": 37.93
+  },
+  "configured_preflight": {
+    "command": [
+      "conda",
+      "run",
+      "--no-capture-output",
+      "-n",
+      "pre_analysis",
+      "python",
+      "-B",
+      "run.py",
+      "--validate-only",
+      "--output-dir",
+      "/home/arnohoutman/projects/pre_analysis/outputs/all_layers_only_20261020/configured_preflight_destination"
+    ],
+    "returncode": 0,
+    "output_created": false
+  },
+  "cases": {
+    "synthetic_success": {
+      "status": "passed",
+      "compared": {
+        "json": 36,
+        "csv": 2,
+        "xlsx": 24,
+        "png": 87,
+        "pdf": 72
+      },
+      "allowed_typography_changes": 44,
+      "failures": [],
+      "report": "outputs/all_layers_only_20261020/comparisons/verified_synthetic_success.json"
+    },
+    "synthetic_blocked": {
+      "status": "passed",
+      "compared": {
+        "json": 36,
+        "csv": 2,
+        "xlsx": 24,
+        "png": 69,
+        "pdf": 54
+      },
+      "allowed_typography_changes": 20,
+      "failures": [],
+      "report": "outputs/all_layers_only_20261020/comparisons/verified_synthetic_blocked.json"
+    }
+  },
+  "visual_review": {
+    "status": "passed",
+    "final_pngs": [
+      "03_advanced_analysis/circall/figures/cfdna_ng_per_ml_plasma/gb_per_l/cfdna_ng_per_ml_plasma_vs_gb_per_l.png",
+      "04_disease_modeling/circall/figures/blood_counts/blast_full_range.png"
+    ]
+  },
+  "static_checks": {
+    "master_options_unchanged": true,
+    "environment_unchanged": true,
+    "syntax": "passed",
+    "diff_check": "passed",
+    "archive_entries_verified": 126,
+    "documentation_unresolved": [
+      {
+        "file": "docs/history/layer3_validation_20261006.md",
+        "line": 12,
+        "target": "../../outputs/layer3_advanced_analysis/validation_20261006T102847Z.json",
+        "kind": "missing_file"
+      },
+      {
+        "file": "docs/history/layer4_validation_20261006.md",
+        "line": 19,
+        "target": "../../outputs/layer4_disease_modeling/validation_20261006T142704Z.json",
+        "kind": "missing_file"
+      }
+    ]
+  },
+  "limitations": [
+    "No clinical full execution or independent scientific validation.",
+    "Two historical acceptance JSON records remain absent and explicitly documented.",
+    "Representative PNG visual review only; no Excel or independent PDF rendering."
+  ]
+}

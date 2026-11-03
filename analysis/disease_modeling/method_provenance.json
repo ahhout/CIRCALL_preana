@@ -16,5 +16,5 @@
     "Clinical/count cache unavailability reported explicitly",
     "Count full-range plots supplement early-window views"
   ],
-  "circall_category_scope": "Existing categories only; positive nonquantifiable annotations remain blocked pending source review at investigator request"
+  "circall_category_scope": "October 8, 2026 investigator-approved extension: positive/pos NQ means detected but nonquantifiable; reported limit is assay sensitivity, separate from measured MRD and retrospective upper bounds. Original source annotations preserved. CIRCALL NQ counted without a numerical trajectory position; existing pooled assigned display retained."
 }

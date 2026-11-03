@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "canonical_missing_token": "na",
-  "definition_version": "disease-tracking-1",
+  "definition_version": "disease-tracking-2",
   "missing_tokens": ["", "na", "n/a", "nan", "none", "-", "sk"],
   "unknown_tokens": ["?"],
   "visits": ["TP1", "TP2"],
@@ -9,6 +9,11 @@
   "mrd": {
     "retrospective": {"sheet": "Inventaire", "identity": "patient_id", "value": "MRD_IgTCR", "visit": "timepoint", "specimen": "specimen_type", "specimen_filter": "bone marrow"},
     "circall": {"sheet": "cohorte_lal", "identity": "circall_id", "values": {"TP1": "MRD_TP1", "TP2": "MRD_TP2"}},
+    "circall_positive_nq": {
+      "labels": ["pos nq", "positive nq"],
+      "limit_semantics": "Reported assay sensitivity in residual clone fraction units; not a measured MRD value or an inferred upper bound",
+      "trajectory_display": "Counted without a numerical position in CIRCALL trajectories; existing pooled assigned display level retained"
+    },
     "unit": "residual clone fraction",
     "minimum_exclusive": 0,
     "maximum_inclusive": 1,

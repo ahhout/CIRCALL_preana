@@ -1,3 +1,4 @@
+from tests.fixtures.pipeline import full_entries
 """Integrated runner safety and failure propagation, with synthetic sources only."""
 from contextlib import redirect_stdout, redirect_stderr
 import io
@@ -10,7 +11,6 @@ from unittest.mock import patch
 
 from analysis import pipeline
 from analysis import provenance
-from analysis import artifacts
 from analysis.cli import arguments, main
 from analysis.worker import completion
 from analysis.outputs import audit_directory
@@ -24,12 +24,13 @@ class PipelineTests(unittest.TestCase):
         self.source = self.root / 'synthetic.xlsx'
         self.source.write_text('synthetic source')
         self.config = self.root / 'pipeline.json'
-        self.entries = [{'name': 'canonical', 'options': {'circall': 'synthetic.xlsx', 'analysis': 'inventory'}},
-                        {'name': 'cfdna_associations', 'options': {'inventory': 'synthetic.xlsx'}}]
+        self.entries = [{'name': 'data_integrity', 'options': {'circall': 'synthetic.xlsx', 'cohort': 'circall'}},
+                        {'name': 'sample_statistics', 'options': {'inventory': 'synthetic.xlsx', 'cohort': 'retrospective'}}]
+        self.entries = full_entries(self.root, self.entries)
         self.write_config()
         self.output = self.root / 'fresh'
         self.evidence = {e['name']: {'status': 'complete', 'workflow': e['name'], 'schema_version': 1,
-                          'environment_name': pipeline.REGISTRY[e['name']],
+                          'environment_name': pipeline.REGISTRY[e['name']], 'source_states': {},
                           'inputs': {'synthetic': {'path': str(self.source), 'sha256': provenance.digest(self.source)}}}
                          for e in self.entries}
 
@@ -44,8 +45,8 @@ class PipelineTests(unittest.TestCase):
     def test_options_and_config_paths_are_explicit(self):
         loaded = pipeline.load_config(self.config)
         self.assertEqual(loaded['workflows'][0]['options']['circall'], str(self.source))
-        self.assertEqual(pipeline.worker_command('blast_kinetics')[:5], ['conda', 'run', '--no-capture-output', '-n', 'pre_analysis'])
-        argv = pipeline.option_argv({'pool-cohorts': False, 'mixed-random-slope-sensitivity': False})
+        self.assertEqual(pipeline.worker_command('disease_modeling')[:5], ['conda', 'run', '--no-capture-output', '-n', 'pre_analysis'])
+        argv = pipeline.option_argv({'pool-cohorts': False})
         self.assertEqual(argv, ['--no-pool-cohorts'])
 
     def test_default_dispatch_uses_layered_profile(self):
@@ -60,42 +61,8 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(main(), 0)
         self.assertEqual(run.call_args.args[0].config, pipeline.ROOT / 'configs/pipeline_layers.json')
 
-    def test_compatibility_profile_and_direct_flags_remain_selectable(self):
-        args = arguments(['--config', str(pipeline.ROOT/'configs/pipeline_all.json')])
-        self.assertEqual([e['name'] for e in pipeline.load_config(args.config)['workflows']],
-                         ['canonical', 'cfdna_associations'])
-        for flags in (['--workflow', 'canonical', '--circall', str(self.source)],
-                      ['--circall', str(self.source), '--analysis', 'inventory']):
-            self.assertEqual(arguments(flags).workflow, 'canonical')
-        self.assertEqual(arguments(['--workflow', 'cfdna_associations']).workflow, 'cfdna_associations')
 
-    def test_consolidated_kinetics_profiles_select_counts_and_mrd_once(self):
-        from analysis.sample_analysis.runner import selection
-        full = pipeline.load_config(pipeline.ROOT / 'configs/pipeline_all.json')
-        focused = pipeline.load_config(pipeline.ROOT / 'configs/pipeline_kinetics.json')
-        self.assertEqual([entry['name'] for entry in focused['workflows']], ['canonical'])
-        full_args = pipeline.workflow_args(full['workflows'][0])
-        focused_args = pipeline.workflow_args(focused['workflows'][0])
-        cohorts, tasks, inputs = selection(focused_args)
-        self.assertEqual(cohorts, ['retrospective', 'circall'])
-        self.assertEqual(tasks, ['kinetics', 'mrd'])
-        self.assertEqual(inputs['retrospective_blasts'], pipeline.ROOT / 'input/retrospective_blast_count_01102026.xlsx')
-        self.assertEqual(focused_args.retrospective_blast_unit, 'x10^9/L')
-        self.assertEqual(inputs['blood_counts'], pipeline.ROOT / 'input/CIRCALL_wbc_blast_count_01102026.xlsx')
-        self.assertEqual(inputs['circall'], pipeline.ROOT / 'input/inventaire_CIRCALL_01102026.xlsx')
-        for args in (full_args, focused_args):
-            selected = selection(args)[1]
-            self.assertEqual(selected.count('kinetics'), 1)
-            self.assertEqual(selected.count('mrd'), 1)
-        for field in ('baseline_day_max', 'baseline_selection', 'overlay_max_day',
-                      'mrd_unknown_level', 'mrd_negative_level'):
-            self.assertEqual(getattr(focused_args, field), getattr(full_args, field))
 
-    def test_normalized_kinetics_remains_explicitly_selectable(self):
-        profile = pipeline.ROOT / 'configs/blast_kinetics/blast_kinetics.yml'
-        self.write_config([{'name': 'blast_kinetics', 'profile': str(profile)}])
-        self.assertEqual(pipeline.load_config(self.config)['workflows'],
-                         [{'name': 'blast_kinetics', 'profile': str(profile)}])
 
     def test_config_execution_settings_and_cli_override(self):
         config = {'schema_version': 1, 'workflows': self.entries,
@@ -123,13 +90,13 @@ class PipelineTests(unittest.TestCase):
                     pipeline.load_config(self.config)
 
     def test_worker_cache_does_not_occupy_atomic_destination(self):
-        destination = self.output / 'blast_kinetics'
+        destination = self.output / '04_disease_modeling'
         environment = pipeline.worker_environment(destination)
         self.assertFalse(Path(environment['MPLCONFIGDIR']).is_relative_to(destination))
         self.assertTrue(Path(environment['MPLCONFIGDIR']).is_relative_to(self.output))
 
     def test_invalid_configuration_and_option_types(self):
-        invalid = [[], [self.entries[0], self.entries[0]], [{'name': 'unknown', 'options': {}}], [{'name': 'legacy', 'options': {}}],
+        invalid = [[{'name': 'sample_statistics', 'options': {'assessment-time': 7}}], [{'name': 'advanced_analysis', 'options': {'sample-selection-seed': True}}], [{'name': 'sample_statistics', 'options': {'include-controls': 'false'}}], [], [self.entries[0], self.entries[0]], [{'name': 'unknown', 'options': {}}], [{'name': 'legacy', 'options': {}}],
                    [{'name': 'canonical', 'options': {}}],
                    [{'name': 'canonical', 'options': {'circall': 'synthetic.xlsx', 'overwrite': True}}],
                    [{'name': 'canonical', 'options': {'circall': 'synthetic.xlsx', 'mixed-outlier-drop-n': True}}],
@@ -156,7 +123,7 @@ class PipelineTests(unittest.TestCase):
         with patch.object(pipeline.subprocess, 'run', side_effect=child) as worker:
             evidence = pipeline.preflight(pipeline.load_config(self.config), self.output)
         self.assertEqual(set(evidence), set(self.evidence))
-        self.assertEqual(len(worker.call_args_list), 2)
+        self.assertEqual(len(worker.call_args_list), 4)
         self.assertTrue(all(call.kwargs['cwd'] == pipeline.ROOT for call in worker.call_args_list))
 
     def test_preflight_failure_publishes_nothing(self):
@@ -171,14 +138,14 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(worker.call_count, 0)
 
     def test_failure_continues_independent_workflow(self):
-        results = [subprocess.CompletedProcess([], 1), subprocess.CompletedProcess([], 0)]
+        results = [subprocess.CompletedProcess([], 1), *[subprocess.CompletedProcess([], 0)]*3]
         with patch.object(pipeline, 'preflight', return_value=self.evidence), \
              patch.object(pipeline, 'run_worker', side_effect=results) as worker, \
-             patch('analysis.worker.completion', return_value={'inputs': {}}), \
+             patch('analysis.worker.completion', return_value={'inputs': {}, 'quality_status': 'no_issues_detected', 'report_generation_status': 'complete'}), \
              patch.object(pipeline, 'publish', return_value=[]):
             self.assertEqual(self.run_quiet(), 1)
         record = json.loads((self.output / '.audit/run_manifest.json').read_text())
-        self.assertEqual([s['status'] for s in record['workflows']], ['failed', 'complete'])
+        self.assertEqual([s['status'] for s in record['workflows']], ['failed', 'complete', 'complete', 'complete'])
         self.assertEqual([call.args[2] for call in worker.call_args_list], [audit_directory(self.output, e['name']) for e in self.entries])
         self.assertNotIn('private source', (self.output / '.audit/run_manifest.json').read_text())
 
@@ -194,7 +161,7 @@ class PipelineTests(unittest.TestCase):
              patch.object(pipeline, 'run_worker', side_effect=KeyboardInterrupt):
             self.assertEqual(self.run_quiet(), 1)
         record = json.loads((self.output / '.audit/run_manifest.json').read_text())
-        self.assertEqual([s['status'] for s in record['workflows']], ['interrupted', 'not_run'])
+        self.assertEqual([s['status'] for s in record['workflows']], ['interrupted', 'not_run', 'not_run', 'not_run'])
 
     def test_worker_interruption_terminates_child_process_group(self):
         from unittest.mock import Mock
@@ -212,7 +179,7 @@ class PipelineTests(unittest.TestCase):
             self.source.write_text('changed synthetic source')
             return subprocess.CompletedProcess([], 0)
         with patch.object(pipeline, 'preflight', return_value=self.evidence), patch.object(pipeline, 'run_worker', side_effect=child), \
-             patch('analysis.worker.completion', return_value={'inputs': {}}), \
+             patch('analysis.worker.completion', return_value={'inputs': {}, 'quality_status': 'no_issues_detected', 'report_generation_status': 'complete'}), \
              patch.object(pipeline, 'publish', return_value=[]):
             self.assertEqual(self.run_quiet(), 1)
         self.assertEqual(json.loads((self.output / '.audit/run_manifest.json').read_text())['status'], 'failed')
@@ -224,14 +191,6 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(self.run_quiet(), 1)
         self.assertEqual(keep.read_text(), 'keep')
 
-    def test_artifact_headers_and_image_structure(self):
-        self.output.mkdir()
-        (self.output / 'table.csv').write_text('wrong\nsynthetic\n')
-        with self.assertRaises(ValueError):
-            artifacts.validate_files(self.output, {'table.csv': ['required']})
-        (self.output / 'plot.png').write_text('not a PNG')
-        with self.assertRaises(ValueError):
-            artifacts.validate_files(self.output, {'plot.png': []})
 
     def test_index_hashes_published_files_and_ignores_cache(self):
         self.output.mkdir()
@@ -255,15 +214,3 @@ class PipelineTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-def test_catalog_hash_failure_is_actionable_without_relaying_raw_output(tmp_path):
-    import subprocess
-    from unittest.mock import patch
-    import pytest
-    from analysis import pipeline
-    result=subprocess.CompletedProcess([],1,stdout='{"error_code":"CatalogHashMismatch"}',stderr='private source content')
-    with patch.object(pipeline.subprocess,'run',return_value=result):
-        with pytest.raises(ValueError,match='workbook hash differs from configs/source_catalog.json') as error:
-            pipeline.preflight({'workflows':[{'name':'cfdna_associations','options':{}}]},tmp_path/'fresh')
-    assert 'private source content' not in str(error.value)

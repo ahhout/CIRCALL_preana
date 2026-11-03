@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "original": "configs/pipeline_integrity.json",
+      "archived": "archive/retired/single_layer_interfaces_20261020/configs/pipeline_integrity.json",
+      "sha256": "54c26db0203e665ded71db2f11bceaf4daa56be431a5a326d6ee2de39970044c"
+    },
+    {
+      "original": "configs/pipeline_sample_statistics.json",
+      "archived": "archive/retired/single_layer_interfaces_20261020/configs/pipeline_sample_statistics.json",
+      "sha256": "580e48c10434b8de5b53ffdd216685b6a3676bfc803aa9b99768f980b936dd42"
+    },
+    {
+      "original": "configs/pipeline_advanced_analysis.json",
+      "archived": "archive/retired/single_layer_interfaces_20261020/configs/pipeline_advanced_analysis.json",
+      "sha256": "24bbc26fda273835cea2ef0476a686276da7e87942734701e4d899592fd03e30"
+    },
+    {
+      "original": "configs/pipeline_disease_modeling.json",
+      "archived": "archive/retired/single_layer_interfaces_20261020/configs/pipeline_disease_modeling.json",
+      "sha256": "93bac3a163a770f6c27c62a6b3bb0fffa8887864fb040dde9ed214b92080d426"
+    },
+    {
+      "original": "analysis/artifacts.py",
+      "archived": "archive/retired/single_layer_interfaces_20261020/analysis/artifacts.py",
+      "sha256": "451bf095293a8b3411128872ad49fc7c50a75860900ad4f8b4e577c19d930ca1"
+    }
+  ]
+}

@@ -1,20 +1,13 @@
-"""Standalone and integrated data-integrity execution with quality-aware reports."""
+"""Internal data-integrity engine with quality-aware reports."""
 import argparse
-from datetime import datetime, timezone
 import json
 from pathlib import Path
-import sys
 
 from analysis.source_state import sources, capture_sources, verify_source_states
 from analysis.retrospective_controls import inspect_with_controls
 from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
 from .checks import load_rules, inspect_cohort, group_findings, summarize
 from .reporting import write_workbook, validate_workbook
-
-
-def default_output_dir():
-    """Keep independently auditable runs under the requested Layer 1 root."""
-    return ROOT/'outputs'/'layer1_data_integrity'/('run_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
 
 
 def arguments(argv=None):
@@ -106,28 +99,3 @@ def validate_results(output,record):
             raise ValueError('Integrity audit groups do not reconcile')
         validate_workbook(output/cohort['cohort']/'integrity_report.xlsx',result)
     verify_source_states(record['source_states'])
-
-
-def main(argv=None):
-    args=arguments(argv)
-    try:
-        evidence=preflight(args)
-        if args.output_dir is not None and (args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir,*args.output_dir.parents))):
-            raise ValueError('Output destination must be fresh and not a symlink')
-        if args.validate_only:
-            print('Integrity preflight complete; workbook defects are reported during inspection')
-            return 0
-        args.output_dir=args.output_dir or default_output_dir()
-        from analysis.outputs import run_standalone
-        from analysis.worker import completion
-        entry={'name':'data_integrity','options':{}}
-        def execute(native):
-            from copy import copy
-            verify_inputs(evidence['inputs']);verify_source_states(evidence['source_states'])
-            worker=copy(args);worker.output_dir=native
-            return run(worker)
-        return run_standalone('data_integrity',args.output_dir,evidence['resolved_settings'],execute,
-                              lambda native:completion(entry,native))
-    except (OSError,ValueError) as error:
-        print(f'Integrity execution could not complete ({type(error).__name__}); review configuration and destination',file=sys.stderr)
-        return 1

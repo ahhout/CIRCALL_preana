@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "status": "passed",
+  "recorded_utc": "2026-10-20T08:13:33.375068+00:00",
+  "tests": {
+    "command": "conda run --no-capture-output -n pre_analysis python -B -m pytest -q -p no:cacheprovider tests/orchestration --tb=short",
+    "passed": 113,
+    "subtests": 23,
+    "warnings": 0,
+    "seconds": 188.2
+  },
+  "real_bootstrap": {
+    "interpreter": "/usr/bin/python3",
+    "activated_environment": false,
+    "conda_on_path": false,
+    "preflight_returncode": 0,
+    "output_created": false,
+    "evidence": "outputs/conda_launcher_20261020/system_python_preflight.json"
+  },
+  "static_checks": {
+    "snapshot_files": 150,
+    "preservation": "passed",
+    "scientific_configuration": "unchanged",
+    "environment": "unchanged",
+    "links": "only two previously acknowledged missing historical JSON records",
+    "diff_check": "passed",
+    "shell_launcher": "archived",
+    "staging": "empty"
+  }
+}

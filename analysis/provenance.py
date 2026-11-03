@@ -64,7 +64,7 @@ def git_state():
 
 
 def contract(workflow):
-    return {'id': workflow, 'version': 2 if workflow in ('canonical', 'cfdna_associations') else 1, 'path': str(CONTRACT.relative_to(ROOT)),
+    return {'id': workflow, 'version': 1, 'path': str(CONTRACT.relative_to(ROOT)),
             'sha256': digest(CONTRACT)}
 
 

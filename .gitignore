@@ -47,3 +47,37 @@ logs/
 # Only explicitly synthetic fixtures may be committed.
 !tests/fixtures/synthetic_*.csv
 !tests/fixtures/synthetic_*.xlsx
+
+# This reviewed retirement bundle contains implementation files only.
+!archive/
+archive/*
+!archive/retired/
+archive/retired/*
+!archive/retired/older_workflows_20261008/
+!archive/retired/older_workflows_20261008/**
+archive/retired/older_workflows_20261008/**/__pycache__/
+archive/retired/older_workflows_20261008/**/*.pyc
+archive/retired/older_workflows_20261008/**/*.xlsx
+archive/retired/older_workflows_20261008/**/*.csv
+archive/retired/older_workflows_20261008/**/*.png
+archive/retired/older_workflows_20261008/**/*.pdf
+
+# Reviewed code-only retirement: allow only implementation/configuration/docs.
+!archive/retired/single_layer_interfaces_20261020/
+archive/retired/single_layer_interfaces_20261020/**
+!archive/retired/single_layer_interfaces_20261020/**/
+!archive/retired/single_layer_interfaces_20261020/**/*.py
+!archive/retired/single_layer_interfaces_20261020/**/*.json
+!archive/retired/single_layer_interfaces_20261020/**/*.md
+archive/retired/single_layer_interfaces_20261020/**/__pycache__/
+archive/retired/single_layer_interfaces_20261020/**/*.pyc
+archive/retired/single_layer_interfaces_20261020/**/.env*
+archive/retired/single_layer_interfaces_20261020/**/*.secret
+archive/retired/single_layer_interfaces_20261020/**/*.secrets
+
+# Reviewed retired shell wrapper and small provenance records only.
+!archive/retired/conda_launcher_20261020/
+archive/retired/conda_launcher_20261020/**
+!archive/retired/conda_launcher_20261020/*.sh
+!archive/retired/conda_launcher_20261020/*.md
+!archive/retired/conda_launcher_20261020/*.json

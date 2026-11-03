@@ -12,6 +12,7 @@ from analysis.configuration import unique_object
 from analysis.data_integrity.checks import number
 from analysis.sample_io import read_sheet
 from analysis.sample_definitions import extraction_state
+from .calendar_volumes import collection_date
 
 
 def load_definitions(path):
@@ -60,7 +61,7 @@ def receipt(sample, visit, planned, cohort, as_of, d, control=False):
         day = planned.date() if isinstance(planned, datetime) else planned
         start = datetime.combine(day, time(), ZoneInfo(d['timezone'])).astimezone(timezone.utc)
     basis = 'deadline' if timed else ('retrospective_inventory' if cohort == 'retrospective' else 'manual_or_id')
-    overdue = kind == 'manual_na' and timed and as_of > start + timedelta(hours=d['grace_hours'])
+    overdue = kind in d['overdue_id_states'] and timed and as_of > start + timedelta(hours=d['grace_hours'])
     due_received = kind == 'present' and timed and as_of >= start
     if kind == 'present':
         status = 'received'
@@ -70,10 +71,14 @@ def receipt(sample, visit, planned, cohort, as_of, d, control=False):
         timing = ('not_yet_due' if timed and as_of < start else 'overdue' if overdue else
                   'pending' if timed else 'not_assessed')
     else:
-        status, timing = 'unassessed', 'not_assessed'
+        status = 'unassessed'
+        timing = ('not_yet_due' if timed and as_of < start else 'late' if overdue else
+                  'pending' if timed else 'not_assessed')
     return dict(receipt=status, receipt_basis=basis, receipt_reason=(
         'deadline_elapsed' if overdue else 'manual_na' if kind == 'manual_na' else status), id_state=kind,
-        receipt_timing=timing, overdue=bool(overdue), overdue_assessed=timed and kind=='manual_na',
+        receipt_timing=timing, overdue=bool(overdue),
+        overdue_status=('marked_missing' if kind=='manual_na' else 'late') if overdue else None,
+        overdue_assessed=timed and kind in d['overdue_id_states'],
         due_received=bool(due_received))
 
 
@@ -116,6 +121,17 @@ def prepare(path, cohort, controls, as_of, d):
             if not any(val(f) is not None and token(val(f)) != '' for f in anchors):
                 skipped += 1
                 continue
+            # Unassigned template visits are not missing patient records. Keep
+            # identified planned visits and orphaned records with actual data.
+            missing = set(d['missing_tokens']) | set(d['unknown_tokens'])
+            empty_template = all(
+                field in d['unassigned_template_fields'] or (
+                    token(cell.value) in missing and cell.data_type != 'e' and cell.cached_type != 'e'
+                    and not (field in (identity, 'sample_id', 'dna_id') and cell.formula))
+                for field, cell in source.items())
+            if empty_template:
+                skipped += 1
+                continue
             row = cells[0].row
             pid = val(identity)
             valid_identity = id_kind(pid, d) == 'present' and not (identity in source and source[identity].formula)
@@ -140,6 +156,10 @@ def prepare(path, cohort, controls, as_of, d):
                         extraction_status=extraction)
             item.update(receipt(val('sample_id'), visit, val('sampling_plan'), cohort, as_of, d, control))
             item['measurements'] = {f: measurement(source.get(f), 'unclassified' if f=='extraction_input_volume_ml' else extraction, d) for f in d['metrics']}
+            volume = d['metrics'].get('extraction_input_volume_ml', {})
+            calendar = volume.get('calendar_plot', {})
+            if not control and cohort in calendar.get('cohorts', []) and specimen in volume['specimens']:
+                item['collection_date'] = collection_date(source.get(calendar['date_field']), d)
             rows.append(item)
     return rows, issues, skipped
 
@@ -148,6 +168,7 @@ def dimensions(rows, views):
     """Disjoint groups within each named view; totals never add across views."""
     specs = {'overall': (), 'center': ('center',), 'specimen': ('specimen',),
              'visit': ('visit',), 'specimen_visit': ('specimen','visit'),
+             'center_specimen': ('center', 'specimen'),
              'center_specimen_visit': ('center', 'specimen', 'visit')}
     for view in views:
         fields=specs[view]
@@ -169,7 +190,7 @@ def describe(values):
 
 def aggregate(rows, d, pooled=False, *, detailed=False):
     totals, receipts, measures, availability, checklist = [], [], [], [], []
-    views=['overall','center','specimen','visit','center_specimen_visit'] if detailed else d['inventory_views']
+    views=['overall','center','specimen','visit','center_specimen','center_specimen_visit'] if detailed else d['inventory_views']
     for dims, group in dimensions(rows, views):
         received = [r for r in group if r['receipt'] in ('received', 'received_early')]
         totals.append({**dims, 'samples': len(group), 'patients': len({r['subject_key'] for r in group}),
@@ -181,20 +202,21 @@ def aggregate(rows, d, pooled=False, *, detailed=False):
                 subset = [r for r in group if r['receipt_basis'] == basis]
                 counts = Counter(r['receipt'] for r in subset)
                 received_due=sum(r.get('due_received',False) for r in subset)
-                overdue=sum(r.get('overdue',False) for r in subset)
+                overdue=sum(r.get('overdue',False) and r['receipt']=='marked_missing' for r in subset)
                 denominator = received_due + overdue
                 percentages = basis == 'deadline' and not any(r['control'] for r in subset)
                 for status, count in sorted(counts.items()):
                     classified=received_due if status=='received' else overdue if status=='marked_missing' else 0
                     receipts.append({**dims, 'basis': basis, 'status': status, 'samples': count,
                                      'patients': len({r['subject_key'] for r in subset if r['receipt']==status}),
-                                     'overdue_samples':overdue if status=='marked_missing' else 0,
+                                     'overdue_samples':sum(r.get('overdue',False) for r in subset if r['receipt']==status),
                                      'classified_samples':classified if percentages else None,
                                      'classified_denominator': denominator if percentages else None,
                                      'classified_percentage': classified/denominator if percentages and denominator and status in ('received','marked_missing') else None})
     for row in rows:
         if not pooled and row.get('overdue',False):
-            checklist.append({k: row[k] for k in ('patient_id','center','visit','specimen','sheet','row','receipt_reason')})
+            checklist.append({**{k: row[k] for k in ('patient_id','center','visit','specimen','sheet','row','receipt_reason')},
+                              'status':row['overdue_status']})
     # Each metric/specimen/assay has its own denominator; cohort contributions stay visible.
     for field, definition in d['metrics'].items():
         eligible = [r for r in rows if r['specimen'] in definition['specimens'] and r['cohort'] not in definition.get('exclude_cohorts', [])

@@ -1,4 +1,5 @@
 """Aggregate Excel and disease figures; no clinical row export paths."""
+from analysis.figure_layout import remove_plot_text
 import json
 from pathlib import Path
 
@@ -94,14 +95,17 @@ def validate_workbook(path, result, d, settings):
         book.close()
 
 
-def save(fig, destination):
+def save(fig, destination, pdf_output=True):
+    from analysis.plot_style import save_figure
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
+    remove_plot_text(fig)
     fig.tight_layout()
     legends_below(fig)
     try:
-        for ext in ('png', 'pdf'):
-            fig.savefig(destination.with_suffix('.'+ext), bbox_inches='tight', dpi=200)
+        for ext in (('png', 'pdf') if pdf_output else ('png',)):
+            remove_plot_text(fig)
+            save_figure(fig, destination.with_suffix('.'+ext), dpi=200)
     finally:
         plt.close(fig)
 
@@ -109,7 +113,9 @@ def save(fig, destination):
 def mrd_figure(records, scope, args, d):
     if not any(r['status'] not in ('missing', 'normalized_baseline') for r in records):
         return None
+    from analysis.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
     pooled = scope == 'pooled'
+    colors = d['colors'] if pooled else {**d['colors'], **COHORT_COLORS}
     visits = d['pooled_visits'] if pooled or scope == 'circall' else d['visits']
     levels = dict(negative=args.mrd_negative_level, unknown_significance=args.mrd_unknown_level,
                   positive_nonquantifiable=args.mrd_positive_nq_level, normalized_baseline=1.)
@@ -135,8 +141,10 @@ def mrd_figure(records, scope, args, d):
             drawn.append(value)
             x = positions[r['visit']]+jitter
             points.append((positions[r['visit']], x, value, status))
-            color = d['colors'][cohort]
+            color = colors[cohort]
             marker = 'v' if status in ('negative', 'positive_nonquantifiable') else 'D' if status == 'unknown_significance' else 'o'
+            if scope == 'circall':
+                marker = CENTER_MARKERS.get(r.get('center','unknown'), 'o')
             ax.scatter(x, value, color=color, marker=marker, facecolors='none' if status in ('positive_nonquantifiable', 'unknown_significance') else color,
                        edgecolors=color, alpha=.75, s=34)
         points.sort()
@@ -148,7 +156,7 @@ def mrd_figure(records, scope, args, d):
             if 'positive_nonquantifiable' in (first[3], second[3]):
                 continue
             assigned = any(s in ('negative', 'unknown_significance') for s in (first[3], second[3]))
-            ax.plot([first[1], second[1]], [first[2], second[2]], color=d['colors'][cohort], alpha=.25,
+            ax.plot([first[1], second[1]], [first[2], second[2]], color=colors[cohort], alpha=.25,
                     linewidth=.7, linestyle=':' if assigned else '-')
     ax.set(yscale='log', ylabel='MRD residual clone fraction', xlabel='Nominal treatment visit',
            title=f'{scope.upper() if scope == "circall" else scope.capitalize()} MRD trajectories')
@@ -157,14 +165,24 @@ def mrd_figure(records, scope, args, d):
     ax.set_xticks(range(len(visits)), [f'{v}\nn={sum(r["visit"] == v and r["status"] != "missing" for r in records)}' for v in visits])
     ax.set_xlim(-.35, len(visits)-.65)
     ax.grid(axis='y', alpha=.18)
-    handles = [Line2D([], [], color=d['colors'][cohort], marker='o', linestyle='', label=f'{cohort.upper() if cohort == "circall" else "Retrospective"} (n={sum(c == cohort for c, _ in groups)})') for cohort in sorted({r['cohort'] for r in records})]
+    handles = [Line2D([], [], color=colors[cohort], marker='o', linestyle='', label=(cohort.upper() if cohort == 'circall' else 'Retrospective') if pooled else f'{cohort.upper() if cohort == "circall" else "Retrospective"} (n={sum(c == cohort for c, _ in groups)})') for cohort in sorted({r['cohort'] for r in records})]
     handles += [Line2D([], [], color='#555555', marker=marker, linestyle='', markerfacecolor=face, label=label) for marker, face, label in
                 [('o', '#555555', 'Quantified MRD / assumed diagnosis reference' if scope != 'retrospective' else 'Quantified MRD'),
                  ('v', '#555555', f'Negative: assigned {args.mrd_negative_level:g}'),
-                 ('v', 'none', f'Positive NQ: assigned {args.mrd_positive_nq_level:g}' if pooled else 'Positive NQ: upper bound, not a measurement')]]
+                 ('v', 'none', f'Positive NQ: assigned {args.mrd_positive_nq_level:g}' if pooled else
+                  'Positive NQ: counted, not positioned' if scope == 'circall' else 'Positive NQ: upper bound, not a measurement')]]
     if any(r['status'] == 'unknown_significance' for r in records):
         handles.append(Line2D([], [], color='#555555', marker='D', linestyle='', markerfacecolor='none', label=f'Uncertain: assigned {args.mrd_unknown_level:g}'))
-    ax.legend(handles=handles, frameon=False, fontsize=9)
+    if scope == 'circall':
+        handles = point_handles('circall', [r.get('center','unknown') for r in records], circall_only=True)
+        # Center owns shape; status is conveyed by assigned level and fill.
+        handles += [Line2D([], [], linestyle='', color='none', label=text) for text in (
+            'Filled: quantified MRD / assumed diagnosis reference',
+            f'Negative: assigned {args.mrd_negative_level:g}',
+            'Positive NQ: counted, not positioned',
+            f'Hollow: uncertain significance, assigned {args.mrd_unknown_level:g}')]
+    ax.legend(handles=handles, frameon=False, fontsize=9,
+              title=f'CIRCALL: {len(groups)} patients' if scope=='circall' else None)
     unbounded = sum(r['status'] == 'positive_nonquantifiable' and r['upper_bound_fraction'] is None for r in records)
     note = 'Descriptive only. Assigned levels are not measurements or detection limits. No shared calendar days assumed.'
     if scope != 'retrospective':
@@ -173,7 +191,10 @@ def mrd_figure(records, scope, args, d):
         note += f'\nUnbounded positive NQ counted, not positioned: {unbounded}. Lines connect quantified pairs only.'
     else:
         note += '\nMissing visits and positive NQ are not connected; dotted lines touch other assigned levels.'
+        if scope == 'circall':
+            note += f'\nPositive NQ counted, not positioned: {unbounded}. Reported sensitivity is not measured MRD.'
     fig.text(.5, -.01, note, ha='center', va='top', fontsize=8)
+    remove_plot_text(fig)
     return fig
 
 
@@ -194,6 +215,7 @@ def mrd_status_figure(rows, d):
     fig.text(.5, -.01, 'Diagnosis is an assumed disease-positive reference. Missing results are hidden; fixed denominators retained.\n'
              'Display groups combine statuses; the workbook retains all clinical categories and missing counts.',
              ha='center', va='top', fontsize=8)
+    remove_plot_text(fig)
     return fig
 
 
@@ -203,6 +225,9 @@ def count_figure(records, measurement, args, d, *, early=False, comparison=False
     if not data:
         return None
     fig, ax = plt.subplots(figsize=(10, 6))
+    from analysis.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
+    circall_only = not comparison and {r['cohort'] for r in data} == {'circall'}
+    colors = d['colors'] if comparison else {**d['colors'], **COHORT_COLORS}
     handles = []
     for cohort in sorted({r['cohort'] for r in data}):
         selected = [r for r in data if r['cohort'] == cohort]
@@ -213,9 +238,12 @@ def count_figure(records, measurement, args, d, *, early=False, comparison=False
             ordered = sorted(group, key=lambda r: r['day'])
             x = [r['display_day'] for r in ordered]
             y = [r['value'] if r['value'] > 0 or args.kinetics_y_scale == 'linear' else np.nan for r in ordered]
-            ax.plot(x, y, color=d['colors'][cohort], alpha=.3, linewidth=.8)
-            ax.scatter(x, y, color=d['colors'][cohort], s=24, alpha=.8)
-        handles.append(Line2D([], [], color=d['colors'][cohort], marker='o', label=f'{cohort.upper() if cohort == "circall" else "Retrospective"}: {len(groups)} patients; {len(selected)} measurements'))
+            ax.plot(x, y, color=colors[cohort], alpha=.3, linewidth=.8)
+            marker = CENTER_MARKERS.get(group[0].get('center','unknown'), 'o') if circall_only else 'o'
+            ax.scatter(x, y, color=colors[cohort], marker=marker, s=24, alpha=.8)
+        handles.append(Line2D([], [], color=colors[cohort], marker='o', label=f'{cohort.upper() if cohort == "circall" else "Retrospective"}: {len(groups)} patients; {len(selected)} measurements'))
+    if circall_only:
+        handles = point_handles('circall', [r.get('center','unknown') for r in data], circall_only=True)
     scope = 'Cohort comparison' if comparison else data[0]['cohort'].upper() if data[0]['cohort'] == 'circall' else 'Retrospective'
     window = f'Diagnostic baseline through day {args.overlay_max_day}' if early else 'Full recorded range'
     ax.set(title=f'{scope} {"blast" if measurement == "blast" else "WBC"} counts · {window}',
@@ -244,13 +272,15 @@ def count_figure(records, measurement, args, d, *, early=False, comparison=False
         ticks = sorted({args.baseline_day_max, *(int(v) for v in candidates if args.baseline_day_max+gap <= v <= last_day)})
         ax.set_xticks(ticks, [f'Diagnostic\n(day ≤{v})' if v == args.baseline_day_max else f'D{v}' for v in ticks])
     ax.grid(alpha=.18)
-    ax.legend(handles=handles, frameon=False)
+    ax.legend(handles=handles, frameon=False,
+              title=f'CIRCALL: {len({r["subject_hash"] for r in data})} patients; {len(data)} measurements' if circall_only else None)
     zero_n = sum(r['value'] == 0 for r in data)
     note = f'Recorded counts; no normalization or inference. Diagnostic repeats: {args.baseline_selection}.\n'
     note += f'Log display: zeros omitted ({zero_n}); lines break at zero; no pseudocount.' if args.kinetics_y_scale == 'log' else f'Linear display: zeros retained ({zero_n}).'
     if comparison:
         note += '\nCohorts remain separate; no pooled count population or fit.'
     fig.text(.5, -.01, note, ha='center', va='top', fontsize=8)
+    remove_plot_text(fig)
     return fig
 
 
@@ -258,13 +288,13 @@ def figures(destination, scope, prepared, result, args, d):
     destination = Path(destination)
     fig = mrd_figure(prepared['mrd'], scope, args, d)
     if fig is not None:
-        save(fig, destination/'mrd'/'mrd_trajectories')
+        save(fig, destination/'mrd'/'mrd_trajectories', pdf_output=getattr(args, 'pdf_output', True))
     if scope == 'pooled':
         if prepared['mrd']:
-            save(mrd_status_figure(result['tables']['MRD'], d), destination/'mrd'/'mrd_status')
+            save(mrd_status_figure(result['tables']['MRD'], d), destination/'mrd'/'mrd_status', pdf_output=getattr(args, 'pdf_output', True))
         return
     for measurement in d['counts'][scope]['sheets']:
         for early in (False, True):
             fig = count_figure(prepared['counts'], measurement, args, d, early=early)
             if fig is not None:
-                save(fig, destination/'blood_counts'/f'{measurement}_{"early_window" if early else "full_range"}')
+                save(fig, destination/'blood_counts'/f'{measurement}_{"early_window" if early else "full_range"}', pdf_output=getattr(args, 'pdf_output', True))

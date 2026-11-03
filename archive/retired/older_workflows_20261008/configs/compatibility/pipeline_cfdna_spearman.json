@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "workflows": [
+    {
+      "name": "cfdna_associations",
+      "options": {
+        "sheet": "Inventaire",
+        "phase": "diag",
+        "blood-tissue": "Sang",
+        "marrow-tissue": "Moelle",
+        "nucleic-acid": "cfDNA",
+        "tube": "Roche",
+        "log-level": "INFO",
+        "predictors": [
+          "peripheral_blast_percent"
+        ],
+        "circall": "../../input/inventaire_CIRCALL_01102026.xlsx",
+        "pool-cohorts": true,
+        "spearman-sensitivity": true,
+        "retrospective-wbc-unit": "x10^9/L"
+      }
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import re
 from openpyxl.formula import Tokenizer
 from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
 
+from analysis.configuration import unique_object
 from analysis.sample_io import read_sheet, SourceReadError
 from analysis.sample_definitions import extraction_state
 
@@ -16,15 +17,8 @@ RULE_IDS = frozenset('file_unavailable file_unreadable sheet_missing header_miss
 
 
 def load_rules(path):
-    def unique(pairs):
-        result = {}
-        for key, value in pairs:
-            if key in result:
-                raise ValueError('Duplicate rules key')
-            result[key] = value
-        return result
     try:
-        rules = json.loads(Path(path).read_text(), object_pairs_hook=unique)
+        rules = json.loads(Path(path).read_text(), object_pairs_hook=unique_object)
         if rules['schema_version'] != 1 or set(rules['rules']) != RULE_IDS:
             raise ValueError()
         if rules['extraction_basis'] != 'dna_id':
@@ -57,6 +51,11 @@ def load_rules(path):
         for key in ('required','patient_required','identifier_fields','missing_tokens','unknown_tokens','extraction_dependent_fields','workflow_annotations'):
             if not isinstance(rules[key],list) or any(not isinstance(x,str) for x in rules[key]):
                 raise ValueError()
+        ignored=rules.get('ignored_fields',[])
+        if not isinstance(ignored,list) or any(not isinstance(x,str) or x not in rules['fields'] for x in ignored):
+            raise ValueError()
+        if set(ignored) & (set(rules['required']) | set(rules['patient_required']) | set(rules['extraction_dependent_fields']) | {rules['extraction_basis']}):
+            raise ValueError()
         if len(set(rules['required']))!=len(rules['required']) or set(rules['fields']) & set(rules['identifier_fields']):
             raise ValueError()
         if set(rules['missing_tokens']) & set(rules['unknown_tokens']) or set(rules['extraction_dependent_fields']) & set(rules['identifier_fields']):
@@ -218,6 +217,9 @@ def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):
                 emit(sheet_name,field,'header_duplicate',header.coordinate)
         for col,raw_field in headers.items():
             field = safe(col)
+            if raw_field in rules.get('ignored_fields',[]):
+                cover(sheet_name,field,'field_checks',reason='ignored_by_configuration',unavailable=len(sheet.rows))
+                continue
             if counts.get(raw_field,0)>1:
                 cover(sheet_name,field,'field_checks',reason='duplicate_header',unavailable=len(sheet.rows))
                 continue
@@ -264,11 +266,6 @@ def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):
                 assessed += 1
                 if isinstance(value,str) and (value != value.strip() or '\u00a0' in value):
                     emit(sheet_name,field,'whitespace',cell.coordinate)
-                if raw_field=='extraction_status':
-                    dna_col=index.get(rules['extraction_basis'])
-                    derived=extraction_state(row[dna_col-1] if dna_col is not None else None,missing,unknown)
-                    if value in ('yes','no') and derived in ('yes','no') and value!=derived:
-                        emit(sheet_name,field,'extraction_state_conflict',cell.coordinate)
                 kind = definition['type']
                 annotation = str(value).strip().casefold()
                 if kind in ('number','date') and annotation in {v.casefold() for v in rules['workflow_annotations']}:

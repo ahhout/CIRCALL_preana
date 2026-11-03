@@ -1,12 +1,24 @@
 # Workflow scientific contracts — version 2
 
+For current operation use [configuration](configuration.md) and [results](results.md).
+Current layer rules are the Layer 1–4 sections plus their explicitly superseding
+amendments below. Older canonical/association rules document historical interfaces,
+which are archived and cannot execute. Public execution now requires all four layers;
+see the [October 20 amendment](#all-layers-only-execution-and-audit-fixes--october-20-2026). The [October 8 configuration consolidation](#supporting-architecture-consolidation--october-8-2026)
+changes organization and selection transport, not scientific defaults.
+The [October 8 CIRCALL NQ amendment](#circall-positive-nonquantifiable-mrd-and-reported-sensitivity--october-8-2026)
+supersedes earlier instructions to block reviewed CIRCALL positive nonquantifiable annotations.
+
 The [October 7 shared sample annotation amendment](#shared-sample-annotations-and-receipt-revision--october-7-2026)
 supersedes earlier extraction-state, missing-marker and receipt definitions for
-Layers 1–4. Earlier acceptance counts remain evidence for their recorded hashes.
+Layers 1–4. The [pre-entered method clarification](#pre-entered-extraction-methods--october-7-2026)
+additionally supersedes method/status contradiction rules. Earlier acceptance
+counts remain evidence for their recorded hashes. The [legacy status clarification](#legacy-extraction-status-ignored--october-7-2026)
+removes the recorded status column from validation criteria.
 
-The current canonical and association contracts include the investigator-approved
+The historical canonical and association contracts included the investigator-approved
 statistical simplification below. Normalized kinetics retains its version-1 methods. Integration preserves each engine's preparation. All active engines now use the
-shared pre_analysis environment; see [consolidation evidence](repository_cleanup.md).
+shared pre_analysis environment; see [consolidation evidence](history/repository_cleanup.md).
 Resolved arguments/profiles and source hashes identify the exact execution. No
 cross-workflow prepared-table exchange or patient linkage is performed.
 
@@ -91,7 +103,7 @@ The compatibility sensitivity switches remain opt-in, outside the primary family
 The default association predictor was selected during exploratory review, not
 preregistered. With one selected test per cohort BH leaves its p-value unchanged;
 there is no study-wide correction across cohorts or workflows. See the
-[verified archive comparison](statistical_questions.md#verified-comparison-with-the-retrospective-archive--october-1-2026)
+[verified archive comparison](../archive/retired/older_workflows_20261008/docs/compatibility/statistical_questions.md#verified-comparison-with-the-retrospective-archive--october-1-2026)
 for the distinct rationales for diagnostic and handling associations.
 
 Rollback snapshot: `archive/migrations/statistical_simplification_20261001T115744Z/`.
@@ -164,7 +176,7 @@ CIRCALL MRD through the same canonical engine. The investigator clarified that
 retrospective `num_blast` is in ×10⁹/L, matching the CIRCALL count unit.
 CIRCALL calculations remain unchanged; retrospective counts now receive the same
 descriptive preparation instead of the former default normalized-model analysis.
-The normalized-kinetics column above documents the explicitly selectable compatibility
+The normalized-kinetics column above documents the historically selectable, now archived compatibility
 workflow; its profile, sources, CLI/JSON name, and historical results are retained.
 
 | Decision | Rule | Rationale and source |
@@ -443,7 +455,7 @@ still requires confirmation before changing their analytical treatment.
 
 The investigator approved harmonizing the cleaned workbook copies. The exact
 header aliases and specimen mappings are versioned in
-[`configs/definitions/workbook_harmonization.json`](../configs/definitions/workbook_harmonization.json).
+[`configs/maintenance/workbook_harmonization.json`](../configs/maintenance/workbook_harmonization.json).
 
 | Rule | Decision and rationale | Source |
 | --- | --- | --- |
@@ -489,7 +501,7 @@ scientific models remain in their existing workflow contracts.
 | Privacy and identifiers | Only workbook/sheet/cell locations identify records in reports. Defer identifier validation, normalization, matching and deduplication; omit source text/identifier values from reports and logs. | Investigator chose sheet/cell locations and deferred identifier work |
 | Execution | Standalone and master entrypoints share checks. Publish valid reports even when quality fails; errors yield nonzero final exit, reviews alone do not. Independent cohorts continue. Default analysis profiles and downstream gating are unchanged. | Investigator's selected execution policy |
 
-See [the integrity guide](data_integrity.md) and
+See [the integrity guide](layers/data_integrity.md) and
 [versioned rules](../configs/definitions/data_integrity.json). Historical and
 current-source reports require separate source hashes; issue counts are not fixed
 cohort expectations. The implementation snapshot is
@@ -569,7 +581,7 @@ selected workflow; no legacy analysis/default profile is migrated implicitly.
 
 | Rule | Decision and rationale | Source |
 | --- | --- | --- |
-| Observation/population | One row per sample, patient counts from recorded cohort-qualified IDs; patients represented in the inventory, not a registry enrollment denominator. No row merging or patient weighting. Numbering-only rows excluded from sample counts and counted as skipped. | Approved Layer 2 plan |
+| Observation/population | One row per sample, patient counts from recorded cohort-qualified IDs; patients represented in the inventory, not a registry enrollment denominator. No row merging or patient weighting. Numbering-only and unassigned template rows are counted as non-sample rows and skipped. A template may contain only the pre-entered fields listed in the definition; any actual IDs, clinical data or measurements still require a valid participant ID. Identified planned visits retain their receipt classifications. | Approved Layer 2 plan; investigator's empty-row nonblocking decision applied to the reported October 7 layered failure |
 | Identity/centers | Retrospective patient_id from inclusion IDs plus manually initiated unk IDs; all retrospective samples RDB. CIRCALL existing protocol IDs, 001 RDB / 002 TRS; unknown prefixes remain unknown. No cross-cohort linkage. | Investigator October 6 revision and planning answers |
 | Gate | Run Layer 1 on current source hashes. Any error blocks the cohort; included controls belong to CIRCALL gate. Reviews permit execution. Both cohorts required for pooled results. | Investigator selected cohort-level error-free gate |
 | Receipt | Present actual sample ID proves receipt; early receipt included in measurements but excluded from due percentages until planned date. | Investigator planning answers |
@@ -646,44 +658,52 @@ in the attached implementation plan. This is a separately selected read-only
 statistical functions. The older `cfdna_associations`, canonical and normalized
 kinetics contracts/defaults remain applicable to their established entrypoints.
 Rules and mappings are versioned in `configs/definitions/advanced_analysis.json`
-(`diagnosis-2`) and included in input/provenance hashes. These preparation and
+(`diagnosis-4`) and included in input/provenance hashes. These preparation and
 pooling decisions are project-specific adaptations, not a claim of published-method
 equivalence to clinical results prepared from different sources or identities.
 
 | Rule | Decision and rationale | Source |
 | --- | --- | --- |
 | Explicit sources | Retrospective cfDNA_inventaire_retrospective_05102026.xlsx / Inventaire; CIRCALL inventaire_CIRCALL_07102026.xlsx / cohorte_lal; optional integrity-only cohorte_control and explicit cfDNA_donors.xlsx / Feuil1. Shared raw/cached reader; no Layer 2 summary dependency, kinetics borrowing or modification-time selection. | Approved Layer 3 plan; investigator-selected October 7 CIRCALL update |
-| Identity and diagnosis | Retrospective patient_id and CIRCALL circall_id, trimmed without case folding and qualified by cohort. Preserve recorded codes; no names/DOB fallback or cross-cohort linkage. Only timepoint=diag. Invalid diagnosis participant IDs are preparation errors. | Approved identity/diagnosis changes; existing Layer 2 identifier convention |
+| Identity and diagnosis | Retrospective patient_id and CIRCALL circall_id, trimmed without case folding and qualified by cohort. Preserve recorded codes; no names/DOB fallback or cross-cohort linkage. Only timepoint=diag. Skip and count unassigned diagnosis rows only when participant/sample/DNA IDs and clinical/extraction measurements are unavailable. Actual records with invalid participant IDs remain preparation errors. | Approved identity/diagnosis changes; existing Layer 2 identifier convention |
 | Outcome receipt/filters | Present nonformula sample ID; blank, na, ? and configured missing/unknown tokens are not receipt evidence. Retrospective plasma + cfDNA + Roche with case-insensitive filtering; CIRCALL diagnosis plasma without added tube filter. No planned-date gate. | Approved receipt/filter changes |
-| Endpoint and repeats | Recorded cfdna_ng_per_ml_plasma only. Uniformly select one eligible diagnosis plasma row with an available numeric outcome per patient, including zero candidates. Missing/unknown, qualified text and unavailable caches are not numeric candidates; negatives remain errors. If all outcomes are unavailable, select one eligible row for audit/metadata but retain an unavailable outcome. Use one selection across all predictors; never redraw for zero or incomplete clinical values. No imputation or endpoint recalculation. | Investigator approved random one-sample selection October 7, replacing patient-median aggregation |
+| Endpoint and repeats | Read the five recorded outcomes listed in the versioned definition from one selected diagnosis plasma sample. Selection remains based on numeric cfdna_ng_per_ml_plasma including zeros, with one eligible-row fallback when all selection outcomes are unavailable. No endpoint-specific redraw, imputation, recalculation or substitution. Negatives and cfDNA fractions outside [0,1] remain errors. | Investigator-requested five-outcome expansion October 7; retained seeded selection and existing log-outcome method |
 | Sample selection | Shipped sample-selection-seed = 123, exposed in profiles and standalone CLI. Independent Python RNG per cohort-qualified patient, seeded with the configured seed, cohort and patient hash. Sort candidates by hashed cohort/patient/sample identity, using source row for identical-ID ties. Distinct-ID row reordering and unrelated patients do not change a selection. Selected rows/hashes remain local audit evidence; count unselected numeric samples separately. Repeated collections are not declared duplicate records. | Investigator-approved reproducible random selection; explicit implementation and privacy rules |
 | Log eligibility | Positive selected outcomes and predictor-specific complete pairs. Count nonpositive outcomes and unavailable outcomes; no pseudocount or common complete-case restriction. Original-scale descriptions retain selected zeros. | Retained zero-handling rules applied to selected samples |
 | Volume | extraction_input_volume_ml records available plasma/CSF; entire recorded volume was used when extracted. Recorded ng/mL remains appropriate; no recalculation and never blood_volume_ml as denominator. | Investigator's October 6 volume clarification |
 | Sex/age | Retrospective selected diagnosis plasma row; missing selected values remain unavailable, without borrowing from other rows. Both unavailable in CIRCALL; age is not derived. | Sample-level pairing for approved one-sample selection |
-| Subtype | Retrospective first nonmissing genetic_subtype across diagnosis; expose patient discordance counts. CIRCALL concordant diagnosis metadata; conflicts block. Recorded categories remain distinct; unknown/missing tokens unavailable. | Approved Layer 3 mapping and retained conflict rules |
-| WBC | Retrospective GB_per_L on the selected diagnosis plasma row, with no cross-row fallback; CIRCALL concordant diag_blood_wbc_x10*9/L. Both confirmed ×10⁹/L in the shipped profile; CLI unit confirmation is recorded. No retrospective historical availability count is hard-coded. | Investigator-confirmed units; sample-level pairing for approved one-sample selection |
+| Subtype | Retrospective first nonmissing genetic_subtype across diagnosis plasma only; expose discordance counts. CIRCALL concordant diagnosis metadata; conflicts block. Recorded categories remain distinct; unknown/missing tokens unavailable. | Retained subtype handling within investigator-confirmed plasma-only retrospective scope |
+| WBC | Both sources now use diag_blood_wbc_max_x10*9/L; retrospective former GB_per_L explicitly confirmed as maximum diagnosis WBC. Retrospective values must come from the selected diagnosis plasma row; CIRCALL concordant diagnosis metadata. Confirmed ×10⁹/L; no blood-cell, marrow or follow-up substitution. | Investigator maximum-WBC confirmation and rejection of other-specimen matching, October 7 |
 | Peripheral blasts | Retrospective cytology, falling back to cytospin_% only if unavailable on the same selected plasma row; no cross-row substitution. CIRCALL concordant diag_blood_blast_pct at diagnosis. Validate recorded numeric fractions in [0,1], multiply once by 100. A qualified unused fallback does not replace/invalidate valid primary cytology. | Existing tissue-specific fallback and clinical validation; pairing for approved one-sample selection |
-| Marrow blasts | Retrospective diagnosis bone marrow cytology/cytospin median, joined by patient_id; CIRCALL concordant diag_bm_blast_pct. Same [0,1] validation and conversion. Receipt required for outcome only. | Existing marrow aggregation/matching, updated retrospective availability |
+| Marrow blasts | CIRCALL diag_bm_blast_pct only, recorded fraction [0,1] multiplied by 100. Remove retrospective marrow comparisons and matching entirely. | Investigator requested removal of comparisons absent from the supplied list, October 7 |
+| Sampling time | Categorical Morning before 12:00, Afternoon from 12:00, from the selected CIRCALL plasma clock time. No elapsed-time or timezone derivation. Missing times unavailable; unsupported populated time annotations block. | Investigator clarified morning versus afternoon yield question, October 7; noon implements the stated categories |
+| Handling variables | Selected plasma-row elution volume, available plasma volume, DNA concentration and corticosteroid exposure; do not require handling values to agree across repeated samples. Elution volume enters several outcome formulas, so those associations include arithmetic dependence. | Requested technical-variable associations; preserve sample-level pairing |
 | Clinical validation | Missing/unknown clinical values remain unavailable. Malformed selected numeric annotations, nonfinite/negative values and fractions outside [0,1] block rather than silently becoming plausible measurements. | Approved validation safeguard |
-| Deferred measurements | Absolute peripheral/marrow blast counts and hematocrit unavailable. No WBC × fraction derivation; Hb_g_per_dL is hemoglobin. | Investigator's explicit non-derivation rules |
-| Primary models | Separate existing log10(cfDNA) ~ predictor ordinary least-squares regression; no patient random effect or mixed-effects model. HC3 continuous uncertainty, conventional categorical omnibus when selected, ordinary 95% intervals. Default family contains peripheral_blast_percent only; additional predictors require a later decision. | Existing statistical engine; approved Layer 3 plan; current primary predictor reconfirmed October 7 |
+| Deferred measurements | Retrospective Hb_g_per_dL and platelets_10e9_per_L are requested from the selected plasma row only. Missing values remain unavailable, even if blood-pellet rows contain them. Remove unrequested absolute-count/hematocrit coverage rows; no derived absolute counts. | Investigator-requested comparison scope and explicit plasma-only clarification, October 7 |
+| Primary models | Existing log10(outcome) ~ predictor OLS for each requested pair, including positive cfDNA_fraction; no random effects or covariate adjustment. HC3 continuous uncertainty, conventional categorical omnibus, ordinary 95% intervals. Exact versioned matrix: 31 CIRCALL and 30 retrospective pairs; no unrequested descriptions. | Requested endpoint/predictor expansion using retained methods; confirmed categorical associations |
 | Fit acceptance | Preserve ≥3 complete observations, ≥2 predictor values, ≥1 residual degree of freedom and finite standard-error/p-value checks. Unestimable fits have explicit skipped reasons and retain available points. | Existing fit_regression checks |
-| Effect sizes/BH | Continuous fold change per 10 percentage points for blast predictors, otherwise per recorded unit. BH over configured predictor family within cohort; unavailable tests use p=1 for adjustment only, exported inference remains unavailable. No cross-cohort or study-wide correction. | Existing engine conventions |
-| Descriptions/sensitivity | All six predictor views retained independently of testing. Descriptive log10 least-squares trends and Pearson/Spearman coefficients have no extra tests. Selected peripheral-blast Spearman uses existing two-sided asymptotic test, explicitly unadjusted secondary analysis. | Existing engine conventions and approved sensitivity |
-| Pooling/controls | Both patient cohorts must complete; each predictor needs positive pairs in both cohorts with comparable units. Cohort colors retained; descriptive only, no pooled fit inference. Controls affect whole-cohort integrity only and never enter patient models or pooling. | Approved Layer 3 scope |
+| Influence diagnostics | Studentized residuals and Cook's distances are unavailable at unit leverage or unavailable residual variance. Handle rounding around one with a dimension-scaled floating-point tolerance (8 × machine epsilon × largest design-matrix dimension); count unavailable diagnostics and omit only those scale-location points. No model rows/categories, coefficients, p-values or fit eligibility change. | Diagnostic numerical fix for the reported October 7 sqrt warnings; no scientific filtering or model change |
+| Comparison switches | Each approved cohort/outcome/predictor pair has a JSON true/false switch in the Layer 3 definition. All 61 default to true. False removes the test, descriptions and figures; pooled views require both cohort switches true. All-false is valid and yields settings/summary workbooks without analyses. CLI predictor selection can restrict tests further but cannot re-enable a false switch. Record switches and disabled counts; preparation, sample selection and integrity gates are unchanged. | Investigator requested an independent config toggle for each Layer 3 analysis, October 7 |
+| Effect sizes and multiplicity | Continuous fold change per 10 percentage points for blasts, otherwise per recorded unit. All primary p-values unadjusted: no BH or other multiplicity correction. Report configured test counts and retain unavailable tests as unavailable. Pointwise intervals and correlated endpoints do not control false positives across the expanded scope. | Investigator explicitly requested no BH correction, October 7; supersedes earlier Layer 3 correction |
+| Descriptions/sensitivity | Describe only requested pairs. Descriptive log10 trends and Pearson/Spearman coefficients have no extra tests. Selected peripheral-blast Spearman remains secondary, two-sided asymptotic and unadjusted for each outcome. | Requested scope; retained descriptive and sensitivity methods |
+| Pooling/controls | Both patient cohorts must complete; only requested outcome/predictor pairs shared by both cohorts with positive observations and confirmed comparable units may be pooled. Cohort colors; descriptive only, no pooled tests. No retrospective marrow pooling. Controls enter integrity only. | Existing pooling rules restricted to investigator-requested matrix |
 | Integrity/exit | Same whole-cohort Layer 1 checks as Layer 2, including selected control sources. Reviews permit execution; errors block only affected cohort. Publish available aggregate/blocked reports before final nonzero on structural, data-quality or execution failures. Unavailable predictors/fits are limitations, not failures. | Approved independent-cohort gate and publication requirements |
-| Presentation/privacy | Excel 2021-compatible literal aggregate workbooks with six tabs; original ng/mL on log y-axes; WBC and marrow blast percentage comparisons also use log x-axes. Nonpositive predictor values are counted but omitted from the log display only, retained in models/tables; no pseudocount or log-predictor model transformation. Back-transformed log10 fits/CIs. Categorical boxes calculated on log10 scale before coordinate transformation. No source identifiers, names/DOB or notes in engine result frames; hashed row evidence/coordinates and residual diagnostics local under .audit. | Approved reporting/privacy requirements; investigator-requested log–log WBC and marrow blast percentage displays, October 6, 2026 |
+| Presentation/privacy | Six-tab literal aggregate workbooks identify outcome, units and predictor on each comparison. Original outcome units on log y-axes; WBC, CIRCALL marrow and DNA concentration (ng/µL) use log x-axes, configured by `rules.log_x_predictors`, with nonpositive predictors omitted and counted for display only. Predictor values in models remain on their original scale; no pseudocount. Categorical boxes computed on log10 values then back-transformed. Figures under figures/<outcome>/<predictor>/. No identifiers, names/DOB or notes in result frames; hashed row evidence/coordinates and residuals stay under .audit. | Expanded outcome reporting with retained display and privacy rules; investigator requested log DNA-concentration x-axes across Layer 3, October 7, 2026 |
 | Determinism/provenance | Separate seeds for sample selection and categorical display jitter. Record resolved selection seed in options and report definitions, source/definition/rule/code/lock hashes, actual package versions, command, ISO execution timestamps and publication checksums; verify source bytes after execution. Fresh destinations only. | Existing shared provenance; approved random-selection reproducibility |
 
-The October 7 review confirmed diagnosis-only scope and the current primary
-peripheral blood blast percentage association, with additional predictors deferred.
-The investigator subsequently approved selecting one diagnosis sample at random,
-replacing patient-median aggregation while retaining ordinary regression and the
-secondary patient-level Spearman analysis. This gives each patient one observation
-and preserves the selected plasma row's clinical pairing, but discards repeats from
-inference and introduces dependence on the selected seed. Do not select a primary
-seed by inspecting statistical significance. Inference using all repeats, mixed
-models and dependence-aware correlation testing remain deferred scientific choices.
+The October 7 expanded comparison request supersedes the earlier single-primary-
+predictor scope and BH correction. The investigator retained the cytology/cytospin
+fallback, confirmed maximum WBC and categorical tests, requested morning/afternoon
+comparison, removed unlisted retrospective marrow comparisons, and rejected matching
+blood-cell measurements to plasma outcomes. Empty unreceived template rows must not
+block analysis. One seeded diagnosis sample per patient is still used, which discards
+repeats and can make results seed-dependent; never choose a seed by significance.
+
+The expansion checkpoint is
+`archive/migrations/layer3_scope_before_20261007T132913447315Z/`.
+It preserves the relevant dirty code/configuration/documentation state and excludes
+clinical data, outputs and credentials. Restore only reviewed affected files for
+rollback; preserve later user edits, source workbooks, runs and snapshots.
 
 The scoped pre-change implementation snapshot is
 `archive/migrations/layer3_before_20261006T100400Z/implementation_before.tar.gz`,
@@ -695,7 +715,7 @@ environment-lock, legacy entrypoint/default or clinical-workbook change is inclu
 ## Layer 4 disease tracking — October 6, 2026
 
 The investigator approved implementation of the descriptive first release in
-the [Layer 4 plan](layer4_implementation_plan.md), requiring self-contained
+the [Layer 4 plan](history/layer4_implementation_plan.md), requiring self-contained
 scientific methods so old helper modules can later be archived. Layer 4 therefore
 owns its MRD parser, repeat resolution, count preparation, summaries and plotting;
 it uses only retained shared infrastructure. Method-origin hashes and an identical-
@@ -810,7 +830,7 @@ and tracked/staged diffs, excluding clinical data, credentials and outputs.
 Use `conda run -n pre_analysis python -m analysis.sample_annotations
 --retrospective <inventory.xlsx> --circall <circall.xlsx> --donors <donors.xlsx>
 --output-dir <fresh-migration-folder> [--adopt]` with the explicit versioned
-`configs/definitions/sample_annotations.json` selection. Originals are separately
+`configs/maintenance/sample_annotations.json` selection. Originals are separately
 backed up under that destination. Rollback requires reviewing later edits and
 restoring only affected implementation/source files from their checkpoints.
 Retain existing results and migration evidence.
@@ -852,15 +872,23 @@ remains explicitly deferred until after these modifications.
 | Rule | Decision and rationale | Source |
 | --- | --- | --- |
 | Metric exclusions | Remove `MNC_albumin_ng_per_uL` and `MNC_DIN` from Layer 2 metrics, tables, availability summaries and figures. Preserve source values and original Layer 1 integrity scope; other DNA measurements remain selected. | Investigator: “exclude these” |
+| DNA-per-mL inference | For `dna_ng_per_ml_plasma`, use received numeric observations including zeros, with one median per participant per visit and one per control participant. Test controls–Diagnosis and controls–TP1 using two-sided Mann–Whitney U (different people); test all 15 pairs of the six patient visits with paired Wilcoxon signed-rank on original-unit differences (same people at both visits). No imputation or extra independent observations from repeats. Document symmetry of paired differences as an assumption. | Investigator accepted these independent/paired tests and requested the distinction in the guide, October 7, 2026 |
+| Inference families and computation | Holm adjustment across all 17 planned comparisons per endpoint/specimen/scope, including undisplayed tests; unavailable tests export null p-values and reasons but use p=1 internally for correction. Include all-zero paired differences as p=1; otherwise use Wilcoxon zero_method=wilcox. Require two participants per independent group or two matched pairs, reflecting the permutation engine minimum; smaller tests are unavailable with counts retained. Use SciPy permutation methods (vectorized sign flips of average ranks for Wilcoxon) with exact enumeration when feasible, otherwise deterministic Monte Carlo; resamples, batch and seed are explicit in `inference`. Preserve actual package versions in normal run provenance. | Accepted multiple-comparison recommendation; small-sample/tie-aware implementation with explicit settings |
+| Pooled inference | Pooled tests combine both cohorts' patients and controls; separate cohort analyses use their own controls. Cohort-qualified identities keep matched pairs within cohort; no cross-cohort identity linkage. Pooled estimates/tests have no cohort adjustment and retain cohort-composition limitations. Control reference observations share one combined box with cohort-coloured points, and controls remain outside patient descriptive summaries. | Investigator explicitly requested combining data for the pooled tests, October 7, 2026 |
+| Significance display and evidence | Annotate only controls–Diagnosis and controls–TP1, using adjusted-p stars alone: <0.05 *, <0.01 **, <0.001 ***, <0.0001 ****. Omit nonsignificant/unavailable brackets; export numeric raw/adjusted p-values, aggregate counts, medians, method, seed and reasons in audit evidence and a Comparisons sheet. Other visit contrasts appear only in the table. Sample-level plot points/boxes remain unchanged. | Investigator requested stars without numeric plot p-values and only two displayed comparison types |
+| Shared Layer 2/3 styling | Use the same orange circles for CIRCALL and blue triangles for retrospective data across all figures and controls; diagnostic plots retain cohort identity. Neutral boxes/medians and fitted curves, light horizontal gridlines, legends below, 300-dpi PNG and embedded-font vector PDF exports. Layer 2 horizontal jitter uses the recorded `plot_jitter_seed`; Layer 3 retains its existing categorical jitter seed. Preserve all measurement/visit eligibility, scale settings, box statistics, sample counts, fitted models and statistical results. | Investigator requested matching style and colour coding across Layers 2 and 3, October 7, 2026; subsequent instruction limits this update to code/tests, without result regeneration |
+| Mass and concentration display | All Layer 2 `dna_total_ng`, `cfdna_total_ng`, and DNA/cfDNA concentration plots (ng/µL and ng/mL) use base-10 logarithmic y-axes across specimens, cohorts, controls and pooled views. Supersedes the earlier linear mass display; concentration scaling is retained. Positive values define boxes; nonpositive observations are counted but omitted from the log axis, without pseudocounts. Original measurements, table summaries and visit grouping are preserved. | Investigator requested log y-axes for all total_ng and concentration_ng plots, October 7, 2026 |
+| Overall display across scopes | `extraction_input_volume_ml`, `elution_volume_ul`, `cfdna_avg_size_bp` and `cfdna_fraction` use overall sample distributions across eligible visits wherever that analysis is generated: every applicable compartment, cohort, control and pooled view. Preserve specimen/assay separation, sample and distinct-participant counts, cohort-colored pooled points and visit tables. Existing metric exclusions and pooled shared-visit eligibility remain unchanged; no new analyses or patient averaging. Configured per metric with `plot_grouping: overall`, replacing the former cohort/specimen display restrictions. | Investigator clarified that all prior plot changes must apply across every instance of the analysis and requested removal of the earlier CIRCALL/plasma limitations, October 7, 2026 |
 | Pooled bins | One combined distribution per metric and nominal visit, using all eligible samples from both cohorts. Cohort-colored points share the bin and retain a legend. Concentration boxes use positive values under the retained log display; tables retain genuine zeros. Metrics/units and specimens remain separate. No new inferential model or patient averaging. | Investigator: pooled endpoints are plotted together, not in separate bins |
+| Grant DNA-per-mL figures | All `dna_ng_per_ml_plasma` plots use a consistent publication layout with original units on log y-axes, positive-value boxes and deterministic horizontal point jitter (`plot_jitter_seed`), distinct cohort colours/shapes, and per-visit sample/participant counts. Patient figures in every cohort and pooled view show only the configured `plot_visits`: diag, d4, d8, d15, tp1, tp2. TP1/TP2 display as MRD1 (D29)/MRD2 (D71). The investigator clarified D1 means Diagnosis: remove the separate D1 position without recoding source labels. Empty selected visits display n=0. Where cohort controls are explicitly selected and validated, combine their observations into one Controls reference bin before Diagnosis in every DNA-per-mL patient figure, retaining cohort colours/shapes and distinct-participant counts; never add controls to patient descriptive rows/counts; the approved pooled inference combines controls only for testing. Omit unavailable or excluded control sources. Single-cohort visits remain allowed; workbook summaries retain shared-visit eligibility. No model, measurements, cohort membership or other metric visit rules change. Export 300-dpi PNG and vector PDF. | Investigator corrected the visit list, clarified D1 means Diagnosis and requested both control cohorts before Diagnosis and subsequently combined their display into one box, retaining grant styling across every instance, October 7, 2026 |
 | Fragment size | Extend pooled `cfdna_avg_size_bp` to plasma and CSF separately, using the existing shared diag/TP1/TP2 visits and received-sample rules. Within each specimen, combine cohort contributions even when DNA-type metadata are unavailable in one cohort; do not impute metadata. Retain cohort-colored points and contribution counts. | Investigator explicitly requested merged fragment sizes with clear cohort colors; existing metric specimen/visit scope |
 | Receipt categories | Received (actual sample ID), Marked missing (literal na), Unassessed (blank/unknown ID). A separate overdue flag requires the retained applicable CIRCALL visit/date and more than 72 elapsed hours; exactly 72 is not overdue. Early/future/pending timing remains recorded in audit observations, without extra receipt categories. Measurements still include early received samples. | Investigator confirmed “three labels plus overdue flag” |
 | Timed percentages | Only reliable applicable timing supplies rates: due received + overdue missing. Early receipt, pending/future marked missing and unassessed receipt stay outside that denominator. Untimed rows show counts only, fixing the former received-only 100% manual rate. Main receipt rows distinguish all-category counts from assessed numerator/overdue counts. | Confirmed retention of the timed denominator; earlier review identified undated 100% issue |
 | Main grouping | Inventory/receipt counts show one overall total plus specimen-by-visit breakdown; measurement summaries show metric/specimen/visit with existing applicable DNA-type distinctions. Full previous center and overlapping views, plus pooled cohort contributions, remain under `tables.audit_detail` in native statistics JSON. Audit observations retain source metadata. These details are excluded from visible workbook rows; source population and sample weighting do not change. | Investigator confirmed moving center detail to audit evidence |
-| Reports | Inventory, Measurements, optional Controls and CIRCALL Overdue are the visible tabs. Pivot existing receipt rows into the inventory counts, preserving timed numerators/denominators; show median/Q1/Q3 and measured/missing sample counts with units and recorded DNA labels. Additional measurement statistics and overdue source coordinates remain in hidden columns. Hidden Reference preserves metadata, definitions and all original main aggregate/control/availability rows. Detailed center views remain audit-only. Blocked reports show reasons and unavailable results, never fabricated zero counts. No scientific calculation or population changes. | Investigator requested completing the pending layout redesign October 7 after review of the named CIRCALL workbook |
+| Reports | Inventory, Measurements, Comparisons, optional Controls and CIRCALL Overdue are the visible tabs. Pivot existing receipt rows into the inventory counts, preserving timed numerators/denominators; show median/Q1/Q3 and measured/missing sample counts with units and recorded DNA labels. Additional measurement statistics and overdue source coordinates remain in hidden columns. Hidden Reference preserves metadata, definitions and all original main aggregate/control/availability rows. Detailed center views remain audit-only. Blocked reports show reasons and unavailable results, never fabricated zero counts. No scientific calculation or population changes. | Investigator requested completing the pending layout redesign October 7 after review of the named CIRCALL workbook |
 
-The scientific settings are versioned as `sample-statistics-3` in
-`configs/definitions/sample_statistics.json`. The pre-change scoped implementation
+The original review settings were versioned as `sample-statistics-3`; the
+current definition is linked from the sample-statistics guide. The pre-change scoped implementation
 snapshot is `archive/migrations/layer2_simplification_before_20261007T110719Z/`;
 it records the affected file hashes and Git HEAD/status without clinical inputs,
 outputs or credentials. Original measurements, identity rules, integrity holds,
@@ -903,3 +931,208 @@ quality holds and output policies remain as defined. No modification-time source
 selection or quality-gate bypass is introduced. The scoped pre-change profile/
 documentation checkpoint is
 `archive/migrations/layered_inventory_selection_before_20261007T120922Z/`.
+
+## Pre-entered extraction methods — October 7, 2026
+
+The investigator confirmed that methods were routinely entered before extraction
+and explicitly rejected their presence or absence as an extraction conflict.
+This supersedes the earlier method/status contradiction and method-clearing
+decisions; it does not reinterpret existing measurements or identifiers.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Method metadata | Remove `extraction_method` from extraction-dependent fields in the shared integrity rules (`integrity-3`). Populated and missing methods are both valid with either DNA-ID-derived state; normal text/formatting checks remain. Preserve pre-entered methods, including when the status-consolidation helper uses these rules. | Investigator confirmed routine pre-entry and requested no method-presence conflict |
+| Extraction and remaining conflicts | Continue deriving extraction only from DNA-ID presence. Recorded status disagreements, extraction dates and numeric measurement contradictions retain their existing checks and severity. Cohort gates, pooling and the CIRCALL MRD hold remain unchanged. | Narrow scope of the approved clarification |
+| Sources and evidence | No source workbook edits. Historical reports retain their original rules and hashes; fresh checks record the revised rules. The scoped pre-change snapshot is `archive/migrations/preentered_methods_before_20261007T124716587536Z/`. | Repository provenance and preservation requirements |
+
+## Legacy extraction status ignored — October 7, 2026
+
+The investigator removed the CIRCALL source column and explicitly requested that
+validation no longer use `extraction_status` as a criterion. This supersedes
+earlier recorded-status disagreement checks, including the preceding amendment.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Legacy status | `integrity-4` lists `extraction_status` in configurable `ignored_fields`. Its cell contents are not checked or compared with DNA IDs, whether absent, stale, malformed or formula-based. Coverage records the ignored column when present. | Investigator request to stop using the column as a validation criterion |
+| Extraction evidence | DNA-ID presence remains the sole extraction criterion. Measurement/date contradictions and all other cohort gates remain unchanged; extraction methods remain independent metadata. | Retained approved DNA-ID rule and narrow scope of the request |
+| Preservation | No source edits. Historical runs retain their original rules and hashes. Pre-change code, configuration, tests and contract are preserved in `archive/migrations/ignore_status_before_20261007T130117983372Z/`. | Repository provenance requirements |
+
+## Supporting architecture consolidation — October 8, 2026
+
+The investigator approved one master configuration, three documentation entry
+points, shared synthetic fixtures and separated validation commands, with one
+pipeline as the eventual target and current layered outputs preserved.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Master configuration | Schema-2 `configs/pipeline_layers.json` owns explicit shared workbook paths, shared defaults, enabled layers and per-layer options. It resolves into the existing engine settings; version-1 profiles remain readable. | Investigator-approved supporting-architecture audit |
+| Selection | Boolean layer switches and `--layers` select existing layers only. CLI selection narrows enabled layers, never bypasses their integrity gates; independent failure handling and the CIRCALL hold remain intact. | Existing execution safeguards; requested master controls |
+| Comparison controls | The existing Layer 3 Boolean matrix is exposed in the master and validated against the approved definition. It changes only selection within the approved scope. All shipped comparison values, scientific options, sources and figure-format choices match the pre-change state. | Investigator requested consolidation, preserving layered output |
+| Paths and provenance | Single-layer and previous profile names forward to their authoritative profile. Paths resolve from the owning file; all references and masters are hashed and reverified, with resolved engine settings retained. Multiple selected layers publish in numbered folders; single-layer destinations remain unchanged. | Preserve reproducibility while removing copied settings |
+| Retirement boundary | Scientific packages and existing commands remain available. Older configurations/instructions are explicitly separated. Future retirement must choose needed capabilities and demonstrate unchanged layered output and gates; no scientific migration or source repair is authorized by layout work. | Investigator's one-pipeline direction and explicit output-preservation requirement |
+
+Pre-change dirty and untracked implementation state is preserved in
+`archive/migrations/support_architecture_before_20261008T072011Z/`.
+The snapshot excludes clinical inputs, outputs, credentials and caches. Restore
+only reviewed affected files after accounting for later edits; preserve all
+existing inputs, runs and evidence. Validation and moves are recorded in
+[the dated implementation record](history/support_architecture_20261008.md).
+
+## Figure text simplification — October 8, 2026
+
+The investigator requested an aesthetic-only change across current and retained
+plot exporters, and clarified that pooled total-n labels apply to plots and
+legends only, not workbook tables. New plots omit titles/subtitles and descriptive
+text beneath the graph. Axis labels, units, legends and in-panel statistical/data
+annotations remain. Pooled plots label total n per plotted group/visit rather than
+cohort contributions or additional participant counts; sample-versus-patient
+observation units are unchanged. Detailed counts, eligibility, measurements,
+statistical tests, correction families, pooling rules and workbooks remain intact.
+This supersedes earlier figure-title/footer instructions only. Source files and
+existing run artifacts are not edited. Interpretive limitations remain documented
+in the workbooks, workflow guides and scientific contracts.
+
+The pre-change scoped snapshot is
+`archive/migrations/plot_labels_before_20261008T074324Z/`.
+
+## Older workflow retirement — October 8, 2026
+
+The investigator authorized full archival of the three older scientific packages,
+preserving the four layers as executed immediately before retirement, including
+the October 8 plotting changes. This supersedes earlier compatibility-retention
+and migration plans. It does not authorize scientific changes within Layers 1–4.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Acceptance boundary | Preserve today's layered settings, populations, numerical evidence, workbook contents, figure presentation, publication, privacy and failure behavior. Compare fresh fixed-seed/fixed-assessment successful, blocked and current-source runs. Older-source results are not the equivalence target. | Investigator's explicit retirement instruction |
+| Historical functionality | Longitudinal mixed models, bootstrap trajectories, older pooled inference and handling scope, combined yield/WBC panels, protocol/derived-comparison exports and normalized kinetics become historical. Any future addition needs a separate scope and scientific approval. | Explicit decision that older-only capabilities need no migration |
+| Retained infrastructure | Keep shared association methods and frozen references, readers, plotting, provenance, integrity, all four layers and maintained workbook tools. Move retrospective-blast migration and historical workbook packaging into independent shared modules. | Dependency and maintenance boundary |
+| Gates and data | Preserve the CIRCALL hold, independent completion, nonzero quality exits, output locations and aggregate-export restrictions. Keep clinical inputs, existing outputs and earlier archives in place. | Existing safeguards and explicit preservation instruction |
+| Rollback | Restore only reviewed implementation files from `archive/migrations/workflow_retirement_before_20261008/implementation/`, using its hash inventory and accounting for later edits. The code-only older-workflow bundle is `archive/retired/older_workflows_20261008/`. Never reset the dirty tree or replace clinical inputs/results. | Investigator's reproducibility and rollback requirements |
+
+## Consistent plot typography and legend spacing — October 8, 2026
+
+At the investigator's request, active plot exporters use 12-point Arial for axis
+labels, ticks, legends and in-panel annotations, including diagnostic plots.
+Legend placement is measured after typography is applied, with at least 18 points
+of clearance below axis content; multiple legends are stacked with the same gap.
+The earlier removal of titles and descriptive footers remains in effect. Arial
+must be available on the rendering system; exports do not silently substitute
+another font. Scientific values, selections, random seeds, workbook contents and
+quality holds are unchanged. Archived code and existing results remain historical.
+The scoped pre-change snapshot is
+`archive/migrations/plot_fonts_spacing_before_20261008T082538Z/`.
+
+## DNA/cfDNA per-mL timepoint presentation — October 8, 2026
+
+The investigator requested the referenced pooled DNA-per-mL presentation across
+all DNA and cfDNA per-mL figures with timepoints on the x-axis, and clarified
+that diagnosis association plots are outside this request. Both endpoints share
+the current box/point styling, original-unit log axes, cohort colours/markers,
+Arial typography and legend clearance. Where the visits are present, use the
+same display labels: Diagnosis, D4, D8, D15, MRD1 (D29; TP1) and MRD2 (D71; TP2).
+Metric-specific label overrides remain respected. This changes presentation
+only: retain existing visit eligibility, samples, control inclusion, pooling,
+count conventions and statistical tests. In particular, do not extend DNA-only
+control comparisons or its six-visit selection to cfDNA. Source measurements,
+workbooks and archived results are unchanged. The pre-change snapshot is
+`archive/migrations/per_ml_timepoint_style_before_20261008T083525Z/`.
+
+## CIRCALL positive nonquantifiable MRD and reported sensitivity — October 8, 2026
+
+During manual review of `cohorte_lal!R2`, the investigator confirmed that
+`Positive NQ` means detected but nonquantifiable and that the number following
+`<` reports assay sensitivity. The investigator explicitly authorized parser,
+contract and report changes. This supersedes the earlier CIRCALL NQ category hold;
+historical acceptance results and failed-run evidence remain unchanged.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| CIRCALL categories | Accept case-insensitive `Positive NQ` and `pos NQ`, optionally followed by `<` and a positive finite sensitivity in the configured residual-clone fraction units. Preserve the original workbook annotation. Other unsupported annotations still block. | Investigator's manual interpretation and implementation approval in this conversation |
+| Sensitivity semantics | Store `reported_sensitivity_fraction` separately in memory; never populate measured MRD, measured log reduction or retrospective upper-bound fields from it. Accept decimal/scientific and recorded power notation such as `5.10-5`. | Investigator identified the reported number as sensitivity, not a quantifiable result |
+| Aggregate reporting | Report positive NQ counts, counts with sensitivity and sensitivity-frequency distributions by visit. Identical repeated metadata collapse under existing participant/visit matching; conflicts still block. No patient-level exports. | Preserve established identity, duplicate and aggregate-export safeguards |
+| Display | CIRCALL positive NQ is counted without a numerical trajectory position. Existing pooled assigned positive NQ display level remains a convention, independent of sensitivity; no NQ trajectory connections. Retrospective bound handling is unchanged. | Avoid introducing a measured value or new display threshold from sensitivity metadata |
+| Gates and provenance | Re-run preflight and publish only validated independent outputs to fresh destinations. Remaining invalid annotations, fractions, sensitivity limits and conflicts retain their gates. Definition version and method provenance record the approved extension. | Existing validation and data-safety contracts |
+
+The scoped pre-change code/configuration/documentation snapshot is
+`/tmp/pre_analysis_circall_nq_before_20261008T084058Z/` (local temporary rollback
+copy, not a durable archive). No clinical inputs or outputs are included.
+
+
+## Layer 2 late follow-up and center inventory — October 8, 2026
+
+The investigator requested that Overdue identify unreceived samples that have not
+been explicitly marked missing, distinguish them from `na`, show center totals
+in Inventory and use “timepoint” workbook terminology. This supersedes the
+October 7 rule that only explicit `na` could receive an overdue flag.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Late follow-up | Definition `sample-statistics-6` flags the configured absent/unknown sample-ID states, as well as explicit `na`, only for applicable identified CIRCALL records after the existing local-midnight + 72 elapsed hours deadline. Exactly 72 hours, future rows, untimed/unreliable dates, controls and retrospective records do not become late. Actual sample IDs still prove receipt. | Investigator's explicit overdue follow-up request |
+| Status and denominator | Overdue status is Marked missing for explicit `na`, otherwise Late. Late receipt remains unassessed; it is not silently reclassified as confirmed missing or added to receipt-rate denominators. The denominator remains due received + overdue explicitly marked missing. Inventory Overdue counts include both statuses; Marked missing continues to count all explicit `na`. | Requested status distinction; preserve other scientific receipt rules |
+| Overdue worksheet | List both statuses with Late rows first and filterable Status; remove Reason. Keep approved protocol pseudonyms, Center, Timepoint and Specimen, with source worksheet/row hidden. Preserve identifier privacy and input files. | Investigator's workbook request |
+| Inventory centers | Add Center and show All specimens / All centers, then RDB and TRS totals (zero when absent), and Unknown separately when present, before specimen/timepoint rows. Reuse existing center audit groups and cohort-qualified participant identities. These overlapping summary views must never be added together; retain cohort/control boundaries and no pooled receipt rates. | Explicit center-summary request; existing matching rules |
+| Terminology and unchanged analysis | Use Timepoint / All timepoints in visible workbook headers and prose. Internal visit keys remain unchanged for provenance. Measurements, comparisons, figures, source identities and the CIRCALL disease hold are unaffected. | User terminology request and narrow scope |
+
+The pre-change code/configuration/tests/documentation snapshot is
+`archive/migrations/layer2_late_inventory_before_20261008T084311Z/`.
+Existing results remain in place; new reports use a fresh destination.
+
+
+## TP1/TP2 display labels — October 8, 2026
+
+The investigator replaced MRD1/MRD2 presentation labels with TP1/TP2 across
+Layer 2 DNA/cfDNA per-mL timepoint plots and comparison labels. Retain D29/D71
+in parentheses. This supersedes the earlier display names only; source timepoint
+keys, populations, measurements and statistical rules are unchanged. The scoped
+pre-change snapshot is `archive/migrations/tp_labels_before_20261008T090714Z/`.
+
+## All-layers-only execution and audit fixes — October 20, 2026
+
+The investigator explicitly approved retiring public partial-layer execution and
+fixing the repository audit findings. This supersedes earlier standalone-layer,
+enabled-switch and selector-profile interface guarantees. Scientific options,
+identity, populations, preparation, models, multiplicity and clinical gates are unchanged.
+
+| Rule | Decision | Rationale and source |
+| --- | --- | --- |
+| Public execution | Both launchers always attempt Layers 1–4 in order; `--layers`, public `--workflow`, direct layer commands and single-layer selector profiles fail before preflight/output creation. | Investigator-approved October 20 implementation plan |
+| Configuration | All four option blocks/entries required. Retained schema-1 and schema-2 full-run references accepted; legacy enabled is omitted or Boolean true. Partial/duplicate selections and false fail explicitly. | Preserve complete configurations without silent widening |
+| Failure handling | Keep infrastructure preflight aborts, independent work after quality/worker failures, nonzero holds, source-change invalidation and interruption behavior. | Existing orchestration and clinical safeguards |
+| Results | All new runs use the full numbered-layer layout; historical single-layer results and archived evidence stay in place and remain readable. | One public pipeline with retained provenance |
+| Audit reporting | Layer 2 completed reports with integrity reviews report review_needed; review-only runs still exit successfully. Comparators check symmetric scope/figure sets and complete artifact inventories. | Reproduced audit findings; no statistical change |
+| Display | Render count-unit superscripts through mathtext using Arial at export; original definition labels and recorded units remain unchanged. PDFs remain optional. | Missing Arial superscript-nine glyph confirmed in the existing environment |
+
+[Acceptance and rollback](history/all_layers_only_20261020.md) records the actual
+verification, permitted presentation/status differences and remaining limitations.
+
+## Single Conda-aware launcher — October 20, 2026
+
+The investigator requested one launcher that selects Conda itself. This supersedes
+the two-launcher interface in the preceding amendment. `python3 run.py` launches the
+existing `pre_analysis` environment automatically, reusing it when already active.
+No environment is created or changed automatically. CLI paths retain caller-relative
+resolution; configuration paths retain owner-relative resolution. Arguments, exit
+codes and terminal signals are forwarded without shell interpolation. Every execution
+still attempts all four layers under the unchanged scientific settings and gates.
+The former shell wrapper is preserved in a code-only archive; its historical hashes
+and prior run records remain unchanged. New code inventories hash `run.py` and the
+active Python modules, without requiring the retired wrapper.
+[Verification and rollback](history/conda_launcher_20261020.md).
+
+## Calendar collection-volume views — October 20, 2026
+
+The investigator requested CSF and plasma volumes against calendar collection
+dates to monitor sample collection longitudinally. This adds descriptive CIRCALL
+views without changing existing overall displays, measurements or tests.
+
+| Rule | Decision | Rationale and source |
+| --- | --- | --- |
+| Endpoint and scope | Recorded `extraction_input_volume_ml`, in mL available plasma after centrifugation or available CSF, separately for received CIRCALL patient samples across existing visits. Preserve measured zeros and repeats; no controls or pooled calendar view. | Investigator requested the CIRCALL CSF/plasma views; retained volume/receipt definitions |
+| Calendar axis | Use typed `sampling_date` or a usable typed formula-cache date at recorded calendar-day precision. No planned-date fallback, string/serial-date inference or timezone conversion. Missing/unknown/unusable dates remain unavailable and are counted. | Investigator explicitly selected calendar collection dates |
+| Display | One sample point at the exact date and recorded volume, linear volume axis, existing cohort styling. Retain sample/participant counts and disjoint missing-volume/undated-numeric-volume counts. No date jitter, aggregation, smoothing, patient joins, hypothesis testing or performance threshold. | Minimal descriptive representation of the requested monitoring question |
+| Provenance | Record the selected date field/cohort in the scientific definition, retain source-date states in local hashed Layer 2 observations and reconcile aggregate plotting coverage at completion. Publish only through a fresh complete pipeline run; keep historical run artifacts unchanged. | Existing provenance, identity and publication safeguards |
+| Interpretation | Available volume is a collection-handling proxy, not blood volume drawn or evidence of extraction. Visit mix, repeated participants and missing metadata can affect calendar patterns; no adjusted or causal performance claim. | Retained endpoint and observational limitations |
+
+The scoped pre-change snapshot is
+`archive/migrations/longitudinal_volumes_before_20261020/`.

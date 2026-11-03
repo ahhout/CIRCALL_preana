@@ -1,0 +1,737 @@
+{
+  "synthetic_success": {
+    "started_utc": "2026-10-08T07:57:59.640786+00:00",
+    "finished_utc": "2026-10-08T07:58:23.178662+00:00",
+    "code_revision": "92044beb31b7609a09b473e64603be34da582c2d",
+    "code_dirty": true,
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
+    "packages": {
+      "numpy": "2.4.3",
+      "pandas": "3.0.2",
+      "scipy": "1.17.1",
+      "statsmodels": "0.14.6",
+      "matplotlib": "3.10.8",
+      "openpyxl": "3.1.5",
+      "seaborn": "0.13.2",
+      "PyYAML": "6.0.3"
+    },
+    "code_sha256": {
+      "analysis/__init__.py": "6f928c42f81a7059b662320de670878d7b59b174fa596eb7a76e2a5519f01dd3",
+      "analysis/advanced_analysis/__init__.py": "4d0107a4f5f5ad06777536b71a1131c333af55587c838c8ce4e8c27db7f64d5d",
+      "analysis/advanced_analysis/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/advanced_analysis/preparation.py": "a6b4c27ec6af045dde7ed40aa6d326ea972b0689156f0180d78dc3dd1ca15e8e",
+      "analysis/advanced_analysis/reporting.py": "e53a6676ce9a557dbee3cb4c725e7a56457f061142ffbaf25137a5d84ee1307d",
+      "analysis/advanced_analysis/runner.py": "0b6eff9218807de4bb66db24d5170e14f311ba2bbb60aa26b335747f2032ab76",
+      "analysis/advanced_analysis/schema.py": "3f4e5c00bf0cbef8d9c584487fb4f498e0429ce482aa84c40bc8b97b6831fee5",
+      "analysis/advanced_analysis/statistics.py": "ea6bea5340d80ad2b70b04e65e7fe8a278e824e73a8c99fdc6cb6958a0dadb25",
+      "analysis/artifacts.py": "60d0a84221a780576c249840c6db6b1b094bbab9db1977f4effa5f1ac859f5b7",
+      "analysis/association_methods.py": "9a9cfee603227aa7159351266630bede4188b3ec8ad458b3a9941ea3db6d962a",
+      "analysis/blast_kinetics/__init__.py": "e52feeb40379c66e1ff9f8a85161ef00f606f95fef0dfbd2dacc56875e5754f5",
+      "analysis/blast_kinetics/__main__.py": "1b26d8d3aae35aafccfda56d5dd1e33bc66a8b938c6eabf7bba1b657b31cca5d",
+      "analysis/blast_kinetics/cli.py": "583450876c7bd2681624628d45a5541389c4c0239c66dc967101063a9c201936",
+      "analysis/blast_kinetics/config.py": "b4cc0c52ac3a7a03fc4ef2d552b9978eed0f1f9ad1d2dcf332debe2e20955be2",
+      "analysis/blast_kinetics/data_io.py": "34e87aaf3a3397b63b4b08a3c95f277056bef5161072c97278510c2f86cddefc",
+      "analysis/blast_kinetics/outputs.py": "efa6de3a9ee0ceec2b2f81e984f47798b37b657709dece98eb6af82b010c0511",
+      "analysis/blast_kinetics/pipeline.py": "3350a02fc8172af1ac8aee6768983741bb63c3d624d55144f89de93d6ed19888",
+      "analysis/blast_kinetics/plotting.py": "fb42163d97d9764d1a98404322b3d27bd72ae8dfa24abbd6ee3376bc15901171",
+      "analysis/blast_kinetics/preprocessing.py": "2dc2508e0b62120a7e2a4245d61918fd31a9c27c34f4856256b5996f5d544eef",
+      "analysis/blast_kinetics/statistics.py": "6687f4fb340ae8ecf56234b5144c8dd91ffe1a3e804f2f9a91c102593583a14b",
+      "analysis/cfdna_associations/__init__.py": "3fb8fc0e68b42b1457467eaa1f30e221df9592413b24c979c230e59e417266ba",
+      "analysis/cfdna_associations/analyze_blast_cfdna.py": "053cbf193ca3294c29e820736fd457ad045a7ac67de713481d9d7f02ceaab139",
+      "analysis/cfdna_associations/diagnosis.py": "5d73007b23f909d623d805f1fa72d09214b55d2cbaf440fa438e5c394129e5b1",
+      "analysis/cfdna_associations/runner.py": "32def0c02053ba9f5a8e9bf6d74a451e660bf1390bfd4ed7452b0058ebf2358a",
+      "analysis/cfdna_associations/worker.py": "931b7be198a53e7e32aca46c218fc7366bba69ffe26d8c20d803770a4f70241e",
+      "analysis/cli.py": "723100b1657364b07e078b7a53c7eef7ad11af4c07157bc811cff474cb10993d",
+      "analysis/configuration.py": "c70437bb1bdfe65b4281560e5dc796f65d9bb92a6bd5abf7eee3658c6c10acad",
+      "analysis/data_integrity/__init__.py": "c10c7bfbd0b2abef42d883d7fc2b3bff8fe492456da42708703af892d185eab5",
+      "analysis/data_integrity/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/data_integrity/checks.py": "f22d60a91b28d2144ccfe3dfae0f816edbcf00c4b590ca2b70ea7403b4b3eede",
+      "analysis/data_integrity/reporting.py": "f2593e30b457df37c147d5dd6f6ed89699f154a3b44bcf079f310af6fb4d0ae1",
+      "analysis/data_integrity/runner.py": "1a8a5701c7339e774b6898ce1edc79cc1c62670846be01f0607ec7f4a60da4a7",
+      "analysis/disease_modeling/__init__.py": "42ccb12386c10cb830fc3d0a6b8a9aa102b27a1988a565230dfb54ef26862d3b",
+      "analysis/disease_modeling/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/disease_modeling/common.py": "28fef172ddc8549c5855605e9e78cf736be53fb142e6c863486f3caad040414e",
+      "analysis/disease_modeling/counts.py": "e1e45605cae3ab1e2ef837feb188b251f8715cf90d6f5caf8e65bf6acc5dfb15",
+      "analysis/disease_modeling/mrd.py": "77c486f729d9b4f1acba79196d02593a80df7af4eb8b12b85d34fa51a1ca3060",
+      "analysis/disease_modeling/reporting.py": "01f69932efd37aad757576bb27a6cb6a4c10fe426d2606434b8824b055f2bb04",
+      "analysis/disease_modeling/runner.py": "a6a85420984a323d8adbb422274957e4696175ff23d4f2ee4cc677e56de828bb",
+      "analysis/extraction_status.py": "7c9d9b79845815a86fe1c795ff835c607fd61872fa2a0975a7e202404057607a",
+      "analysis/figure_layout.py": "d31d8a4242a4cc0297b59e2c0db1a32f2608767fb3a44761c0ee1120e645bddc",
+      "analysis/layer_configuration.py": "b4fe8ea4d81aec80dceaf3c754d6537a1b9d02e9e50ee58d5812fd23a10f9105",
+      "analysis/outputs.py": "58b066f592d7fb670f44a77ab36d4767304c5428bb6b047b1d7ee086e8759978",
+      "analysis/patient_ids.py": "f75be0ce7faef6c61a10982d303744e6f87fed1089a0b4a6115eb67a8a045cf5",
+      "analysis/pipeline.py": "971688449cc92088a2a4b1793fe35817c021807e16e3bda396632835be570d1d",
+      "analysis/plot_style.py": "33be500beaa1b4223e6a4b043d35b90150046374998761db63fb49fec944e4b3",
+      "analysis/provenance.py": "5d500d7f9576c2f37bf4cabea6eecfd15dc7afbe1d744da157a6f484a5e2ab23",
+      "analysis/repair_inventory_formulas.py": "961ddd238b12ccd079a43e7226eb1741dcc6133766cf21d1599034d6ab81cc42",
+      "analysis/retrospective_controls.py": "4fe1df9a2293a849bb90bddfe22b527dbfe3becc11903f24d62b09c08868b1c6",
+      "analysis/sample_analysis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "analysis/sample_analysis/adapters.py": "f7761e578035a35b2a48d9a0d7aeb742556646619ecbdc26a7c09bd2255114a5",
+      "analysis/sample_analysis/analyses.py": "892b6be84287e2a9a7eca4fca3e984cccf8e1e774ae1cdea701a95ad0c59afab",
+      "analysis/sample_analysis/blood_counts.py": "86eaba192dc4be5848abe39231bec617a28e6b17977a8959e6c3a613ce82a827",
+      "analysis/sample_analysis/extraction.py": "2599563abf2fd6aa5c8860459f51a37ddb32f5670c17278c26a23c2e911e8c60",
+      "analysis/sample_analysis/longitudinal_trends.py": "77ad0e6c80bfcc22840d3dd3e68cae4552a55b5f65483666791f28a2bdbecca3",
+      "analysis/sample_analysis/migrate_retrospective_blasts.py": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "analysis/sample_analysis/mrd.py": "8e3633ba235a87c03a334768d5171b5e56126550b76dc01ea51cfce11e9e3f7c",
+      "analysis/sample_analysis/policies.py": "6580818fe8d7fb6bcd45ca6e9fbd772d300608113c1d9fd837407f3ee819d19d",
+      "analysis/sample_analysis/pooled.py": "a09fb72a5b7ef9d599d74ead8f786caf6494350e702ab8a282823c70b69d2a74",
+      "analysis/sample_analysis/pooled_mrd.py": "2c7fa2e3801d8b065d4cfb1efae1ac698794de785b77326d53a298e61fa3660d",
+      "analysis/sample_analysis/pooled_trend.py": "3ad95a3bc6b782185c0a04de3b9a890c261bab09579316230484f29199586f5b",
+      "analysis/sample_analysis/preparation.py": "f57db1be4b319e9a9025736fdfd591ae4a80bb539e7bf4ebd43adcc456d5c3cb",
+      "analysis/sample_analysis/reporting.py": "2bdc0ad86be8d986d64ca423da1e2dfdf9059fcaab310f53f78c43a4e1e02fa3",
+      "analysis/sample_analysis/retrospective_blasts.py": "6fc19a6804a2896d5c4fbcd4d8314e78f57ca5d807fbda467ee08190ee3da967",
+      "analysis/sample_analysis/retrospective_mrd.py": "c94db2d23203ebaaf1042da33dce7f85fd0ae54dd4139e1104ac704ad27a3895",
+      "analysis/sample_analysis/runner.py": "ac6c122b50782fd19e9b687c327db4bac7f4cf5b6d8b7b8f0ec49020d1b2cf8d",
+      "analysis/sample_analysis/statistical_plots.py": "7d6fa48feb58f81efe2ffd3550c9ed2406685238c9a670deea27f75913223cd7",
+      "analysis/sample_analysis/statistics.py": "0b450753f191f15c9624171b19d354353a90a36625a1591c2205d062a2cf3302",
+      "analysis/sample_analysis/stats_workbooks.py": "d6ce9e787e7d9f8cd4c0d4c2331e840981a1192800b0df3c94ea5597e92d3c58",
+      "analysis/sample_analysis/yield_wbc_panel.py": "8f64c8ef4c1ecbae018cbdd63e7e6cf012434155491d935f968127ad716f82e9",
+      "analysis/sample_annotations.py": "596b383a928bc43c5b29067669c899522ecee9f4e1cd4f3c2be97d498ffdf929",
+      "analysis/sample_definitions.py": "cf07074ee6c80109ab18092adcb2865d7c68f23187e9ad7d4508f0b7fd1d66ab",
+      "analysis/sample_io.py": "13331f3946ecfed342fe64e225543a24ce68f8b534ef562c8824e65fc2798063",
+      "analysis/sample_statistics/__init__.py": "372043b4af29d8f85de2d74696399c0c98c0b19c8b41b5a2c86ad164fdcf2a54",
+      "analysis/sample_statistics/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/sample_statistics/comparisons.py": "70b7db073b9a902aa8cceeaae668c774971dc89e30d1110d65aca1e01e691ade",
+      "analysis/sample_statistics/core.py": "f2f41ce5e44e6870b194495260b580e517b0f9290191653bbb5f4294ef5c0a2b",
+      "analysis/sample_statistics/reporting.py": "375bcfbb44d4a2a86930171e6350bd32f47daff957123b2f821bcc2f98e1cf4c",
+      "analysis/sample_statistics/runner.py": "010125cd3490f7df1d78ac4488caf2accf588d7888a1e075a60fbd5472e8062f",
+      "analysis/source_state.py": "5234bd1f206ad20bfe5013efaa790072c0b4d7ca5fdb4ad3d3b127520fb4c5c7",
+      "analysis/validation/__init__.py": "8a37afb6465a6dfbed5855615893b80826f4610d52fab6f9f500d6dd4b474320",
+      "analysis/validation/compare_integrated.py": "28e66184aaca1190bd3a8f8e6fc0f746b2994d6eb696662d08faeedd4fdc3abb",
+      "analysis/validation/validate_advanced_analysis.py": "7107637b48d4f76de571dbc9a958f35c37ce0a000e723549e62eac9ef02063df",
+      "analysis/validation/validate_associations.py": "09a2685cea2c2adf87da3bdf92af5a9b3a0bbccdd2c920bd4c21e2c9f6430d74",
+      "analysis/validation/validate_canonical.py": "20069a45712f135fee822763c2863a16b60e6ee65b3cadbbec7022392b744874",
+      "analysis/validation/validate_disease_modeling.py": "73b4d988696a94d0fc42052417bfb56054f388d0edd86a04f78aa11624197598",
+      "analysis/validation/validate_longitudinal_trends.py": "e7be015d048e4de6ab1029e5268edef4358ea274568f5118bdbe73045cbd0b3c",
+      "analysis/workbook_cleanup.py": "1e7332972e5db70ffbbef1e052405663040558f6df8961c370cc28d04043c101",
+      "analysis/workbook_harmonization.py": "5d68c9b60e1011eb8b5c9d249c5f420a27e5f3110a1819103a2b846cbde95f25",
+      "analysis/worker.py": "1c01842159404f984bbdf00b37019de76e7c92d01c16d72015bde58813b41f1a",
+      "run.py": "abe587a111596154afb7d98b755e7e9a8c34c58464e0fedba5af66269a760a8d",
+      "run_all_layers.sh": "f6551527e4b01aede68612b9ff564e551c60caf33d6edefd6c18a3c0bc6b6901"
+    },
+    "scientific_contract": {
+      "id": "pipeline",
+      "version": 1,
+      "path": "docs/workflow_contracts.md",
+      "sha256": "0c2f5d17db1997e7e6697d4af949d3cd4609a9dc8b471450c151a2ff203787d0"
+    },
+    "inputs": {
+      "configuration": {
+        "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/profiles/synthetic_success.json",
+        "sha256": "166a3b4f09a9994057bcecca3e739f97c275bee301f6d2563c0bdba1500dedee"
+      }
+    },
+    "workflows": [
+      {
+        "workflow": "data_integrity",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "61e9a122587b115b646aee9ea9b1884b17238bcfca5f5562728e5246aae90145",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "sample_statistics",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/sample_statistics.json",
+            "sha256": "b67c27d8388135d942c1691d775a2452999785c287480c8537d3a2a1206d38cb"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "f06ce027fe1d201d3cdca3519c816a9fd16e5e22a7c8967f2f4f7ed60374d27a",
+        "quality_status": "no_issues_detected"
+      },
+      {
+        "workflow": "advanced_analysis",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/advanced_analysis.json",
+            "sha256": "73b4bf2f9471f16c38afe26251f2b9097886b023d6835acd714878572682656b"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "90501a5fa86d83db45417ee151227fa6324929edd3c62912e69b41d0e5f6a8fc",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "disease_modeling",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/disease_modeling.json",
+            "sha256": "18d7d87a7f697ff06e3b85170f9713ccfded6976a2d92a2a4a03dac861d4f30a"
+          },
+          "method_provenance": {
+            "path": "/home/arnohoutman/projects/pre_analysis/analysis/disease_modeling/method_provenance.json",
+            "sha256": "cb9a0f99fb3c8d77843fda7e08667cad56bdbc97ddd404278534cab852bc25ab"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/disease/inventory.xlsx",
+            "sha256": "87c483249a031392869f1d64bde526f0db3191912a9498a9ae5c176fc7ee509c"
+          },
+          "retrospective_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/disease/retrospective_blasts.xlsx",
+            "sha256": "1350df70f368e2c5d32f6a04ec49654aad10f07731432550e30d0bd0d619a006"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/disease/circall.xlsx",
+            "sha256": "7cd6672650a1da8ecf0a2b615c5fd10f8fe840f79b656e7122e473f79b3a8a0a"
+          },
+          "circall_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/disease/blood_counts.xlsx",
+            "sha256": "8722692d5109a4d9e2ea71cc9f3c5ccedc2261e8fbf5f09480ecd499b44d637a"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_success/disease/donors.xlsx",
+            "sha256": "e9d5da19fdb9cb9da4b8892d0ce54972102cb2d51175c1122f7145fb1127f7c5"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "7feda98d1678b9d842f40e53f1b660b79521f11164c103c70ade095cc4c3e37b",
+        "quality_status": "no_issues_detected"
+      }
+    ]
+  },
+  "synthetic_blocked": {
+    "started_utc": "2026-10-08T07:58:40.765711+00:00",
+    "finished_utc": "2026-10-08T07:59:01.381959+00:00",
+    "code_revision": "92044beb31b7609a09b473e64603be34da582c2d",
+    "code_dirty": true,
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
+    "packages": {
+      "numpy": "2.4.3",
+      "pandas": "3.0.2",
+      "scipy": "1.17.1",
+      "statsmodels": "0.14.6",
+      "matplotlib": "3.10.8",
+      "openpyxl": "3.1.5",
+      "seaborn": "0.13.2",
+      "PyYAML": "6.0.3"
+    },
+    "code_sha256": {
+      "analysis/__init__.py": "6f928c42f81a7059b662320de670878d7b59b174fa596eb7a76e2a5519f01dd3",
+      "analysis/advanced_analysis/__init__.py": "4d0107a4f5f5ad06777536b71a1131c333af55587c838c8ce4e8c27db7f64d5d",
+      "analysis/advanced_analysis/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/advanced_analysis/preparation.py": "a6b4c27ec6af045dde7ed40aa6d326ea972b0689156f0180d78dc3dd1ca15e8e",
+      "analysis/advanced_analysis/reporting.py": "e53a6676ce9a557dbee3cb4c725e7a56457f061142ffbaf25137a5d84ee1307d",
+      "analysis/advanced_analysis/runner.py": "0b6eff9218807de4bb66db24d5170e14f311ba2bbb60aa26b335747f2032ab76",
+      "analysis/advanced_analysis/schema.py": "3f4e5c00bf0cbef8d9c584487fb4f498e0429ce482aa84c40bc8b97b6831fee5",
+      "analysis/advanced_analysis/statistics.py": "ea6bea5340d80ad2b70b04e65e7fe8a278e824e73a8c99fdc6cb6958a0dadb25",
+      "analysis/artifacts.py": "60d0a84221a780576c249840c6db6b1b094bbab9db1977f4effa5f1ac859f5b7",
+      "analysis/association_methods.py": "9a9cfee603227aa7159351266630bede4188b3ec8ad458b3a9941ea3db6d962a",
+      "analysis/blast_kinetics/__init__.py": "e52feeb40379c66e1ff9f8a85161ef00f606f95fef0dfbd2dacc56875e5754f5",
+      "analysis/blast_kinetics/__main__.py": "1b26d8d3aae35aafccfda56d5dd1e33bc66a8b938c6eabf7bba1b657b31cca5d",
+      "analysis/blast_kinetics/cli.py": "583450876c7bd2681624628d45a5541389c4c0239c66dc967101063a9c201936",
+      "analysis/blast_kinetics/config.py": "b4cc0c52ac3a7a03fc4ef2d552b9978eed0f1f9ad1d2dcf332debe2e20955be2",
+      "analysis/blast_kinetics/data_io.py": "34e87aaf3a3397b63b4b08a3c95f277056bef5161072c97278510c2f86cddefc",
+      "analysis/blast_kinetics/outputs.py": "efa6de3a9ee0ceec2b2f81e984f47798b37b657709dece98eb6af82b010c0511",
+      "analysis/blast_kinetics/pipeline.py": "3350a02fc8172af1ac8aee6768983741bb63c3d624d55144f89de93d6ed19888",
+      "analysis/blast_kinetics/plotting.py": "fb42163d97d9764d1a98404322b3d27bd72ae8dfa24abbd6ee3376bc15901171",
+      "analysis/blast_kinetics/preprocessing.py": "2dc2508e0b62120a7e2a4245d61918fd31a9c27c34f4856256b5996f5d544eef",
+      "analysis/blast_kinetics/statistics.py": "6687f4fb340ae8ecf56234b5144c8dd91ffe1a3e804f2f9a91c102593583a14b",
+      "analysis/cfdna_associations/__init__.py": "3fb8fc0e68b42b1457467eaa1f30e221df9592413b24c979c230e59e417266ba",
+      "analysis/cfdna_associations/analyze_blast_cfdna.py": "053cbf193ca3294c29e820736fd457ad045a7ac67de713481d9d7f02ceaab139",
+      "analysis/cfdna_associations/diagnosis.py": "5d73007b23f909d623d805f1fa72d09214b55d2cbaf440fa438e5c394129e5b1",
+      "analysis/cfdna_associations/runner.py": "32def0c02053ba9f5a8e9bf6d74a451e660bf1390bfd4ed7452b0058ebf2358a",
+      "analysis/cfdna_associations/worker.py": "931b7be198a53e7e32aca46c218fc7366bba69ffe26d8c20d803770a4f70241e",
+      "analysis/cli.py": "723100b1657364b07e078b7a53c7eef7ad11af4c07157bc811cff474cb10993d",
+      "analysis/configuration.py": "c70437bb1bdfe65b4281560e5dc796f65d9bb92a6bd5abf7eee3658c6c10acad",
+      "analysis/data_integrity/__init__.py": "c10c7bfbd0b2abef42d883d7fc2b3bff8fe492456da42708703af892d185eab5",
+      "analysis/data_integrity/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/data_integrity/checks.py": "f22d60a91b28d2144ccfe3dfae0f816edbcf00c4b590ca2b70ea7403b4b3eede",
+      "analysis/data_integrity/reporting.py": "f2593e30b457df37c147d5dd6f6ed89699f154a3b44bcf079f310af6fb4d0ae1",
+      "analysis/data_integrity/runner.py": "1a8a5701c7339e774b6898ce1edc79cc1c62670846be01f0607ec7f4a60da4a7",
+      "analysis/disease_modeling/__init__.py": "42ccb12386c10cb830fc3d0a6b8a9aa102b27a1988a565230dfb54ef26862d3b",
+      "analysis/disease_modeling/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/disease_modeling/common.py": "28fef172ddc8549c5855605e9e78cf736be53fb142e6c863486f3caad040414e",
+      "analysis/disease_modeling/counts.py": "e1e45605cae3ab1e2ef837feb188b251f8715cf90d6f5caf8e65bf6acc5dfb15",
+      "analysis/disease_modeling/mrd.py": "77c486f729d9b4f1acba79196d02593a80df7af4eb8b12b85d34fa51a1ca3060",
+      "analysis/disease_modeling/reporting.py": "01f69932efd37aad757576bb27a6cb6a4c10fe426d2606434b8824b055f2bb04",
+      "analysis/disease_modeling/runner.py": "a6a85420984a323d8adbb422274957e4696175ff23d4f2ee4cc677e56de828bb",
+      "analysis/extraction_status.py": "7c9d9b79845815a86fe1c795ff835c607fd61872fa2a0975a7e202404057607a",
+      "analysis/figure_layout.py": "d31d8a4242a4cc0297b59e2c0db1a32f2608767fb3a44761c0ee1120e645bddc",
+      "analysis/layer_configuration.py": "b4fe8ea4d81aec80dceaf3c754d6537a1b9d02e9e50ee58d5812fd23a10f9105",
+      "analysis/outputs.py": "58b066f592d7fb670f44a77ab36d4767304c5428bb6b047b1d7ee086e8759978",
+      "analysis/patient_ids.py": "f75be0ce7faef6c61a10982d303744e6f87fed1089a0b4a6115eb67a8a045cf5",
+      "analysis/pipeline.py": "971688449cc92088a2a4b1793fe35817c021807e16e3bda396632835be570d1d",
+      "analysis/plot_style.py": "33be500beaa1b4223e6a4b043d35b90150046374998761db63fb49fec944e4b3",
+      "analysis/provenance.py": "5d500d7f9576c2f37bf4cabea6eecfd15dc7afbe1d744da157a6f484a5e2ab23",
+      "analysis/repair_inventory_formulas.py": "961ddd238b12ccd079a43e7226eb1741dcc6133766cf21d1599034d6ab81cc42",
+      "analysis/retrospective_controls.py": "4fe1df9a2293a849bb90bddfe22b527dbfe3becc11903f24d62b09c08868b1c6",
+      "analysis/sample_analysis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "analysis/sample_analysis/adapters.py": "f7761e578035a35b2a48d9a0d7aeb742556646619ecbdc26a7c09bd2255114a5",
+      "analysis/sample_analysis/analyses.py": "892b6be84287e2a9a7eca4fca3e984cccf8e1e774ae1cdea701a95ad0c59afab",
+      "analysis/sample_analysis/blood_counts.py": "86eaba192dc4be5848abe39231bec617a28e6b17977a8959e6c3a613ce82a827",
+      "analysis/sample_analysis/extraction.py": "2599563abf2fd6aa5c8860459f51a37ddb32f5670c17278c26a23c2e911e8c60",
+      "analysis/sample_analysis/longitudinal_trends.py": "77ad0e6c80bfcc22840d3dd3e68cae4552a55b5f65483666791f28a2bdbecca3",
+      "analysis/sample_analysis/migrate_retrospective_blasts.py": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "analysis/sample_analysis/mrd.py": "8e3633ba235a87c03a334768d5171b5e56126550b76dc01ea51cfce11e9e3f7c",
+      "analysis/sample_analysis/policies.py": "6580818fe8d7fb6bcd45ca6e9fbd772d300608113c1d9fd837407f3ee819d19d",
+      "analysis/sample_analysis/pooled.py": "a09fb72a5b7ef9d599d74ead8f786caf6494350e702ab8a282823c70b69d2a74",
+      "analysis/sample_analysis/pooled_mrd.py": "2c7fa2e3801d8b065d4cfb1efae1ac698794de785b77326d53a298e61fa3660d",
+      "analysis/sample_analysis/pooled_trend.py": "3ad95a3bc6b782185c0a04de3b9a890c261bab09579316230484f29199586f5b",
+      "analysis/sample_analysis/preparation.py": "f57db1be4b319e9a9025736fdfd591ae4a80bb539e7bf4ebd43adcc456d5c3cb",
+      "analysis/sample_analysis/reporting.py": "2bdc0ad86be8d986d64ca423da1e2dfdf9059fcaab310f53f78c43a4e1e02fa3",
+      "analysis/sample_analysis/retrospective_blasts.py": "6fc19a6804a2896d5c4fbcd4d8314e78f57ca5d807fbda467ee08190ee3da967",
+      "analysis/sample_analysis/retrospective_mrd.py": "c94db2d23203ebaaf1042da33dce7f85fd0ae54dd4139e1104ac704ad27a3895",
+      "analysis/sample_analysis/runner.py": "ac6c122b50782fd19e9b687c327db4bac7f4cf5b6d8b7b8f0ec49020d1b2cf8d",
+      "analysis/sample_analysis/statistical_plots.py": "7d6fa48feb58f81efe2ffd3550c9ed2406685238c9a670deea27f75913223cd7",
+      "analysis/sample_analysis/statistics.py": "0b450753f191f15c9624171b19d354353a90a36625a1591c2205d062a2cf3302",
+      "analysis/sample_analysis/stats_workbooks.py": "d6ce9e787e7d9f8cd4c0d4c2331e840981a1192800b0df3c94ea5597e92d3c58",
+      "analysis/sample_analysis/yield_wbc_panel.py": "8f64c8ef4c1ecbae018cbdd63e7e6cf012434155491d935f968127ad716f82e9",
+      "analysis/sample_annotations.py": "596b383a928bc43c5b29067669c899522ecee9f4e1cd4f3c2be97d498ffdf929",
+      "analysis/sample_definitions.py": "cf07074ee6c80109ab18092adcb2865d7c68f23187e9ad7d4508f0b7fd1d66ab",
+      "analysis/sample_io.py": "13331f3946ecfed342fe64e225543a24ce68f8b534ef562c8824e65fc2798063",
+      "analysis/sample_statistics/__init__.py": "372043b4af29d8f85de2d74696399c0c98c0b19c8b41b5a2c86ad164fdcf2a54",
+      "analysis/sample_statistics/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/sample_statistics/comparisons.py": "70b7db073b9a902aa8cceeaae668c774971dc89e30d1110d65aca1e01e691ade",
+      "analysis/sample_statistics/core.py": "f2f41ce5e44e6870b194495260b580e517b0f9290191653bbb5f4294ef5c0a2b",
+      "analysis/sample_statistics/reporting.py": "375bcfbb44d4a2a86930171e6350bd32f47daff957123b2f821bcc2f98e1cf4c",
+      "analysis/sample_statistics/runner.py": "010125cd3490f7df1d78ac4488caf2accf588d7888a1e075a60fbd5472e8062f",
+      "analysis/source_state.py": "5234bd1f206ad20bfe5013efaa790072c0b4d7ca5fdb4ad3d3b127520fb4c5c7",
+      "analysis/validation/__init__.py": "8a37afb6465a6dfbed5855615893b80826f4610d52fab6f9f500d6dd4b474320",
+      "analysis/validation/compare_integrated.py": "28e66184aaca1190bd3a8f8e6fc0f746b2994d6eb696662d08faeedd4fdc3abb",
+      "analysis/validation/validate_advanced_analysis.py": "7107637b48d4f76de571dbc9a958f35c37ce0a000e723549e62eac9ef02063df",
+      "analysis/validation/validate_associations.py": "09a2685cea2c2adf87da3bdf92af5a9b3a0bbccdd2c920bd4c21e2c9f6430d74",
+      "analysis/validation/validate_canonical.py": "20069a45712f135fee822763c2863a16b60e6ee65b3cadbbec7022392b744874",
+      "analysis/validation/validate_disease_modeling.py": "73b4d988696a94d0fc42052417bfb56054f388d0edd86a04f78aa11624197598",
+      "analysis/validation/validate_longitudinal_trends.py": "e7be015d048e4de6ab1029e5268edef4358ea274568f5118bdbe73045cbd0b3c",
+      "analysis/workbook_cleanup.py": "1e7332972e5db70ffbbef1e052405663040558f6df8961c370cc28d04043c101",
+      "analysis/workbook_harmonization.py": "5d68c9b60e1011eb8b5c9d249c5f420a27e5f3110a1819103a2b846cbde95f25",
+      "analysis/worker.py": "1c01842159404f984bbdf00b37019de76e7c92d01c16d72015bde58813b41f1a",
+      "run.py": "abe587a111596154afb7d98b755e7e9a8c34c58464e0fedba5af66269a760a8d",
+      "run_all_layers.sh": "f6551527e4b01aede68612b9ff564e551c60caf33d6edefd6c18a3c0bc6b6901"
+    },
+    "scientific_contract": {
+      "id": "pipeline",
+      "version": 1,
+      "path": "docs/workflow_contracts.md",
+      "sha256": "0c2f5d17db1997e7e6697d4af949d3cd4609a9dc8b471450c151a2ff203787d0"
+    },
+    "inputs": {
+      "configuration": {
+        "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/profiles/synthetic_blocked.json",
+        "sha256": "402a851254e37abb5b9198832c72fd3346eb3928e18a73936ee392349d411add"
+      }
+    },
+    "workflows": [
+      {
+        "workflow": "data_integrity",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "1c61231a4c8a7f59747cbddc30edda2ddc54a2cd54f98ed855c8a9fe2ee42146",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "sample_statistics",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/sample_statistics.json",
+            "sha256": "b67c27d8388135d942c1691d775a2452999785c287480c8537d3a2a1206d38cb"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "172cc84416e2f792fce1b2886b16bad17d0f2aaabea6f32784c45d4a9eeae501",
+        "quality_status": "no_issues_detected"
+      },
+      {
+        "workflow": "advanced_analysis",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/retrospective.xlsx",
+            "sha256": "aae76d03c42856601ffd5cfd5189d44658ed177224b7b3318a93acfde86b7ef1"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/circall.xlsx",
+            "sha256": "8535f5e825c400e8a620b8f7bdabe9e3a199763358aa9189df55aa9e98b25199"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/associations/donors.xlsx",
+            "sha256": "7f1fdb29afce7dfc7b61c0cbfe78bcd5f683e1e84e758bbefd7f4a627564e845"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/advanced_analysis.json",
+            "sha256": "73b4bf2f9471f16c38afe26251f2b9097886b023d6835acd714878572682656b"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "ae5d788c5cc342a47f46870d2c4f7b0be69b52ed09a1050cbb72fdbfc723dbe3",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "disease_modeling",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/disease_modeling.json",
+            "sha256": "18d7d87a7f697ff06e3b85170f9713ccfded6976a2d92a2a4a03dac861d4f30a"
+          },
+          "method_provenance": {
+            "path": "/home/arnohoutman/projects/pre_analysis/analysis/disease_modeling/method_provenance.json",
+            "sha256": "cb9a0f99fb3c8d77843fda7e08667cad56bdbc97ddd404278534cab852bc25ab"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/disease/inventory.xlsx",
+            "sha256": "87c483249a031392869f1d64bde526f0db3191912a9498a9ae5c176fc7ee509c"
+          },
+          "retrospective_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/disease/retrospective_blasts.xlsx",
+            "sha256": "1350df70f368e2c5d32f6a04ec49654aad10f07731432550e30d0bd0d619a006"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/disease/circall.xlsx",
+            "sha256": "f0cd4fdc45ee9ab827d8073597e447bd5f4f5e0540afa3345ac07da4404f5665"
+          },
+          "circall_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/disease/blood_counts.xlsx",
+            "sha256": "8722692d5109a4d9e2ea71cc9f3c5ccedc2261e8fbf5f09480ecd499b44d637a"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/sources/synthetic_blocked/disease/donors.xlsx",
+            "sha256": "e9d5da19fdb9cb9da4b8892d0ce54972102cb2d51175c1122f7145fb1127f7c5"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "39f83892570b91752e34809d7579dfd2b946fffde43c7cc2295a546f34f96319",
+        "quality_status": "errors_found"
+      }
+    ]
+  },
+  "clinical_current": {
+    "started_utc": "2026-10-08T07:59:22.458780+00:00",
+    "finished_utc": "2026-10-08T08:01:51.843452+00:00",
+    "code_revision": "92044beb31b7609a09b473e64603be34da582c2d",
+    "code_dirty": true,
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
+    "packages": {
+      "numpy": "2.4.3",
+      "pandas": "3.0.2",
+      "scipy": "1.17.1",
+      "statsmodels": "0.14.6",
+      "matplotlib": "3.10.8",
+      "openpyxl": "3.1.5",
+      "seaborn": "0.13.2",
+      "PyYAML": "6.0.3"
+    },
+    "code_sha256": {
+      "analysis/__init__.py": "6f928c42f81a7059b662320de670878d7b59b174fa596eb7a76e2a5519f01dd3",
+      "analysis/advanced_analysis/__init__.py": "4d0107a4f5f5ad06777536b71a1131c333af55587c838c8ce4e8c27db7f64d5d",
+      "analysis/advanced_analysis/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/advanced_analysis/preparation.py": "a6b4c27ec6af045dde7ed40aa6d326ea972b0689156f0180d78dc3dd1ca15e8e",
+      "analysis/advanced_analysis/reporting.py": "e53a6676ce9a557dbee3cb4c725e7a56457f061142ffbaf25137a5d84ee1307d",
+      "analysis/advanced_analysis/runner.py": "0b6eff9218807de4bb66db24d5170e14f311ba2bbb60aa26b335747f2032ab76",
+      "analysis/advanced_analysis/schema.py": "3f4e5c00bf0cbef8d9c584487fb4f498e0429ce482aa84c40bc8b97b6831fee5",
+      "analysis/advanced_analysis/statistics.py": "ea6bea5340d80ad2b70b04e65e7fe8a278e824e73a8c99fdc6cb6958a0dadb25",
+      "analysis/artifacts.py": "60d0a84221a780576c249840c6db6b1b094bbab9db1977f4effa5f1ac859f5b7",
+      "analysis/association_methods.py": "9a9cfee603227aa7159351266630bede4188b3ec8ad458b3a9941ea3db6d962a",
+      "analysis/blast_kinetics/__init__.py": "e52feeb40379c66e1ff9f8a85161ef00f606f95fef0dfbd2dacc56875e5754f5",
+      "analysis/blast_kinetics/__main__.py": "1b26d8d3aae35aafccfda56d5dd1e33bc66a8b938c6eabf7bba1b657b31cca5d",
+      "analysis/blast_kinetics/cli.py": "583450876c7bd2681624628d45a5541389c4c0239c66dc967101063a9c201936",
+      "analysis/blast_kinetics/config.py": "b4cc0c52ac3a7a03fc4ef2d552b9978eed0f1f9ad1d2dcf332debe2e20955be2",
+      "analysis/blast_kinetics/data_io.py": "34e87aaf3a3397b63b4b08a3c95f277056bef5161072c97278510c2f86cddefc",
+      "analysis/blast_kinetics/outputs.py": "efa6de3a9ee0ceec2b2f81e984f47798b37b657709dece98eb6af82b010c0511",
+      "analysis/blast_kinetics/pipeline.py": "3350a02fc8172af1ac8aee6768983741bb63c3d624d55144f89de93d6ed19888",
+      "analysis/blast_kinetics/plotting.py": "fb42163d97d9764d1a98404322b3d27bd72ae8dfa24abbd6ee3376bc15901171",
+      "analysis/blast_kinetics/preprocessing.py": "2dc2508e0b62120a7e2a4245d61918fd31a9c27c34f4856256b5996f5d544eef",
+      "analysis/blast_kinetics/statistics.py": "6687f4fb340ae8ecf56234b5144c8dd91ffe1a3e804f2f9a91c102593583a14b",
+      "analysis/cfdna_associations/__init__.py": "3fb8fc0e68b42b1457467eaa1f30e221df9592413b24c979c230e59e417266ba",
+      "analysis/cfdna_associations/analyze_blast_cfdna.py": "053cbf193ca3294c29e820736fd457ad045a7ac67de713481d9d7f02ceaab139",
+      "analysis/cfdna_associations/diagnosis.py": "5d73007b23f909d623d805f1fa72d09214b55d2cbaf440fa438e5c394129e5b1",
+      "analysis/cfdna_associations/runner.py": "32def0c02053ba9f5a8e9bf6d74a451e660bf1390bfd4ed7452b0058ebf2358a",
+      "analysis/cfdna_associations/worker.py": "931b7be198a53e7e32aca46c218fc7366bba69ffe26d8c20d803770a4f70241e",
+      "analysis/cli.py": "723100b1657364b07e078b7a53c7eef7ad11af4c07157bc811cff474cb10993d",
+      "analysis/configuration.py": "c70437bb1bdfe65b4281560e5dc796f65d9bb92a6bd5abf7eee3658c6c10acad",
+      "analysis/data_integrity/__init__.py": "c10c7bfbd0b2abef42d883d7fc2b3bff8fe492456da42708703af892d185eab5",
+      "analysis/data_integrity/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/data_integrity/checks.py": "f22d60a91b28d2144ccfe3dfae0f816edbcf00c4b590ca2b70ea7403b4b3eede",
+      "analysis/data_integrity/reporting.py": "f2593e30b457df37c147d5dd6f6ed89699f154a3b44bcf079f310af6fb4d0ae1",
+      "analysis/data_integrity/runner.py": "1a8a5701c7339e774b6898ce1edc79cc1c62670846be01f0607ec7f4a60da4a7",
+      "analysis/disease_modeling/__init__.py": "42ccb12386c10cb830fc3d0a6b8a9aa102b27a1988a565230dfb54ef26862d3b",
+      "analysis/disease_modeling/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/disease_modeling/common.py": "28fef172ddc8549c5855605e9e78cf736be53fb142e6c863486f3caad040414e",
+      "analysis/disease_modeling/counts.py": "e1e45605cae3ab1e2ef837feb188b251f8715cf90d6f5caf8e65bf6acc5dfb15",
+      "analysis/disease_modeling/mrd.py": "77c486f729d9b4f1acba79196d02593a80df7af4eb8b12b85d34fa51a1ca3060",
+      "analysis/disease_modeling/reporting.py": "01f69932efd37aad757576bb27a6cb6a4c10fe426d2606434b8824b055f2bb04",
+      "analysis/disease_modeling/runner.py": "a6a85420984a323d8adbb422274957e4696175ff23d4f2ee4cc677e56de828bb",
+      "analysis/extraction_status.py": "7c9d9b79845815a86fe1c795ff835c607fd61872fa2a0975a7e202404057607a",
+      "analysis/figure_layout.py": "d31d8a4242a4cc0297b59e2c0db1a32f2608767fb3a44761c0ee1120e645bddc",
+      "analysis/layer_configuration.py": "b4fe8ea4d81aec80dceaf3c754d6537a1b9d02e9e50ee58d5812fd23a10f9105",
+      "analysis/outputs.py": "58b066f592d7fb670f44a77ab36d4767304c5428bb6b047b1d7ee086e8759978",
+      "analysis/patient_ids.py": "f75be0ce7faef6c61a10982d303744e6f87fed1089a0b4a6115eb67a8a045cf5",
+      "analysis/pipeline.py": "971688449cc92088a2a4b1793fe35817c021807e16e3bda396632835be570d1d",
+      "analysis/plot_style.py": "33be500beaa1b4223e6a4b043d35b90150046374998761db63fb49fec944e4b3",
+      "analysis/provenance.py": "5d500d7f9576c2f37bf4cabea6eecfd15dc7afbe1d744da157a6f484a5e2ab23",
+      "analysis/repair_inventory_formulas.py": "961ddd238b12ccd079a43e7226eb1741dcc6133766cf21d1599034d6ab81cc42",
+      "analysis/retrospective_controls.py": "4fe1df9a2293a849bb90bddfe22b527dbfe3becc11903f24d62b09c08868b1c6",
+      "analysis/sample_analysis/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "analysis/sample_analysis/adapters.py": "f7761e578035a35b2a48d9a0d7aeb742556646619ecbdc26a7c09bd2255114a5",
+      "analysis/sample_analysis/analyses.py": "892b6be84287e2a9a7eca4fca3e984cccf8e1e774ae1cdea701a95ad0c59afab",
+      "analysis/sample_analysis/blood_counts.py": "86eaba192dc4be5848abe39231bec617a28e6b17977a8959e6c3a613ce82a827",
+      "analysis/sample_analysis/extraction.py": "2599563abf2fd6aa5c8860459f51a37ddb32f5670c17278c26a23c2e911e8c60",
+      "analysis/sample_analysis/longitudinal_trends.py": "77ad0e6c80bfcc22840d3dd3e68cae4552a55b5f65483666791f28a2bdbecca3",
+      "analysis/sample_analysis/migrate_retrospective_blasts.py": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "analysis/sample_analysis/mrd.py": "8e3633ba235a87c03a334768d5171b5e56126550b76dc01ea51cfce11e9e3f7c",
+      "analysis/sample_analysis/policies.py": "6580818fe8d7fb6bcd45ca6e9fbd772d300608113c1d9fd837407f3ee819d19d",
+      "analysis/sample_analysis/pooled.py": "a09fb72a5b7ef9d599d74ead8f786caf6494350e702ab8a282823c70b69d2a74",
+      "analysis/sample_analysis/pooled_mrd.py": "2c7fa2e3801d8b065d4cfb1efae1ac698794de785b77326d53a298e61fa3660d",
+      "analysis/sample_analysis/pooled_trend.py": "3ad95a3bc6b782185c0a04de3b9a890c261bab09579316230484f29199586f5b",
+      "analysis/sample_analysis/preparation.py": "f57db1be4b319e9a9025736fdfd591ae4a80bb539e7bf4ebd43adcc456d5c3cb",
+      "analysis/sample_analysis/reporting.py": "2bdc0ad86be8d986d64ca423da1e2dfdf9059fcaab310f53f78c43a4e1e02fa3",
+      "analysis/sample_analysis/retrospective_blasts.py": "6fc19a6804a2896d5c4fbcd4d8314e78f57ca5d807fbda467ee08190ee3da967",
+      "analysis/sample_analysis/retrospective_mrd.py": "c94db2d23203ebaaf1042da33dce7f85fd0ae54dd4139e1104ac704ad27a3895",
+      "analysis/sample_analysis/runner.py": "ac6c122b50782fd19e9b687c327db4bac7f4cf5b6d8b7b8f0ec49020d1b2cf8d",
+      "analysis/sample_analysis/statistical_plots.py": "7d6fa48feb58f81efe2ffd3550c9ed2406685238c9a670deea27f75913223cd7",
+      "analysis/sample_analysis/statistics.py": "0b450753f191f15c9624171b19d354353a90a36625a1591c2205d062a2cf3302",
+      "analysis/sample_analysis/stats_workbooks.py": "d6ce9e787e7d9f8cd4c0d4c2331e840981a1192800b0df3c94ea5597e92d3c58",
+      "analysis/sample_analysis/yield_wbc_panel.py": "8f64c8ef4c1ecbae018cbdd63e7e6cf012434155491d935f968127ad716f82e9",
+      "analysis/sample_annotations.py": "596b383a928bc43c5b29067669c899522ecee9f4e1cd4f3c2be97d498ffdf929",
+      "analysis/sample_definitions.py": "cf07074ee6c80109ab18092adcb2865d7c68f23187e9ad7d4508f0b7fd1d66ab",
+      "analysis/sample_io.py": "13331f3946ecfed342fe64e225543a24ce68f8b534ef562c8824e65fc2798063",
+      "analysis/sample_statistics/__init__.py": "372043b4af29d8f85de2d74696399c0c98c0b19c8b41b5a2c86ad164fdcf2a54",
+      "analysis/sample_statistics/__main__.py": "74fff10eb2bd330c92909b27a5a9ae84f41b3f268a5c04f51f849276919f19c6",
+      "analysis/sample_statistics/comparisons.py": "70b7db073b9a902aa8cceeaae668c774971dc89e30d1110d65aca1e01e691ade",
+      "analysis/sample_statistics/core.py": "f2f41ce5e44e6870b194495260b580e517b0f9290191653bbb5f4294ef5c0a2b",
+      "analysis/sample_statistics/reporting.py": "375bcfbb44d4a2a86930171e6350bd32f47daff957123b2f821bcc2f98e1cf4c",
+      "analysis/sample_statistics/runner.py": "010125cd3490f7df1d78ac4488caf2accf588d7888a1e075a60fbd5472e8062f",
+      "analysis/source_state.py": "5234bd1f206ad20bfe5013efaa790072c0b4d7ca5fdb4ad3d3b127520fb4c5c7",
+      "analysis/validation/__init__.py": "8a37afb6465a6dfbed5855615893b80826f4610d52fab6f9f500d6dd4b474320",
+      "analysis/validation/compare_integrated.py": "28e66184aaca1190bd3a8f8e6fc0f746b2994d6eb696662d08faeedd4fdc3abb",
+      "analysis/validation/validate_advanced_analysis.py": "7107637b48d4f76de571dbc9a958f35c37ce0a000e723549e62eac9ef02063df",
+      "analysis/validation/validate_associations.py": "09a2685cea2c2adf87da3bdf92af5a9b3a0bbccdd2c920bd4c21e2c9f6430d74",
+      "analysis/validation/validate_canonical.py": "20069a45712f135fee822763c2863a16b60e6ee65b3cadbbec7022392b744874",
+      "analysis/validation/validate_disease_modeling.py": "73b4d988696a94d0fc42052417bfb56054f388d0edd86a04f78aa11624197598",
+      "analysis/validation/validate_longitudinal_trends.py": "e7be015d048e4de6ab1029e5268edef4358ea274568f5118bdbe73045cbd0b3c",
+      "analysis/workbook_cleanup.py": "1e7332972e5db70ffbbef1e052405663040558f6df8961c370cc28d04043c101",
+      "analysis/workbook_harmonization.py": "5d68c9b60e1011eb8b5c9d249c5f420a27e5f3110a1819103a2b846cbde95f25",
+      "analysis/worker.py": "1c01842159404f984bbdf00b37019de76e7c92d01c16d72015bde58813b41f1a",
+      "run.py": "abe587a111596154afb7d98b755e7e9a8c34c58464e0fedba5af66269a760a8d",
+      "run_all_layers.sh": "f6551527e4b01aede68612b9ff564e551c60caf33d6edefd6c18a3c0bc6b6901"
+    },
+    "scientific_contract": {
+      "id": "pipeline",
+      "version": 1,
+      "path": "docs/workflow_contracts.md",
+      "sha256": "0c2f5d17db1997e7e6697d4af949d3cd4609a9dc8b471450c151a2ff203787d0"
+    },
+    "inputs": {
+      "configuration": {
+        "path": "/home/arnohoutman/projects/pre_analysis/outputs/workflow_retirement_20261008/profiles/clinical_current.json",
+        "sha256": "c3bbbb41fbb881188516031924c1b6a812fb79b7e71575eee9134e9e2565979c"
+      }
+    },
+    "workflows": [
+      {
+        "workflow": "data_integrity",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_inventaire_retrospective_05102026.xlsx",
+            "sha256": "32cbbf9ef6b20fe5c10514fb3fffab2a04dfda8f3c3da4896963cad903ccb530"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/inventaire_CIRCALL_07102026.xlsx",
+            "sha256": "e89208ec81d68315a4e7db65762f681dce521ce69b914dd6e815885a4cc56c6b"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_donors.xlsx",
+            "sha256": "21b1f5d20ad9ba7248c1bc92597a6fabf4bee9660164993dd89cc4ef40b8742f"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "0e5ff48c310c3f0676ef64667bcf827ec6b7fc3d07a442e7d77efce82b60c589",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "sample_statistics",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_inventaire_retrospective_05102026.xlsx",
+            "sha256": "32cbbf9ef6b20fe5c10514fb3fffab2a04dfda8f3c3da4896963cad903ccb530"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/inventaire_CIRCALL_07102026.xlsx",
+            "sha256": "e89208ec81d68315a4e7db65762f681dce521ce69b914dd6e815885a4cc56c6b"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_donors.xlsx",
+            "sha256": "21b1f5d20ad9ba7248c1bc92597a6fabf4bee9660164993dd89cc4ef40b8742f"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/sample_statistics.json",
+            "sha256": "b67c27d8388135d942c1691d775a2452999785c287480c8537d3a2a1206d38cb"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "0efc0dd38fc1e8e47cdba7c842fd85400b0edba183e22351427fcf73a015d60b",
+        "quality_status": "no_issues_detected"
+      },
+      {
+        "workflow": "advanced_analysis",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_inventaire_retrospective_05102026.xlsx",
+            "sha256": "32cbbf9ef6b20fe5c10514fb3fffab2a04dfda8f3c3da4896963cad903ccb530"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/inventaire_CIRCALL_07102026.xlsx",
+            "sha256": "e89208ec81d68315a4e7db65762f681dce521ce69b914dd6e815885a4cc56c6b"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_donors.xlsx",
+            "sha256": "21b1f5d20ad9ba7248c1bc92597a6fabf4bee9660164993dd89cc4ef40b8742f"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/advanced_analysis.json",
+            "sha256": "73b4bf2f9471f16c38afe26251f2b9097886b023d6835acd714878572682656b"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "05eac598bb3f3a2dcd0ce11ea4c8646ee999773b75c6a69a92a3f7e77c118788",
+        "quality_status": "review_needed"
+      },
+      {
+        "workflow": "disease_modeling",
+        "inputs": {
+          "rules": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/data_integrity.json",
+            "sha256": "19a55b14a0a243d351f487ca46565f17915dc6b7f05d9b80d89a868fa9d57263"
+          },
+          "definitions": {
+            "path": "/home/arnohoutman/projects/pre_analysis/configs/definitions/disease_modeling.json",
+            "sha256": "18d7d87a7f697ff06e3b85170f9713ccfded6976a2d92a2a4a03dac861d4f30a"
+          },
+          "method_provenance": {
+            "path": "/home/arnohoutman/projects/pre_analysis/analysis/disease_modeling/method_provenance.json",
+            "sha256": "cb9a0f99fb3c8d77843fda7e08667cad56bdbc97ddd404278534cab852bc25ab"
+          },
+          "retrospective": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_inventaire_retrospective_05102026.xlsx",
+            "sha256": "32cbbf9ef6b20fe5c10514fb3fffab2a04dfda8f3c3da4896963cad903ccb530"
+          },
+          "retrospective_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/retrospective_blast_count_01102026.xlsx",
+            "sha256": "87334a6e3f9a3d2638a1c4b10ba0a12afad1f3f2b78a05911c0c3c5a9e9c758b"
+          },
+          "circall": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/inventaire_CIRCALL_07102026.xlsx",
+            "sha256": "e89208ec81d68315a4e7db65762f681dce521ce69b914dd6e815885a4cc56c6b"
+          },
+          "circall_counts": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/CIRCALL_wbc_blast_count_01102026.xlsx",
+            "sha256": "4b7a3c2fc035e1ba762da716cf6b8f4fbd08c288775a696737331ff0a9bdb388"
+          },
+          "retrospective_controls": {
+            "path": "/home/arnohoutman/projects/pre_analysis/input/cfDNA_donors.xlsx",
+            "sha256": "21b1f5d20ad9ba7248c1bc92597a6fabf4bee9660164993dd89cc4ef40b8742f"
+          }
+        },
+        "environment_lock_sha256": "70de34c27eed519d21b201ecd343e306d256454632060b86cbcbbbf54be6550d",
+        "resolved_settings_sha256": "f2ea8a066f7bb896b5fb7b17a0dd6f88b11e73b642a2d916215f76292d3219f6",
+        "quality_status": "errors_found"
+      }
+    ]
+  }
+}

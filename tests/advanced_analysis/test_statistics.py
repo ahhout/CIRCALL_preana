@@ -3,13 +3,12 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 import pytest
-from statsmodels.stats.multitest import multipletests
 
-from analysis.advanced_analysis.statistics import analyze, pairs
+from analysis.advanced_analysis.statistics import analyze_outcome as analyze, pairs
 from analysis.advanced_analysis.reporting import figure, workbook, validate_workbook, COLORS
-from analysis.cfdna_associations import analyze_blast_cfdna as engine
-from tests.cfdna_associations.test_analyze_blast_cfdna import toy_cohort
-from .test_preparation import D
+from analysis import association_methods as engine
+from tests.fixtures.associations import toy_cohort
+from tests.fixtures.advanced_analysis import D
 
 
 def args(**changes):
@@ -29,7 +28,7 @@ def frame():
     return f
 
 
-def test_engine_equivalence_complete_pairs_bh_and_spearman():
+def test_engine_equivalence_complete_pairs_unadjusted_and_spearman():
     f = frame()
     f.loc[:2, 'age_diag'] = np.nan
     f['gb_per_l'] = np.nan
@@ -42,7 +41,7 @@ def test_engine_equivalence_complete_pairs_bh_and_spearman():
         actual = next(r for r in result['tables']['Associations'] if r['predictor'] == p.variable)
         assert actual['n'] == len(data)
         if model is None:
-            assert actual['status'] == 'skipped' and actual['p_adj_bh'] is None
+            assert actual['status'] == 'skipped' and 'p_adj_bh' not in actual
             fitted[p.variable] = 1.
         elif p.kind == 'continuous':
             expected = table.loc[table.term.eq(p.variable)].iloc[0]
@@ -54,10 +53,8 @@ def test_engine_equivalence_complete_pairs_bh_and_spearman():
             assert actual['term'] == 'overall predictor' and actual['coefficient'] is None
             assert actual['p_value'] == pytest.approx(table.f_p_value.iat[0])
             fitted[p.variable] = actual['p_value']
-    adjusted = dict(zip(fitted, multipletests(list(fitted.values()), method='fdr_bh')[1]))
     for row in result['tables']['Associations']:
-        if row['status'] == 'fit':
-            assert row['p_adj_bh'] == pytest.approx(adjusted[row['predictor']])
+        assert 'p_adj_bh' not in row
     primary = next(r for r in result['tables']['Associations'] if r['predictor'] == 'peripheral_blast_percent')
     p = engine.select_predictors()[0]
     for key, value in engine.spearman_sensitivity(pairs(f, p), p).items():
@@ -88,7 +85,7 @@ def test_estimability_reasons_and_points(kind):
         assert fig is None
     else:
         assert fig.axes[0].get_yscale() == 'log'
-        assert any('Fit unavailable' in t.get_text() for t in fig.texts)
+        assert not fig.texts and fig.axes[0].get_title() == ''
         import matplotlib.pyplot as plt
         plt.close(fig)
 
@@ -121,8 +118,14 @@ def test_pooling_units_colors_and_no_inference():
     fig = figure(both, p, None, coverage[p.variable], None, 'pooled', a, D)
     assert len(fig.axes[0].collections) == 2
     assert all(c in COLORS for c in ('retrospective', 'circall'))
+    from matplotlib.colors import to_rgba
+    from analysis.plot_style import COHORT_COLORS
+    for collection, cohort in zip(fig.axes[0].collections, ['circall', 'retrospective'], strict=True):
+        assert np.allclose(collection.get_facecolors()[0][:3], to_rgba(COHORT_COLORS[cohort])[:3])
     assert fig.axes[0].get_ylabel() == 'cfDNA concentration (ng/mL plasma)'
-    assert 'Plasma · Diagnosis patient samples' in fig.axes[0].get_title()
+    assert fig.axes[0].get_title() == '' and not fig.texts
+    assert [t.get_text() for t in fig.axes[0].texts] == [f'n={len(both)}']
+    assert all('(n=' not in t.get_text() for t in fig.axes[0].get_legend().get_texts())
     import matplotlib.pyplot as plt
     plt.close(fig)
 
@@ -160,9 +163,12 @@ def test_backtransformed_fitted_curve_and_historical_box_scale():
 
 
 @pytest.mark.parametrize('scope', ['retrospective', 'circall', 'pooled'])
-@pytest.mark.parametrize('variable', ['gb_per_l', 'tumor_fraction_percent'])
+@pytest.mark.parametrize('variable', ['gb_per_l', 'tumor_fraction_percent', 'dna_concentration_ng_per_ul'])
 def test_log_log_display_preserves_zero_in_analysis(scope, variable):
     f = frame()
+    if variable == 'dna_concentration_ng_per_ul':
+        f[variable] = np.linspace(1, 100, len(f))
+        f[variable+'_sample_n'] = 1
     f.loc[0, variable] = 0
     if scope == 'circall':
         f['cohort'] = 'circall'
@@ -173,8 +179,9 @@ def test_log_log_display_preserves_zero_in_analysis(scope, variable):
         cohorts = dict(retrospective=f, circall=circ)
         f = pd.concat([f, circ], ignore_index=True)
     a = args(predictors=[variable])
-    result, models, _ = analyze(f, scope, a, D, cohorts=cohorts)
-    p = next(p for p in engine.PREDICTORS if p.variable == variable)
+    from analysis.advanced_analysis.schema import predictors
+    p = next(p for p in predictors(D) if p.variable == variable)
+    result, models, _ = analyze(f, scope, a, D, cohorts=cohorts, selected_predictors=(p,))
     cov = next(r for r in result['tables']['Coverage'] if r['predictor'] == variable)
     association = result['tables']['Associations'][0] if scope != 'pooled' else None
     assert cov['analysis_patients'] == len(f)
@@ -182,7 +189,7 @@ def test_log_log_display_preserves_zero_in_analysis(scope, variable):
     ax = fig.axes[0]
     assert ax.get_xscale() == ax.get_yscale() == 'log'
     assert sum(len(c.get_offsets()) for c in ax.collections if hasattr(c, 'get_offsets') and c.__class__.__name__ == 'PathCollection') == int(f[variable].gt(0).sum())
-    assert any('retained in tables/models' in t.get_text() for t in fig.texts)
+    assert not fig.texts and ax.get_title() == ''
     grid = ax.lines[0].get_xdata()
     assert np.all(grid > 0) and np.allclose(np.diff(np.log10(grid)), np.diff(np.log10(grid))[0])
     if scope != 'pooled':

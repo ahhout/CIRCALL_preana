@@ -1,3 +1,5 @@
-from .runner import main
+"""Retired public single-layer command; internal workers remain supported."""
+import sys
 
-raise SystemExit(main())
+print("Single-layer execution is retired; use python3 run.py to run all four layers.", file=sys.stderr)
+raise SystemExit(2)

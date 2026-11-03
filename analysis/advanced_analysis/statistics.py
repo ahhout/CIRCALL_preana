@@ -3,16 +3,9 @@ import math
 
 import numpy as np
 import pandas as pd
-from statsmodels.stats.multitest import multipletests
 
 from analysis import association_methods as engine
-
-
-DEFERRED = {
-    'peripheral_blast_count': 'No approved absolute peripheral blast source; not derived from WBC',
-    'marrow_blast_count': 'No approved absolute marrow blast source',
-    'hematocrit': 'No approved hematocrit source; Hb is hemoglobin',
-}
+from .schema import comparisons, outcome_frame, predictors
 
 
 def clean(value):
@@ -43,19 +36,22 @@ def unit(variable, scope, args, definitions):
     return definitions['units'][variable]
 
 
-def analyze(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None):
+def analyze_outcome(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None,
+                    selected_predictors=None):
     result = dict(scope=scope, status=status, summary=counts or {}, blocking=blocking or [],
                   tables={k: [] for k in ('Coverage', 'Associations', 'Descriptions', 'Diagnostics')})
     models, residuals = {}, []
-    tested = set(args.predictors) if scope != 'pooled' else set()
-    for p in engine.PREDICTORS:
+    selected_predictors = tuple(engine.PREDICTORS if selected_predictors is None else selected_predictors)
+    tested = ({p.variable for p in selected_predictors} if args.predictors == ['requested'] else set(args.predictors)) if scope != 'pooled' else set()
+    tested &= {p.variable for p in selected_predictors}
+    for p in selected_predictors:
         if status != 'complete':
             available = pd.DataFrame()
             data = pd.DataFrame()
         else:
             available = frame.loc[frame.cfdna_ng_per_ml.notna() & frame[p.variable].notna()]
             data = pairs(frame, p)
-        reason = '' if len(data) else 'No complete positive cfDNA/predictor pairs'
+        reason = '' if len(data) else 'No complete positive outcome/predictor pairs'
         if scope == 'circall' and p.variable in ('sex', 'age_diag'):
             reason = 'Unavailable in CIRCALL; not derived'
         comparable = True
@@ -75,7 +71,7 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
                         contributing_outcome_samples=int(data.outcome_sample_n.sum()) if n else 0,
                         contributing_predictor_records=int(data[p.variable+'_sample_n'].sum()) if n else 0,
                         status='available' if n and comparable else 'unavailable', reason=reason,
-                        inference=('selected hypothesis' if status == 'complete' else 'selected hypothesis; not run') if p.variable in tested else 'descriptive only',
+                        inference=('selected hypothesis; unadjusted p-value' if status == 'complete' else 'selected hypothesis; not run') if p.variable in tested else 'descriptive only',
                         retrospective_analysis_patients=int((data.cohort == 'retrospective').sum()) if n else 0,
                         circall_analysis_patients=int((data.cohort == 'circall').sum()) if n else 0)
         result['tables']['Coverage'].append(coverage)
@@ -91,7 +87,7 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
                         outcome_samples=int(group.outcome_sample_n.sum()), nonpositive_outcomes=int(values.le(0).sum()),
                         median_cfdna_ng_per_ml=values.median(), q1_cfdna_ng_per_ml=values.quantile(.25),
                         q3_cfdna_ng_per_ml=values.quantile(.75), minimum_cfdna_ng_per_ml=values.min(), maximum_cfdna_ng_per_ml=values.max(),
-                        status='descriptive', correlation_scale='log10(cfDNA), positive complete pairs')
+                        status='descriptive', correlation_scale='log10(outcome), positive complete pairs')
             if p.kind == 'continuous':
                 desc.update(predictor_median=group[p.variable].median(), predictor_q1=group[p.variable].quantile(.25), predictor_q3=group[p.variable].quantile(.75))
                 if n >= 2 and data[p.variable].nunique() > 1:
@@ -112,11 +108,11 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
             diag = engine.model_diagnostics(model).iloc[0].to_dict()
             diag['predictor'] = p.variable
             result['tables']['Diagnostics'].append(diag)
-            influence = model.get_influence()
+            leverage, _, cooks = engine.influence_diagnostics(model)
             for i, (_, observation) in enumerate(data.iterrows()):
                 residuals.append(dict(subject_hash=observation.subject_hash, predictor=p.variable,
                                       fitted_log10=float(model.fittedvalues.iloc[i]), residual=float(model.resid.iloc[i]),
-                                      leverage=float(influence.hat_matrix_diag[i]), cooks_distance=float(influence.cooks_distance[0][i])))
+                                      leverage=float(leverage[i]), cooks_distance=float(cooks[i])))
             if p.kind == 'continuous':
                 table = table.loc[table.term.eq(p.variable)].copy()
                 increment = 10.0 if p.variable.endswith('_percent') else 1.0
@@ -136,15 +132,40 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
                 table[key] = value
         row = table.iloc[0].to_dict()
         row.update(inference='Single-predictor association; no covariate adjustment or causal interpretation',
-                   correction='BH across configured predictors within cohort; unavailable p=1 for adjustment only',
-                   family_size=len(tested), contributing_outcome_samples=coverage['contributing_outcome_samples'])
+                   correction='None; unadjusted p-values requested by investigator',
+                   contributing_outcome_samples=coverage['contributing_outcome_samples'])
         result['tables']['Associations'].append(row)
-    tables = result['tables']['Associations']
-    if tables:
-        adjusted = multipletests([r['p_value'] if r['status'] == 'fit' else 1.0 for r in tables], method='fdr_bh')[1]
-        for row, padj in zip(tables, adjusted, strict=True):
-            row['p_adj_bh'] = float(padj) if row['status'] == 'fit' else None
-    for variable, reason in DEFERRED.items():
-        result['tables']['Coverage'].append(dict(cohort=scope, predictor=variable, status='unavailable', analysis_patients=0,
-                                                  inference='unavailable', reason=reason))
     return clean(result), models, clean(residuals)
+
+
+def analyze(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None):
+    """Fit only requested outcome/predictor pairs using one shared sample selection."""
+    result = dict(scope=scope, status=status, summary=dict(counts or {}), blocking=blocking or [],
+                  tables={k: [] for k in ('Coverage', 'Associations', 'Descriptions', 'Diagnostics')})
+    planned = comparisons(definitions, scope)
+    result['summary']['requested_comparisons'] = len(planned)
+    result['summary']['disabled_comparisons'] = len(comparisons(definitions, scope, enabled_only=False)) - len(planned)
+    result['summary']['sample_selection_outcome'] = definitions['outcome']
+    result['summary']['multiplicity_correction'] = 'None; all p-values unadjusted'
+    available = {p.variable: p for p in predictors(definitions)}
+    models, residuals = {}, []
+    for outcome, spec in definitions['outcomes'].items():
+        selected = [available[v] for o, v in planned if o == outcome]
+        if not selected:
+            continue
+        data = outcome_frame(frame, outcome) if status == 'complete' else frame
+        cohort_data = {c: outcome_frame(f, outcome) for c, f in cohorts.items()} if cohorts else None
+        part, fits, diagnostic_rows = analyze_outcome(data, scope, args, definitions, status=status,
+                                                     cohorts=cohort_data, selected_predictors=selected)
+        for name, rows in part['tables'].items():
+            for row in rows:
+                row = {k.replace('_cfdna_ng_per_ml', '_outcome'): v for k, v in row.items()}
+                row.update(outcome=outcome, outcome_unit=spec['unit'], model_scale='log10(outcome)')
+                if 'formula' in row:
+                    row['formula'] = row['formula'].replace('log10_cfDNA', f'log10({outcome})')
+                result['tables'][name].append(row)
+        models.update({f'{outcome}/{variable}': model for variable, model in fits.items()})
+        residuals.extend(dict(row, outcome=outcome) for row in diagnostic_rows)
+    result['summary']['configured_tests'] = sum(row['inference'].startswith('selected hypothesis')
+                                                 for row in result['tables']['Coverage'])
+    return result, models, residuals

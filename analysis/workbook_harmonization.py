@@ -102,7 +102,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--retrospective',type=Path,required=True)
     parser.add_argument('--circall',type=Path,required=True)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/definitions/workbook_harmonization.json')
+    parser.add_argument('--config',type=Path,default=ROOT/'configs/maintenance/workbook_harmonization.json')
     parser.add_argument('--output-dir',type=Path,required=True)
     args=parser.parse_args()
     if args.output_dir.exists():

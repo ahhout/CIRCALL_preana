@@ -1,7 +1,7 @@
 """Shared diagnosis association methods; no workbook preparation or row exports."""
 from __future__ import annotations
+from analysis.figure_layout import remove_plot_text
 
-import argparse
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -77,12 +77,6 @@ def select_predictors(names=None):
         raise ValueError('Predictors must be a nonempty unique selection of supported variables')
     return tuple(available[name] for name in names)
 
-def add_predictor_argument(parser):
-    parser.add_argument('--spearman-sensitivity', action=argparse.BooleanOptionalAction, default=True,
-                        help='Add two-sided approximate Spearman sensitivity for selected peripheral blasts (default: enabled)')
-    parser.add_argument('--predictors', nargs='+', choices=[p.variable for p in PREDICTORS],
-                        default=list(DEFAULT_PREDICTORS),
-                        help='Predictors selected for hypothesis testing; all six retain descriptive analyses and plots')
 
 def prepare_analysis_data(
     cohort: pd.DataFrame, predictor: PredictorConfig
@@ -201,57 +195,120 @@ def fit_regression(
         )
     return model, pd.DataFrame(rows)
 
+def influence_diagnostics(model):
+    """Diagnostic values only where residual variance is numerically defined.
+
+    Unit leverage is possible for singleton categories. A dimension-scaled
+    floating-point tolerance treats rounding around one consistently; it is not
+    an observation exclusion or a model-fitting threshold.
+    """
+    leverage = np.asarray(model.get_influence().hat_matrix_diag)
+    residuals = np.asarray(model.resid)
+    variance = float(model.mse_resid)
+    tolerance = np.finfo(float).eps * max(model.model.exog.shape) * 8
+    valid = np.isfinite(leverage) & (leverage >= 0) & (1 - leverage > tolerance)
+    valid &= np.isfinite(residuals) & np.isfinite(variance) & (variance > 0)
+    standardized = np.full(residuals.shape, np.nan)
+    cooks = np.full(residuals.shape, np.nan)
+    if valid.any():
+        standardized[valid] = residuals[valid] / np.sqrt(variance) / np.sqrt(1 - leverage[valid])
+        cooks[valid] = standardized[valid] ** 2 / model.model.exog.shape[1]
+        cooks[valid] *= leverage[valid] / (1 - leverage[valid])
+    return leverage, standardized, cooks
+
+
 def model_diagnostics(model):
     """Aggregate residual/influence checks; no additional hypothesis tests."""
-    influence = model.get_influence()
-    return pd.DataFrame([dict(status='review', n=int(model.nobs), df_resid=float(model.df_resid),
-        max_leverage=float(np.max(influence.hat_matrix_diag)),
-        max_cooks_distance=float(np.nanmax(influence.cooks_distance[0])),
-        note='Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection')])
+    leverage, standardized, cooks = influence_diagnostics(model)
+    result = dict(status='review', n=int(model.nobs), df_resid=float(model.df_resid),
+        max_leverage=float(np.max(leverage)),
+        max_cooks_distance=float(np.max(cooks[np.isfinite(cooks)])) if np.isfinite(cooks).any() else np.nan,
+        note='Review residual, Q-Q and influence diagnostics; no automatic assumption-test selection')
+    unavailable = int((~np.isfinite(standardized)).sum())
+    if unavailable:
+        result.update(undefined_studentized_residuals=unavailable,
+                      undefined_cooks_distances=int((~np.isfinite(cooks)).sum()))
+        result['note'] += '; unit leverage or unavailable residual variance makes some influence diagnostics undefined; model observations retained'
+    return pd.DataFrame([result])
 
 def _save_figure(figure: plt.Figure, output_path: Path) -> None:
-    from analysis.figure_layout import legends_below
+    from analysis.plot_style import save_figure
+    remove_plot_text(figure)
     figure.tight_layout()
-    legends_below(figure)
-    figure.savefig(output_path, dpi=300, bbox_inches="tight")
+    save_figure(figure, output_path)
     plt.close(figure)
 
-def plot_assumptions(model: object, output_dir: Path) -> None:
+def plot_assumptions(model: object, output_dir: Path, *, outcome_label: str = 'cfDNA', cohort: str | None = None) -> None:
+    from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS, INK, style_axes, save_figure
+    color = COHORT_COLORS[cohort] if cohort else '#2864a5'
+    marker = COHORT_MARKERS[cohort] if cohort else 'o'
+    from analysis.plot_style import scatter_points, point_handles
+    frame = model.model.data.frame
+    centers = (frame.loc[model.model.data.row_labels, 'center'].fillna('unknown').to_numpy()
+               if cohort == 'circall' and 'center' in frame else None)
+    def scatter(axis, x, y, selected=None, **kwargs):
+        if centers is not None:
+            scatter_points(axis, x, y, cohort, centers if selected is None else centers[selected],
+                           circall_only=True, **kwargs)
+        else:
+            axis.scatter(x, y, color=color, marker=marker, **kwargs)
+    def save(figure, path):
+        if cohort:
+            if centers is not None:
+                figure.axes[0].legend(handles=point_handles(cohort,centers,circall_only=True),frameon=False)
+            style_axes(figure.axes[0])
+            figure.tight_layout()
+            save_figure(figure,path)
+            plt.close(figure)
+        else:
+            _save_figure(figure,path)
     fitted = np.asarray(model.fittedvalues)
     residuals = np.asarray(model.resid)
-    standardized = model.get_influence().resid_studentized_internal
+    _, standardized, _ = influence_diagnostics(model)
 
     figure, axis = plt.subplots(figsize=(6.8, 5.0))
-    axis.scatter(fitted, residuals, color="#2864a5", edgecolor="white", alpha=0.85)
+    scatter(axis, fitted, residuals, edgecolor="white", alpha=0.8)
     axis.axhline(0, color="#333333", linewidth=1)
     axis.set(
-        xlabel="Fitted log10(cfDNA)",
+        xlabel=f"Fitted log10({outcome_label})",
         ylabel="Residuals",
         title="Residuals vs fitted values",
     )
     axis.grid(alpha=0.2)
-    _save_figure(figure, output_dir / "residuals_vs_fitted.png")
+    save(figure, output_dir / "residuals_vs_fitted.png")
 
     figure = sm.qqplot(residuals, line="45", fit=True)
     axis = figure.axes[0]
     axis.set_title("Q-Q plot of residuals")
-    _save_figure(figure, output_dir / "qq_plot.png")
+    if cohort:
+        axis.lines[0].set(color=color,marker=marker,markeredgecolor='white',alpha=.8)
+        axis.lines[1].set(color=INK,linewidth=1)
+        if centers is not None:
+            qq = axis.lines[0]
+            x, y = qq.get_xdata(), qq.get_ydata()
+            qq.set_visible(False)
+            scatter(axis, x, y, selected=np.argsort(residuals), edgecolor='white', alpha=.8)
+    save(figure, output_dir / "qq_plot.png")
 
     figure, axis = plt.subplots(figsize=(6.8, 5.0))
-    axis.scatter(
-        fitted,
-        np.sqrt(np.abs(standardized)),
-        color="#2864a5",
+    usable = np.isfinite(standardized)
+    scatter(
+        axis, fitted[usable],
+        np.sqrt(np.abs(standardized[usable])),
+        selected=usable,
         edgecolor="white",
         alpha=0.85,
     )
+    if not usable.all():
+        axis.text(.02, .98, f'Undefined studentized residuals: {int((~usable).sum())}; model observations retained',
+                  transform=axis.transAxes, va='top', fontsize=8, wrap=True)
     axis.set(
-        xlabel="Fitted log10(cfDNA)",
+        xlabel=f"Fitted log10({outcome_label})",
         ylabel="sqrt(|standardized residuals|)",
         title="Scale-location plot",
     )
     axis.grid(alpha=0.2)
-    _save_figure(figure, output_dir / "scale_location.png")
+    save(figure, output_dir / "scale_location.png")
 
 def spearman_sensitivity(analysis, predictor):
     """Two-sided rank sensitivity on the same complete patient pairs as OLS."""

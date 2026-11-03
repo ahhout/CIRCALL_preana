@@ -62,11 +62,60 @@ def test_circall_patient_metadata_independent_of_source_visit(tmp_path):
         mrd.prepare(path, 'circall', D, duplicate_policy='worst')
 
 
-def test_circall_positive_nq_remains_blocked_by_investigator_decision(tmp_path):
+@pytest.mark.parametrize('label,sensitivity', [('Positive NQ <5.10-5', 5e-5),
+    ('Positive NQ <10-4', 1e-4), ('Positive NQ <10-5', 1e-5),
+    ('pos NQ <2,5e-5', 2.5e-5), ('  POSITIVE  NQ < 10^-4 ', 1e-4), ('pos NQ', None)])
+def test_circall_positive_nq_preserves_sensitivity_without_measurement(tmp_path, label, sensitivity):
     path = tmp_path/'source.xlsx'
-    inventory(path, 'circall', [dict(circall_id='001-9001-X-Z', MRD_TP1='pos NQ <10-4')])
-    with pytest.raises(ClinicalError, match='invalid_mrd_annotation'):
+    inventory(path, 'circall', [dict(circall_id='001-9001-X-Z', MRD_TP1=label)]*2)
+    data, coverage = mrd.prepare(path, 'circall', D, duplicate_policy='worst')
+    nq = next(r for r in data if r['status'] == 'positive_nonquantifiable')
+    assert coverage['retained_patients'] == 1
+    assert nq['reported_sensitivity_fraction'] == sensitivity
+    assert nq['upper_bound_fraction'] is None and nq['measured_fraction'] is None
+    assert nq['measured_log10_reduction'] is None
+    row = next(r for r in mrd.summary(data, D['pooled_visits']) if r['visit'] == 'TP1')
+    assert row['positive_nonquantifiable'] == 1 and row['positive_nq_with_bound'] == 0
+    assert row['positive_nq_with_sensitivity'] == int(sensitivity is not None)
+    assert row['reported_sensitivity_counts'] == ([] if sensitivity is None else [dict(fraction=sensitivity, patients=1)])
+
+
+@pytest.mark.parametrize('value', ['Positive NQ <0', 'Positive NQ <2', 'Positive NQ <nan',
+    'Positive NQ <bad', 'Positive NQ <', 'unsupported annotation'])
+def test_circall_invalid_annotations_still_block(value):
+    with pytest.raises(ClinicalError):
+        mrd.parse_annotation(value, 'circall', D)
+
+
+def test_circall_conflicting_nq_sensitivities_still_block(tmp_path):
+    path = tmp_path/'source.xlsx'
+    inventory(path, 'circall', [dict(circall_id='001-9001-X-Z', MRD_TP1=v)
+                               for v in ['Positive NQ <10-4', 'Positive NQ <10-5']])
+    with pytest.raises(ClinicalError, match='conflicting_mrd_metadata'):
         mrd.prepare(path, 'circall', D, duplicate_policy='worst')
+
+
+def test_circall_nq_sensitivity_is_not_a_trajectory_measurement(tmp_path):
+    paths = sources(tmp_path)
+    inventory(paths['circall'], 'circall', [dict(circall_id='001-9001-X-Z',
+              MRD_TP1='Positive NQ <5.10-5', MRD_TP2=.001)])
+    a = arguments(cli(paths))
+    evaluated = {c: evaluate(c, a, D, load_rules(a.rules)) for c in ('retrospective', 'circall')}
+    result, prepared, _ = evaluated['circall']
+    assert result['status'] == 'complete'
+    fig = reporting.mrd_figure(prepared['mrd'], 'circall', a, D)
+    assert sorted(float(c.get_offsets()[0, 1]) for c in fig.axes[0].collections) == [.001, 1.]
+    assert not fig.axes[0].lines
+    assert 'Positive NQ: counted, not positioned' in [t.get_text() for t in fig.axes[0].get_legend().get_texts()]
+    plt.close(fig)
+    pooled, prepared = combined_results(evaluated, a, D)['pooled']
+    assert pooled['status'] == 'complete'
+    nq = next(r for r in prepared['mrd'] if r['status'] == 'positive_nonquantifiable')
+    assert nq['reported_sensitivity_fraction'] == 5e-5 and nq['measured_fraction'] is None
+    fig = reporting.mrd_figure(prepared['mrd'], 'pooled', a, D)
+    values = [float(c.get_offsets()[0, 1]) for c in fig.axes[0].collections]
+    assert a.mrd_positive_nq_level in values and 5e-5 not in values
+    plt.close(fig)
 
 
 @pytest.mark.parametrize('drop,duplicate', [(['MRD_IgTCR'], None), ([], 'patient_id')])
@@ -127,13 +176,14 @@ def test_pool_denominators_figure_positions_and_zeros(tmp_path):
     assert not pooled['tables']['Counts'] and pooled['tables']['Models'][0]['status'] == 'disabled'
     fig = reporting.mrd_figure(prepared['mrd'], 'pooled', a, D)
     assert fig.axes[0].get_yscale() == 'log'
-    assert any('assumed reference' in t.get_text() for t in fig.texts)
+    assert not fig.texts and fig.axes[0].get_title() == ''
+    assert all('(n=' not in t.get_text() for t in fig.axes[0].get_legend().get_texts())
     plt.close(fig)
     data = evaluated['retrospective'][1]['counts']
     fig = reporting.count_figure(data, 'blast', a, D)
-    assert fig.axes[0].get_yscale() == 'log' and 'Full recorded range' in fig.axes[0].get_title()
+    assert fig.axes[0].get_yscale() == 'log' and fig.axes[0].get_title() == ''
     assert max(fig.axes[0].lines[0].get_xdata()) == 29
-    assert any('zeros omitted (1)' in t.get_text() for t in fig.texts)
+    assert not fig.texts
     plt.close(fig)
 
 

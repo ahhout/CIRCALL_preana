@@ -7,12 +7,12 @@ import subprocess
 import pytest
 
 from analysis.provenance import ROOT, digest
-from tests.advanced_analysis.test_execution import sources as association_sources
+from tests.fixtures.advanced_analysis import sources as association_sources
 from tests.disease_modeling.fixtures import sources as disease_sources, inventory
 
 
 @pytest.mark.parametrize('blocked', [False, True])
-def test_all_layers_standalone_and_integrated_without_older_packages(tmp_path, blocked):
+def test_single_launcher_bootstrapped_and_activated_without_older_packages(tmp_path, blocked):
     isolated = tmp_path/'retained_repository'
     isolated.mkdir()
     excluded = ('sample_analysis', 'cfdna_associations', 'blast_kinetics')
@@ -21,7 +21,6 @@ def test_all_layers_standalone_and_integrated_without_older_packages(tmp_path, b
     for folder in ('configs', 'environments', 'docs'):
         shutil.copytree(ROOT/folder, isolated/folder)
     shutil.copyfile(ROOT/'run.py', isolated/'run.py')
-    shutil.copyfile(ROOT/'run_all_layers.sh', isolated/'run_all_layers.sh')
     assert not any((isolated/'analysis'/name).exists() for name in excluded)
     assoc_dir, disease_dir = tmp_path/'association_sources', tmp_path/'disease_sources'
     assoc_dir.mkdir()
@@ -44,32 +43,37 @@ def test_all_layers_standalone_and_integrated_without_older_packages(tmp_path, b
     env = dict(os.environ, PYTHONPATH=str(isolated), PYTHONDONTWRITEBYTECODE='1',
                MPLBACKEND='Agg', MPLCONFIGDIR=str(tmp_path/'mpl'))
 
-    def run(*args, expected=0, shell=False):
-        command = ['bash', str(isolated/'run_all_layers.sh'), *args] if shell else [
+    def run(*args, expected=0, bootstrap=False):
+        command = ['/usr/bin/python3', str(isolated/'run.py'), *args] if bootstrap else [
             'conda', 'run', '--no-capture-output', '-n', 'pre_analysis', 'python', '-B', *args]
-        result = subprocess.run(command, cwd=isolated, env=env,
+        execution_env = dict(env)
+        if bootstrap:
+            # Model a genuinely unactivated shell, not an inconsistent partial activation.
+            for key in list(execution_env):
+                if key.startswith('CONDA_') or key.startswith('_CE_') or key == 'PRE_ANALYSIS_CONDA_BOOTSTRAP':
+                    execution_env.pop(key)
+            execution_env['CONDA_EXE'] = shutil.which('conda')
+        result = subprocess.run(command, cwd=isolated, env=execution_env,
                                 text=True, capture_output=True, check=False)
         assert result.returncode == expected, result.stdout+result.stderr
 
     master = isolated/'master'
-    run('--output-dir', str(master), '--validate-only', shell=True, expected=int(blocked))
+    run('--output-dir', str(master), '--validate-only', bootstrap=True, expected=int(blocked))
     assert not master.exists()
-    # Standalone module CLIs are exercised independently of master dispatch.
-    for entry in entries:
-        args = [item for key, value in entry['options'].items() for item in ('--'+key, value)]
-        run('-m', 'analysis.'+entry['name'], *args,
-            '--output-dir', str(isolated/entry['name']),
-            expected=int(blocked and entry['name'] == 'disease_modeling'))
+    reference = isolated/'reference'
+    run('run.py', '--output-dir', str(reference), '--validate-only', expected=int(blocked))
+    run('run.py', '--output-dir', str(reference), expected=int(blocked))
     if blocked:
-        run('--output-dir', str(master), shell=True, expected=1)
+        run('--output-dir', str(master), bootstrap=True, expected=1)
     else:
-        # Default Python execution must select the same layered profile as the shell.
-        run('run.py', '--output-dir', str(master))
+        # Bootstrap and already-activated execution must select the same profile.
+        run('--output-dir', str(master), bootstrap=True)
     manifest = json.loads((master/'.audit/run_manifest.json').read_text())
     assert manifest['status'] == ('failed' if blocked else 'complete')
     assert len(manifest['run_id']) == 32
     assert manifest['pipeline_kind'] == 'layered'
-    assert manifest['code_sha256']['run_all_layers.sh'] == digest(isolated/'run_all_layers.sh')
+    assert manifest['code_sha256']['run.py'] == digest(isolated/'run.py')
+    assert 'run_all_layers.sh' not in manifest['code_sha256']
     assert all(w['status'] == 'complete' for w in manifest['workflows'])
     if blocked:
         assert all(w['quality_status'] != 'errors_found' for w in manifest['workflows'][:3])
@@ -82,7 +86,7 @@ def test_all_layers_standalone_and_integrated_without_older_packages(tmp_path, b
     directories = {'data_integrity':'01_data_integrity', 'sample_statistics':'02_sample_statistics',
                    'advanced_analysis':'03_advanced_analysis', 'disease_modeling':'04_disease_modeling'}
     for entry in entries:
-        standalone = isolated/entry['name']
+        standalone = reference
         directory = directories[entry['name']]
         # Compare report contents and PNGs, not ZIP timestamps in Excel containers.
         for p in (standalone/'.audit/workflows'/directory).rglob('*.json'):
@@ -90,9 +94,8 @@ def test_all_layers_standalone_and_integrated_without_older_packages(tmp_path, b
                 continue
             relative = p.relative_to(standalone)
             assert json.loads(p.read_text()) == json.loads((master/relative).read_text())
-        for p in standalone.rglob('*.png'):
-            if '.audit' not in p.relative_to(standalone).parts:
-                assert digest(p) == digest(master/directory/p.relative_to(standalone))
+        for p in (standalone/directory).rglob('*.png'):
+            assert digest(p) == digest(master/p.relative_to(standalone))
         index = json.loads((standalone/'.audit/artifact_index.json').read_text())
         assert all(digest(standalone/a['path']) == a['sha256'] for a in index['artifacts'])
     index = json.loads((master/'.audit/artifact_index.json').read_text())

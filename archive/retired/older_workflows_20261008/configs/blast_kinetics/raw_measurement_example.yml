@@ -1,0 +1,120 @@
+schema_version: 1
+
+run:
+  name: percent_blast_raw_example
+
+input:
+  path: ../../input/retrospective_blast_count_01102026.xlsx
+  format: excel
+  sheet: blast
+  delimiter: ","
+  decimal: ","
+
+columns:
+  subject: lastname
+  time: day
+  value: percent_blast
+  group: subtype
+
+measurement:
+  name: Raw blast percentage
+  unit: percent
+
+time:
+  minimum: 1
+  maximum: 15
+  tick_step: 1
+  minimum_measurements: 2
+
+normalization:
+  mode: none
+  baseline_time: null
+  output_baseline: null
+  missing_baseline_policy: exclude
+  nonpositive_baseline_policy: exclude
+
+grouping:
+  require_constant_per_subject: true
+  unknown_policy: auto
+  aliases:
+    B Other: B-Other
+    HeH: Hyperdiploidy
+    IGH::DUX4: DUX4-r
+    KMT2A: KMT2A-r
+    KMT2A::AFF1: KMT2A-r
+    PAX5 altered: PAX5alt
+    T Other: T-Other
+  colors: {}
+
+bootstrap:
+  confidence: 0.95
+  resamples: 2000
+  minimum_observations: 2
+  seed: 42
+
+analysis:
+  winsorization:
+    enabled: false
+    lower_limit: 0.0
+    upper_limit: 0.0
+  model:
+    enabled: false
+    time_origin: 1
+    response_transform: none
+    log_offset: 0.0
+    anchor_at_baseline: false
+
+plots:
+  scatter:
+    enabled: true
+    title: ""
+    x_label: Day
+    y_label: "{measurement_name} ({unit})"
+    y_scale: linear
+    y_limits: null
+    y_ticks: null
+    detection_limit: 0.01
+    width: 12
+    height: 6
+    dpi: 300
+    title_fontsize: 16
+    label_fontsize: 14
+    legend_title: Group
+    legend_fontsize: 11
+    marker_size: 45
+    marker_alpha: 0.7
+    marker_edge_color: black
+    marker_edge_width: 0.3
+    jitter: 0.15
+    jitter_seed: 42
+    ci_color: black
+    ci_alpha: 0.18
+  model:
+    enabled: false
+    title: ""
+    x_label: Day
+    y_label: "{measurement_name} ({unit})"
+    y_scale: linear
+    y_limits: null
+    y_ticks: null
+    detection_limit: 0.01
+    width: 10
+    height: 6
+    dpi: 300
+    title_fontsize: 16
+    label_fontsize: 14
+    legend_fontsize: 11
+    legend_columns: 4
+    marker_size: 30
+    marker_alpha: 0.8
+    marker_edge_color: white
+    marker_edge_width: 0.5
+    jitter: 0.1
+    jitter_seed: 42
+    trend_color: black
+    trend_marker: o
+    trend_marker_size: 6
+    trend_label: Mixed-model trend
+
+output:
+  root: ../../output
