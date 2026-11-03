@@ -1,22 +1,16 @@
-"""Aggregate Excel reports and original-unit semilog clinical figures."""
-from analysis.figure_layout import remove_plot_text
+"""Aggregate Excel reports and coordination of internal association figures."""
 import json
 from pathlib import Path
-import textwrap
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.cbook import boxplot_stats
-from matplotlib.ticker import FuncFormatter
 import numpy as np
-import pandas as pd
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from analysis.figure_layout import legends_below
-from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS, COHORT_LABELS, BOX_STYLE, INK, style_axes, save_figure
-from .statistics import pairs
+from analysis.plot_style import COHORT_COLORS, save_figure
+from .figures import figure
 from .schema import outcome_frame, predictors
 
 COLORS = COHORT_COLORS
@@ -103,108 +97,6 @@ def validate_workbook(path, result, definitions):
                 raise ValueError('Published workbook must contain literal aggregate results')
     finally:
         book.close()
-
-
-def figure(frame, predictor, model, coverage, association, scope, args, definitions, *, outcome='cfdna_ng_per_ml_plasma'):
-    from analysis.plot_style import scatter_points, point_handles
-    data = pairs(frame, predictor)
-    centers = lambda part: part['center'].fillna('unknown') if 'center' in part else ['unknown']*len(part)
-    if not len(data) or coverage['status'] != 'available':
-        return None
-    log_x = predictor.variable in definitions['rules']['log_x_predictors']
-    displayed = data.loc[data[predictor.variable].gt(0)] if log_x else data
-    category_n = data[predictor.variable].nunique() if predictor.kind == 'categorical' else 0
-    fig, ax = plt.subplots(figsize=(8.4 if predictor.kind == 'continuous' else max(10, category_n*1.1), 6))
-    if predictor.kind == 'continuous':
-        for cohort, group in data.groupby('cohort', sort=True):
-            points = group.loc[group[predictor.variable].gt(0)] if log_x else group
-            scatter_points(ax, points[predictor.variable], points.cfdna_ng_per_ml, cohort, centers(points),
-                       circall_only=scope=='circall',
-                       edgecolor='white', linewidths=.5, alpha=.8, s=38, zorder=3,
-                       label=COHORT_LABELS[cohort] if scope == 'pooled' else f'{COHORT_LABELS[cohort]} patients (n={len(group)})')
-        if displayed[predictor.variable].nunique() > 1:
-            grid = (np.geomspace if log_x else np.linspace)(displayed[predictor.variable].min(), displayed[predictor.variable].max(), 200)
-            if model is not None:
-                inference = model.get_robustcov_results(cov_type='HC3') if predictor.robust_se else model
-                prediction = inference.get_prediction(pd.DataFrame({predictor.variable: grid})).summary_frame(alpha=.05)
-                with np.errstate(over='ignore'):
-                    mean, low, high = [np.power(10., prediction[c].to_numpy()) for c in ('mean', 'mean_ci_lower', 'mean_ci_upper')]
-                usable = np.isfinite(low) & np.isfinite(high) & (low > 0)
-                ax.plot(grid, mean, color=INK, linewidth=2, label='Fitted single-predictor association')
-                if usable.any():
-                    ax.fill_between(grid, low, high, where=usable, color='#8795A1', alpha=.18, label='Ordinary 95% confidence interval')
-            elif len(data) >= 2:
-                slope, intercept = np.polyfit(data[predictor.variable], data.log10_cfDNA, 1)
-                ax.plot(grid, np.power(10., intercept+slope*grid), color=INK, linewidth=2, label='Descriptive linear trend on log10 scale')
-    else:
-        rng = np.random.default_rng(definitions['rules']['jitter_seed'])
-        categories = sorted(data[predictor.variable].astype(str).unique())
-        for pos, category in enumerate(categories, 1):
-            group = data.loc[data[predictor.variable].astype(str).eq(category)]
-            # Compute the historical boxes on log10 values, then change coordinates.
-            box = boxplot_stats(group.log10_cfDNA.to_numpy())[0]
-            for key in ('mean', 'med', 'q1', 'q3', 'whislo', 'whishi', 'cilo', 'cihi', 'fliers'):
-                box[key] = np.power(10., box[key])
-            ax.bxp([box], positions=[pos], widths=.55, showfliers=False, **BOX_STYLE)
-            for cohort, part in group.groupby('cohort', sort=True):
-                scatter_points(ax, pos+rng.normal(0, .045, len(part)), part.cfdna_ng_per_ml, cohort, centers(part),
-                           circall_only=scope=='circall',
-                           edgecolor='white', linewidths=.5, alpha=.8, s=38, zorder=3)
-        ax.set_xticks(range(1, len(categories)+1), ['\n'.join(textwrap.wrap(c, width=18, break_long_words=False))+f'\n(n={int(data[predictor.variable].astype(str).eq(c).sum())})' for c in categories])
-        ax.tick_params(axis='x', labelsize=9, rotation=30)
-        from matplotlib.lines import Line2D
-        ax.legend(handles=[h for c,g in data.groupby('cohort',sort=True)
-                           for h in point_handles(c,centers(g),circall_only=scope=='circall',
-                           label=COHORT_LABELS[c] if scope=='pooled' else f'{COHORT_LABELS[c]} patients (n={len(g)})')],frameon=False)
-    if scope == 'circall' and predictor.kind == 'categorical':
-        ax.get_legend().set_title(f'CIRCALL patients (n={len(data)})')
-    if scope == 'pooled' and predictor.kind == 'continuous':
-        ax.text(.02, .98, f'n={len(data)}', transform=ax.transAxes, ha='left', va='top')
-    label = predictor.label
-    if predictor.variable == 'gb_per_l':
-        label = 'Maximum diagnosis blood WBC (×10⁹/L)' if coverage['unit'] == 'x10^9/L' else 'Maximum diagnosis blood WBC (source units unconfirmed)'
-    spec = definitions['outcomes'][outcome]
-    ax.set(xlabel=label, ylabel=f"{spec['label']} ({spec['unit']})", yscale='log')
-    if log_x:
-        ax.set_xscale('log')
-        ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f'{v:g}'))
-    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f'{v:g}'))
-    title = f"{spec['label']} versus {label}"
-    subtitle = f'Plasma · Diagnosis patient samples · {scope.capitalize()} · Analysis patients n={len(data)}'
-    fig.suptitle(textwrap.fill(title,85,break_long_words=False), fontsize=15, color=INK)
-    ax.set_title(subtitle, fontsize=10, pad=12)
-    notes = []
-    if log_x and len(displayed) < len(data):
-        display_label = {'gb_per_l': 'WBC', 'tumor_fraction_percent': 'marrow blast percentages'}.get(predictor.variable, predictor.label)
-        notes.append(f'Nonpositive {display_label} omitted from log display: {len(data)-len(displayed)}; retained in tables/models; no pseudocount')
-        if displayed.empty:
-            ax.text(.5, .5, f'No positive {display_label} values for logarithmic display', transform=ax.transAxes, ha='center')
-    if coverage['nonpositive_pairs']:
-        notes.append(f"Nonpositive selected sample outcomes excluded from log display/models: {coverage['nonpositive_pairs']}; no pseudocount")
-    if association and association['status'] != 'fit':
-        notes.append('Fit unavailable: '+association['reason'])
-    if association and association['status'] == 'fit':
-        notes.append(f"Unadjusted {'categorical omnibus' if predictor.kind == 'categorical' else 'regression'} p={association['p_value']:.3g}; no multiplicity correction")
-    if association and association.get('spearman_status') == 'computed':
-        notes.append(f"Secondary unadjusted Spearman: ρ={association['spearman_rho']:.3f}, p={association['spearman_p_value']:.3g}")
-    if predictor.kind == 'categorical':
-        notes.append('Boxes calculated on log10(outcome), back-transformed for display')
-    if predictor.variable == 'elution_volume_ul' and outcome != 'cfdna_fraction':
-        notes.append('Elution volume enters the outcome calculation; association includes arithmetic dependence')
-    if scope == 'pooled':
-        notes.append('Descriptive only; no pooled inference')
-    if notes:
-        fig.text(.5, -.01, '\n'.join(textwrap.fill(note,110,break_long_words=False) for note in notes), ha='center', va='top', fontsize=9,color='#52616B')
-    style_axes(ax)
-    if predictor.kind == 'continuous':
-        handles, labels = ax.get_legend_handles_labels()
-        unique = dict(zip(labels, handles))
-        ax.legend(unique.values(), unique.keys(), frameon=False,
-                  title=f'CIRCALL patients (n={len(data)})' if scope=='circall' else None)
-    remove_plot_text(fig)
-    fig.tight_layout()
-    legends_below(fig)
-    return fig
 
 
 def figures(destination, frame, result, models, args, definitions):

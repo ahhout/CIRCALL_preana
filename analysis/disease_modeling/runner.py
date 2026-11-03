@@ -98,7 +98,7 @@ def code_files():
     shared = ['run.py', 'analysis/__init__.py', 'analysis/cli.py', 'analysis/pipeline.py', 'analysis/worker.py',
               'analysis/configuration.py', 'analysis/layer_configuration.py', 'analysis/outputs.py', 'analysis/provenance.py', 'analysis/sample_io.py', 'analysis/sample_definitions.py', 'analysis/figure_layout.py', 'analysis/plot_style.py',
               'analysis/retrospective_controls.py', 'analysis/data_integrity/__init__.py', 'analysis/data_integrity/checks.py']
-    return [ROOT/p for p in shared]+sorted((ROOT/'analysis/disease_modeling').glob('*.py'))
+    return [ROOT/p for p in shared]+sorted((ROOT/'analysis/disease_modeling').rglob('*.py'))
 
 
 def base_result(scope, status='complete', blocking=None):

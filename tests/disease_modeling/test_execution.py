@@ -40,6 +40,9 @@ def test_control_gate_preflight_status_and_independent_reports(tmp_path, monkeyp
     assert layer_main('disease_modeling', cli(paths, out)) == 1
     native = out/'.audit/workflows/04_disease_modeling'
     record = json.loads((native/'run_manifest.json').read_text())
+    for name in ('__init__.py', 'mrd.py', 'mrd_status.py', 'counts.py', 'saving.py', 'render.py'):
+        relative = f'analysis/disease_modeling/figures/{name}'
+        assert record['code_sha256'][relative] == digest(ROOT/relative)
     runner.validate_results(native, record)
     states = {c['cohort']:c['disease_status'] for c in record['cohorts']}
     assert states == dict(retrospective='complete', circall='blocked', pooled='blocked', comparisons='unavailable')

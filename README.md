@@ -77,6 +77,7 @@ PNG output remains enabled. See the [results guide](docs/results.md).
 | Location | Purpose |
 | --- | --- |
 | `analysis/{data_integrity,sample_statistics,advanced_analysis,disease_modeling}/` | Internal scientific layers and worker interfaces |
+| `analysis/{sample_statistics,advanced_analysis,disease_modeling}/figures/` | Internal figure families for Layers 2–4; workbook reporting stays in each layer's `reporting.py` |
 | Shared `analysis/*.py` | Reading, methods, configuration, orchestration, publication and maintained workbook tools |
 | `analysis/validation/` | Read-only result-validation commands |
 | `configs/pipeline_layers.json` | Complete pipeline controls; full-run references remain supported |

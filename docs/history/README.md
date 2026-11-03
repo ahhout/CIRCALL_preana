@@ -6,6 +6,7 @@ They do not define today's run settings. Use [README](../../README.md),
 
 | Record | Scope |
 | --- | --- |
+| [Figure module extraction](figure_modules_20261103.md) | November 3 rendering organization, provenance coverage, parity checks and smoke run |
 | [Single Conda-aware launcher](conda_launcher_20261020.md) | October 20 automatic environment selection and shell-wrapper retirement |
 | [All-layer execution and audit fixes](all_layers_only_20261020.md) | October 20 public interface retirement, regression fixes, acceptance and rollback |
 | [Layer 1 acceptance](layer1_validation_20261005.md) | October 5 integrity and extraction/contextual reporting |
