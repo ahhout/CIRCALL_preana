@@ -4,10 +4,17 @@ __pycache__/
 *.pyo
 *.pyd
 *.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
 
 # Local Conda artifacts
 .micromamba-root/
 .maintenance/
+/codex-clean-cache
 
 # Data & outputs (often large / potentially sensitive)
 raw_data/
@@ -19,9 +26,29 @@ archive/
 output/
 outputs/
 results/
+*.xls
 *.xlsx
+*.xlsm
+*.xlsb
+*.ods
 *.csv
+*.tsv
 *.parquet
+*.feather
+*.h5
+*.hdf5
+*.sqlite
+*.sqlite3
+*.db
+*.bam
+*.bai
+*.cram
+*.crai
+*.vcf
+*.bcf
+*.zip
+*.tar
+*.gz
 *.jpeg
 *.jpg
 *.png
@@ -54,13 +81,15 @@ archive/*
 !archive/retired/
 archive/retired/*
 !archive/retired/older_workflows_20261008/
-!archive/retired/older_workflows_20261008/**
-archive/retired/older_workflows_20261008/**/__pycache__/
-archive/retired/older_workflows_20261008/**/*.pyc
-archive/retired/older_workflows_20261008/**/*.xlsx
-archive/retired/older_workflows_20261008/**/*.csv
-archive/retired/older_workflows_20261008/**/*.png
-archive/retired/older_workflows_20261008/**/*.pdf
+archive/retired/older_workflows_20261008/**
+!archive/retired/older_workflows_20261008/**/
+!archive/retired/older_workflows_20261008/**/*.py
+!archive/retired/older_workflows_20261008/**/*.md
+!archive/retired/older_workflows_20261008/**/*.json
+!archive/retired/older_workflows_20261008/**/*.yml
+!archive/retired/older_workflows_20261008/**/*.lock
+!archive/retired/older_workflows_20261008/baseline_tests.txt
+!archive/retired/older_workflows_20261008/capture_driver_original.txt
 
 # Reviewed code-only retirement: allow only implementation/configuration/docs.
 !archive/retired/single_layer_interfaces_20261020/
@@ -81,3 +110,33 @@ archive/retired/conda_launcher_20261020/**
 !archive/retired/conda_launcher_20261020/*.sh
 !archive/retired/conda_launcher_20261020/*.md
 !archive/retired/conda_launcher_20261020/*.json
+
+# Apply local-state and credential exclusions after archive exceptions.
+.aws/
+.codex/
+.env
+.env.*
+*.secrets
+*.secret
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Keep directory exclusions after archive allowlists as well.
+raw_data/
+runs/
+scratch/
+data/
+input/
+output/
+outputs/
+results/
+logs/
+.maintenance/
+.micromamba-root/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
