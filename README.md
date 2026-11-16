@@ -29,6 +29,70 @@ conda run -n pre_analysis python -c "from matplotlib.font_manager import findfon
 Clinical workbooks and outputs are local and Git-ignored; a code-only clone does
 not include them.
 
+## To do
+
+- [ ] Deidentify the five clinical workbooks selected in
+  [the pipeline master](configs/pipeline_layers.json) before embedding them in a
+  shared container image. Preserve originals; agree the date policy, remove direct
+  identifiers and identifying metadata from copies, preserve approved matching
+  rules, and validate the copies with preflight and a smoke run. Deferred for now;
+  source workbooks, private mappings and data-bearing images must remain outside Git.
+- [x] Adapt packaging to Apptainer and validate a complete four-layer run with
+  synthetic inputs. Clinical-data acceptance remains pending the review above.
+
+## Container build (Linux x86-64)
+
+The optional Apptainer image runs all four layers with the existing launcher and
+Linux Conda lock. Install Apptainer inside WSL2 Ubuntu or Linux using the
+[official installation guide](https://apptainer.org/docs/admin/1.5/installation.html#install-ubuntu-packages).
+Docker Desktop is not required. Standard-library Python and Git prepare the build;
+Arial's four local TTF styles are also required.
+
+Select an explicit schema-2 master with reviewed workbooks under `sources`;
+see [configuration](docs/configuration.md). The helper copies selected bytes
+unchanged and does not anonymise them. Anonymisation of the current clinical
+workbooks is deferred in the [to-do list](#to-do). Use synthetic sources until
+that review is complete. No clinical data image has been built or published.
+
+```bash
+python3 environments/container/build.py \
+  --config /absolute/path/to/reviewed_master.json \
+  --arial-dir /usr/share/fonts/truetype/msttcorefonts \
+  --context .maintenance/container_builds/reviewed_build \
+  --image .maintenance/container_builds/circall-preana.sif
+```
+
+Each context and image destination must be fresh; existing files are preserved.
+Contexts and SIF images are Git-ignored and can contain selected data and fonts.
+`--prepare-only` prepares a context without building. On this WSL installation,
+Apptainer 1.5.5's subordinate-ID build fails while mounting `binfmt_misc`;
+add `--root-mapped-build` to use the tested root-mapped namespace alternative.
+This changes build mechanics only, without changing system configuration.
+
+The font directory must contain `Arial.ttf`, `Arial_Bold.ttf`, `Arial_Italic.ttf`
+and `Arial_Bold_Italic.ttf`. The build checks all four styles without fallback.
+Use fonts covered by the applicable licence for installation and sharing;
+see [Microsoft's redistribution guidance](https://learn.microsoft.com/en-us/typography/fonts/font-faq).
+The Conda definition and lock are unchanged; Arial is an image-level asset.
+
+Run from WSL/Linux. Without pipeline arguments the image performs preflight:
+
+```bash
+apptainer run --cleanenv --containall .maintenance/container_builds/circall-preana.sif
+mkdir -p outputs/container
+apptainer run --cleanenv --containall \
+  --bind "$PWD/outputs/container:/app/outputs" \
+  .maintenance/container_builds/circall-preana.sif --output-dir outputs/smoke
+```
+
+Execution uses your host UID/GID and a read-only image. The output parent must be
+writable; each run destination must not exist. Selected workbooks are embedded
+under `/app/input/`. `--containall --cleanenv` avoids the default home/current
+working-directory mounts and inherited analysis environment. Only the explicit
+output directory is shared with the run. The four-layer clinical gates and exit
+codes remain unchanged. See [container provenance](docs/audit_guide.md#container-provenance)
+for build hashes, validation and limitations.
+
 ## Run
 
 [configs/pipeline_layers.json](configs/pipeline_layers.json) owns current sources,
@@ -83,6 +147,7 @@ PNG output remains enabled. See the [results guide](docs/results.md).
 | `configs/pipeline_layers.json` | Complete pipeline controls; full-run references remain supported |
 | `configs/definitions/` | Approved scientific definitions, mappings and comparison matrix |
 | `configs/maintenance/` | Explicit workbook maintenance; never automatic repair |
+| `Apptainer.def`, `environments/container/` | Single-image Apptainer recipe and explicit-source packaging helper |
 | `tests/` | Automated checks and synthetic fixtures, including historical result layouts |
 | `docs/layers/` | Layer-specific interpretation |
 | [Scientific contracts](docs/workflow_contracts.md) | Approved decisions and rationale |

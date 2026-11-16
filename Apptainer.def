@@ -1,0 +1,56 @@
+Bootstrap: docker
+From: quay.io/condaforge/miniforge3@sha256:1deb4ce237b6c7387a6a0c1bb037c9f59fd5e6cc5829a16faf80426398e8dd56
+
+%files
+    run.py /app/run.py
+    README.md /app/README.md
+    AGENTS.md /app/AGENTS.md
+    analysis /app/analysis
+    configs /app/configs
+    docs /app/docs
+    tests /app/tests
+    environments/environment.yml /app/environments/environment.yml
+    environments/conda-linux-64.lock /app/environments/conda-linux-64.lock
+    container_build.json /app/container_build.json
+    dataset/input /app/input
+    dataset/configs/container_master.json /app/configs/container_master.json
+    arial /usr/local/share/fonts/truetype/arial
+
+%post
+    set -eu
+    /opt/conda/bin/conda create --yes --name pre_analysis --file /app/environments/conda-linux-64.lock
+    /opt/conda/bin/conda clean --all --yes
+    mkdir -p /app/outputs
+    chmod -R a+rX /app /usr/local/share/fonts/truetype/arial /opt/conda/envs/pre_analysis
+
+%environment
+    export PYTHONDONTWRITEBYTECODE=1
+    export MPLBACKEND=Agg
+    export MPLCONFIGDIR=/tmp/pre_analysis/matplotlib
+    export XDG_CACHE_HOME=/tmp/pre_analysis/cache
+    export CONDA_EXE=/opt/conda/bin/conda
+
+%runscript
+    set -eu
+    export HOME=/tmp/pre_analysis
+    mkdir -p "$HOME"
+    cd /app
+    if [ "$#" -eq 0 ]; then
+        set -- --validate-only
+    fi
+    exec /opt/conda/envs/pre_analysis/bin/python -B run.py --config configs/container_master.json "$@"
+
+%test
+    set -eu
+    export HOME=/tmp/pre_analysis
+    mkdir -p "$HOME"
+    cd /app
+    /opt/conda/envs/pre_analysis/bin/python -B -c "from matplotlib.font_manager import FontProperties, findfont; from pathlib import Path; expected=Path('/usr/local/share/fonts/truetype/arial'); assert all(Path(findfont(FontProperties(family='Arial', style=s, weight=w), fallback_to_default=False)).parent == expected for s in ('normal','italic') for w in ('normal','bold'))"
+
+%labels
+    org.opencontainers.image.title CIRCALL pre-analysis
+
+%help
+    All four layers use python3 run.py and the locked pre_analysis Conda environment.
+    No arguments performs integrated validate-only. Bind a fresh output parent at
+    /app/outputs and pass --output-dir outputs/<new-run> for complete execution.

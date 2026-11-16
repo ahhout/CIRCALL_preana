@@ -16,6 +16,7 @@ htmlcov/
 .maintenance/
 /codex-clean-cache
 
+# Clinical workbooks stay local pending reviewed deidentification (see README To do).
 # Data & outputs (often large / potentially sensitive)
 raw_data/
 runs/
@@ -55,6 +56,10 @@ results/
 *.pdf
 *_report.json
 ~$*.xlsx
+
+# Container images may embed clinical workbooks.
+*.sif
+*.simg
 
 # Fonts/binaries
 *.ttf

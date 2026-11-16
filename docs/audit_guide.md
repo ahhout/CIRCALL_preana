@@ -197,3 +197,41 @@ The linked historical records preserve executed commands, inputs, counts and
 rollback details; use current README commands for new runs.
 
 Earlier integration and source-relocation evidence is in [the historical record](history/integration_validation_20261001.md).
+
+## Container provenance
+
+The optional [Apptainer commands](../README.md#container-build-linux-x86-64) keep
+all four workflows and the shared Conda lock. `Apptainer.def` pins the Miniforge
+base by OCI digest. The helper requires Linux x86-64, matching the lock; its
+Git-visible code allowlist excludes clinical inputs, outputs and local state.
+Only the five explicitly selected workbooks and four Arial styles enter the data
+and font bundles. The generated master rewrites source/rule/definition paths for
+`/app` and removes host output and validate-only defaults; scientific settings
+remain unchanged. The earlier `Dockerfile` and `.dockerignore` are retained local drafts outside
+the Apptainer checkpoint; the Apptainer helper does not use them.
+
+`container_build.json` inside the image records code revision/dirty state,
+source/code/lock/font hashes, selected master hash and packaging script hash.
+`build_result.json` beside the context additionally records the SIF SHA-256,
+Apptainer version, build command and working directory. These supplement per-run
+hashes, actual package versions, source validation and ISO execution timestamps.
+The image omits `.git`, so run-level Git revision fields can be null; build
+metadata retains the revision and exact copied source hashes. Record the SIF hash
+alongside shared run evidence. A dirty build is explicitly marked dirty.
+
+The build runs the recipe's four-style Arial check. Use integrated preflight
+before full execution, then compare an explicitly named host run with the same
+sources, settings and fixed assessment timestamp. Scientific validity and clinical
+equivalence are separate from software smoke checks. Preserve clinical holds and
+the [existing validator limitations](history/figure_modules_20261103.md).
+
+Anonymisation remains deferred: current selected clinical sources contain populated
+name/birth-date fields. The packaging helper does not remove or replace identifiers.
+No clinical image has been built or published. Original inputs and retained results
+are preserved. The code-only rollback snapshot for the Apptainer adaptation is
+`.maintenance/apptainer_setup_20261112/before_code.tar.gz`, based on HEAD `e02f8eb`
+plus the preceding uncommitted packaging work. Local evidence is Git-ignored.
+
+The [November 12 Apptainer acceptance record](history/apptainer_20261112.md)
+records the completed synthetic build, preflight, four-layer run, host/container
+comparison, exact commands and remaining clinical-data limitations.
