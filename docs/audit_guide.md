@@ -207,8 +207,7 @@ Git-visible code allowlist excludes clinical inputs, outputs and local state.
 Only the five explicitly selected workbooks and four Arial styles enter the data
 and font bundles. The generated master rewrites source/rule/definition paths for
 `/app` and removes host output and validate-only defaults; scientific settings
-remain unchanged. The earlier `Dockerfile` and `.dockerignore` are retained local drafts outside
-the Apptainer checkpoint; the Apptainer helper does not use them.
+remain unchanged. Apptainer is the sole supported container option; Docker is not used.
 
 `container_build.json` inside the image records code revision/dirty state,
 source/code/lock/font hashes, selected master hash and packaging script hash.
