@@ -63,7 +63,9 @@
 - Keep active code in analysis/, configuration in configs/, environment
   definitions in environments/, and documentation in docs/.
 - Treat archive/ and earlier outputs as retained evidence.
-  input/retrospective_blast_count_01102026.xlsx is the active retrospective blast source.
+  configs/pipeline_layers.json owns active input paths, now selecting validated
+  pseudonymised working copies. input/retrospective_blast_count_01102026.xlsx
+  remains the retained authoritative retrospective blast original.
   The former blast_kinetics_workflow/ is retained under archive/retired/;
   use the relocation record when consulting historical source paths.
   Do not remove sources, audit evidence, or rollback snapshots during code cleanup.

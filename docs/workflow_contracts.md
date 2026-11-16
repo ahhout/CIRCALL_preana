@@ -1136,3 +1136,43 @@ views without changing existing overall displays, measurements or tests.
 
 The scoped pre-change snapshot is
 `archive/migrations/longitudinal_volumes_before_20261020/`.
+
+
+## Pseudonymised working inputs — November 16, 2026
+
+The investigator approved new deidentified working copies while retaining the
+current four-layer analysis logic. The originals and default source selection
+remain intact. This is a controlled-access pseudonymisation procedure, not an
+anonymity claim or authorization to publish clinical data. The
+[operational guide](deidentification.md) owns commands and bundle locations.
+
+| Rule | Approved decision and rationale | Source |
+| --- | --- | --- |
+| Scope | Create five fresh workbook copies, a separate private group map and an explicit full-layer master. Never overwrite or relocate originals or prior results. | Investigator's November 16 approval of the proposed copy-and-validate procedure |
+| Direct fields | Clear firstname, lastname, dob and the unused a2g_id, source_note and private_note fields when present, except the retrospective count surname rule below. Remove identifying document properties/comments and unused shared strings. Preserve sheet/column/row structure. | Approved direct-identifier and metadata cleanup; active code dependency audit |
+| Retrospective count identity | Replace each existing trimmed, case-sensitive surname group with one unique opaque alias in the existing lastname column. Preserve surname collisions, all group memberships, missing identity markers and count-source namespaces; add no inventory linkage. Keep the reidentification map separately protected and outside images/Git. | Approved exception required by the retained Layer 4 grouping rule |
+| Study and sample identity | Retain approved patient_id, circall_id, sample_id, dna_id and donor codes, including existing protocol initials, ID formats and centre prefixes. Retain source row coordinates and all blank/na/unknown markers. No automatic filling or replacement of IDs. | Preserve existing receipt/extraction/grouping rules, centre assignment, Layer 3 hash-sorted candidates and per-patient seeded selection |
+| Dates and measurements | Retain exact clinical/planned dates, sampling times, recorded days, age_diag, clinical categories, MRD annotations, units and measurements. Clear DOB without recalculating age or other cells; any formula dependency on a cleared field requires review. | Investigator approved the first-version exact-date policy to preserve calendar figures and overdue calculations |
+| Scientific invariants | Change no inclusion/exclusion, pooling, duplicate policy, predictor, threshold, statistical model, seed or missing-data rule. New privacy aliases must preserve original count-group partitions. Original and copy runs use identical settings and a fixed assessment time for acceptance. | Explicit scientific-preservation requirement |
+| Package preservation | Patch XML without workbook round-tripping or recalculation; preserve all unedited cells/styles and exact formula/cache bytes. Reject unsupported external/embedded content and dependencies. Scan remaining XML for known removed names without exporting them. | Existing saved-cache and provenance safeguards |
+| Acceptance and sharing | Require preflight and full-run comparisons of populations, selected samples, numerical reports, workbook cells and figures. Only explicit source-path/hash or approved identifier differences are allowed. Retained dates, codes/initials and rare clinical combinations still require controlled access and further sharing review. | Approved validation plan; no extension of publication authorization |
+
+The [dated acceptance record](history/deidentification_20261116.md) records the
+successful original/copy runs, private/local evidence locations and the existing
+short-donor-code privacy-validator limitation. It does not certify anonymity.
+
+
+## Default working-copy adoption — November 16, 2026
+
+The investigator approved making the validated pseudonymised copies the default
+inputs, publishing code/configuration/documentation only, then building and
+validating a private Apptainer image. This supersedes the preceding amendment's
+initial default-source preservation statement; original files remain intact.
+
+| Rule | Decision and rationale | Source |
+| --- | --- | --- |
+| Default sources | Select the five accepted copies explicitly through configs/pipeline_layers.json. Require the accepted workbook hashes; never infer a newer bundle or run maintenance automatically. | Investigator's approval of default adoption after full original/copy equivalence |
+| Scientific settings | Change source paths only. Keep all four layers, definitions, comparison switches, seeds, units, MRD gates and failure behavior. Default assessment time remains current. | Preserve accepted scientific behavior and the existing launcher |
+| Original maintenance | Keep authoritative originals and a separate local original-source master for future copy preparation; never feed already aliased default copies back into the deidentifier implicitly. | Original-source/provenance preservation and stable private mapping rules |
+| Private image | Bundle only the accepted copies and required code/environment/fonts, exclude original workbooks and private maps, retain image/build context under owner-only access, and do not upload the image. | Explicit private-build authorization; sharing review remains open |
+| Image acceptance | Preflight the embedded default profile. Run all four layers with the host run's recorded assessment timestamp supplied through an explicit read-only validation configuration; compare scientific evidence and figures, verify source/build/run hashes and retain quality flags. | Reproducible host/container smoke check without changing persistent time defaults |

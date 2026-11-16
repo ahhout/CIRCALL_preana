@@ -26,17 +26,18 @@ system font installation before running:
 conda run -n pre_analysis python -c "from matplotlib.font_manager import findfont; print(findfont('Arial', fallback_to_default=False))"
 ```
 
-Clinical workbooks and outputs are local and Git-ignored; a code-only clone does
-not include them.
+The default master selects the validated pseudonymised working copies described
+in [the input guide](docs/deidentification.md). Clinical workbooks and outputs
+are local and Git-ignored; a code-only clone does not include them.
 
 ## To do
 
-- [ ] Deidentify the five clinical workbooks selected in
-  [the pipeline master](configs/pipeline_layers.json) before embedding them in a
-  shared container image. Preserve originals; agree the date policy, remove direct
-  identifiers and identifying metadata from copies, preserve approved matching
-  rules, and validate the copies with preflight and a smoke run. Deferred for now;
-  source workbooks, private mappings and data-bearing images must remain outside Git.
+- [x] Create and validate pseudonymised working copies of the five clinical
+  workbooks. Originals are preserved; exact clinical dates and approved study IDs
+  are retained. See [the procedure and accepted profile](docs/deidentification.md).
+- [ ] Review retained dates, protocol IDs/initials and rare clinical combinations
+  before sharing a clinical-data image. These working copies are not certified
+  anonymous; workbooks, private mappings and data-bearing images stay outside Git.
 - [x] Adapt packaging to Apptainer and validate a complete four-layer run with
   synthetic inputs. Clinical-data acceptance remains pending the review above.
 
@@ -50,9 +51,10 @@ Arial's four local TTF styles are also required.
 
 Select an explicit schema-2 master with reviewed workbooks under `sources`;
 see [configuration](docs/configuration.md). The helper copies selected bytes
-unchanged and does not anonymise them. Anonymisation of the current clinical
-workbooks is deferred in the [to-do list](#to-do). Use synthetic sources until
-that review is complete. No clinical data image has been built or published.
+unchanged and does not anonymise them. Deidentification of the current clinical
+workbooks has produced validated pseudonymised working copies, with remaining
+sharing review in the [to-do list](#to-do). Use synthetic sources for shared images
+until that review is complete. No clinical data image has been built or published.
 
 ```bash
 python3 environments/container/build.py \

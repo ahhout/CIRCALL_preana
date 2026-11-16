@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
   "sources": {
-    "inventory": "../input/cfDNA_inventaire_retrospective_21102026.xlsx",
-    "circall": "../input/inventaire_CIRCALL_22102026.xlsx",
-    "donors": "../input/cfDNA_donors.xlsx",
-    "blood-counts": "../input/CIRCALL_wbc_blast_count_01102026.xlsx",
-    "retrospective-blasts": "../input/retrospective_blast_count_01102026.xlsx"
+    "inventory": "../input/deidentified_20261116_ready/inventory.xlsx",
+    "circall": "../input/deidentified_20261116_ready/circall.xlsx",
+    "donors": "../input/deidentified_20261116_ready/donors.xlsx",
+    "blood-counts": "../input/deidentified_20261116_ready/blood-counts.xlsx",
+    "retrospective-blasts": "../input/deidentified_20261116_ready/retrospective-blasts.xlsx"
   },
   "defaults": {
     "cohort": "all",

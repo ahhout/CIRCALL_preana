@@ -3,7 +3,9 @@
 Edit [the master](../configs/pipeline_layers.json) for routine runs. It contains
 the complete pipeline run options and the Layer 3 comparison switches. Referenced
 scientific definitions describe the approved methods; they are not alternative
-run profiles. Use [README](../README.md#run) for execution commands.
+run profiles. The default sources are the validated pseudonymised working copies;
+[the input guide](deidentification.md) owns their provenance and the retained
+original-source maintenance profile. Use [README](../README.md#run) for execution commands.
 
 ## Controls and precedence
 
@@ -49,8 +51,8 @@ Partial references are rejected rather than expanded silently.
 Selection is distinct from changing a scientific rule. Eligibility, matching,
 thresholds, transformations, multiplicity and pooling rules still require explicit
 scientific authorization under [the contracts](workflow_contracts.md). The current
-configuration retains the pre-cleanup sources, scientific values, switches and
-PNG/PDF choices. This reorganization does not enable another analysis.
+configuration selects the validated working copies while retaining scientific
+values, switches and PNG/PDF choices. Source adoption does not enable another analysis.
 
 ## Provenance and other configuration
 

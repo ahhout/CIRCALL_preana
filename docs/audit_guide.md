@@ -224,13 +224,23 @@ sources, settings and fixed assessment timestamp. Scientific validity and clinic
 equivalence are separate from software smoke checks. Preserve clinical holds and
 the [existing validator limitations](history/figure_modules_20261103.md).
 
-Anonymisation remains deferred: current selected clinical sources contain populated
-name/birth-date fields. The packaging helper does not remove or replace identifiers.
-No clinical image has been built or published. Original inputs and retained results
-are preserved. The code-only rollback snapshot for the Apptainer adaptation is
+The default inputs are now validated pseudonymised working copies. Retained dates
+and approved protocol IDs/initials require further review before sharing a clinical
+image. The packaging helper copies selected bytes unchanged. Original inputs and
+retained results are preserved; any clinical image built here remains private. The code-only rollback snapshot for the Apptainer adaptation is
 `.maintenance/apptainer_setup_20261112/before_code.tar.gz`, based on HEAD `e02f8eb`
 plus the preceding uncommitted packaging work. Local evidence is Git-ignored.
 
 The [November 12 Apptainer acceptance record](history/apptainer_20261112.md)
 records the completed synthetic build, preflight, four-layer run, host/container
 comparison, exact commands and remaining clinical-data limitations.
+
+
+## Pseudonymised working-input acceptance
+
+Use the [deidentification guide](deidentification.md) for the explicit copied-data
+profile. The [November 16 acceptance record](history/deidentification_20261116.md)
+records the original/copy full-run comparison, package/source preservation and
+privacy scope. Source path/hash changes are expected; scientific selections,
+measurements and results must remain equivalent. The private mapping and clinical
+copies are Git-ignored and excluded from code-only evidence snapshots.
