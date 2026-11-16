@@ -6,7 +6,7 @@ import unittest
 
 from openpyxl import Workbook, load_workbook
 
-from analysis.extraction_status import normalize
+from archive.retired.completed_migrations_20261116.analysis.extraction_status import normalize
 from analysis.provenance import ROOT,digest
 
 

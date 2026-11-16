@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "checkpoint": "e90445e58884e021951c521b264c0e90d120faa0",
+  "scope": "Code/configuration/tests only; no clinical inputs, results, images or private mapping",
+  "moves": [
+    {
+      "original_path": "analysis/extraction_status.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/extraction_status.py",
+      "original_sha256": "7c9d9b79845815a86fe1c795ff835c607fd61872fa2a0975a7e202404057607a",
+      "sha256": "469d713953b303b3d92ff198737826ced5cf50236f172f712c10b71d087f3c73",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/historical_workbooks.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/historical_workbooks.py",
+      "original_sha256": "a64563ca427988217a455c72a615274fb4e392bdee11fd2f86fceabaeef5520b",
+      "sha256": "a64563ca427988217a455c72a615274fb4e392bdee11fd2f86fceabaeef5520b",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/migrate_retrospective_blasts.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/migrate_retrospective_blasts.py",
+      "original_sha256": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "sha256": "a839edfaa4bd96df596893648a8c2e2f319b65cd0e0e981a5cc16f3d1dd61f60",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/patient_ids.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/patient_ids.py",
+      "original_sha256": "f75be0ce7faef6c61a10982d303744e6f87fed1089a0b4a6115eb67a8a045cf5",
+      "sha256": "b2af01a35926f67aa711c5ebfef0043e91a9dddc8f9ece40fa98949b7e362a0e",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/workbook_harmonization.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/workbook_harmonization.py",
+      "original_sha256": "5d68c9b60e1011eb8b5c9d249c5f420a27e5f3110a1819103a2b846cbde95f25",
+      "sha256": "ec7d7fbc1fbaaa6cb735e6806280dac534254b7ff1e4d0b98481643c474e7750",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/deidentify_workbooks.py",
+      "path": "analysis/maintenance/deidentify_workbooks.py",
+      "original_sha256": "2e60ba3ec28f804b86b618d95aaf3a30206c4591b9c222835bfd6aea7ffeb610",
+      "sha256": "0c024358205fdd4da91cb05338d9bddbb3ed63d8d5c7b504101ecf73955a9a55",
+      "disposition": "reusable_maintenance"
+    },
+    {
+      "original_path": "analysis/deidentification_package.py",
+      "path": "analysis/maintenance/deidentification_package.py",
+      "original_sha256": "c1cec7bf0d4206e76b02f6a84541b7bc46f67e893025e8cdf733d220c0bca1f0",
+      "sha256": "c1cec7bf0d4206e76b02f6a84541b7bc46f67e893025e8cdf733d220c0bca1f0",
+      "disposition": "reusable_maintenance"
+    },
+    {
+      "original_path": "analysis/workbook_cleanup.py",
+      "path": "analysis/maintenance/workbook_cleanup.py",
+      "original_sha256": "1e7332972e5db70ffbbef1e052405663040558f6df8961c370cc28d04043c101",
+      "sha256": "6fc3f807101200426ddafc18a60e4bb087d3abae71c44080a38e17367ebb133b",
+      "disposition": "reusable_maintenance"
+    },
+    {
+      "original_path": "analysis/sample_annotations.py",
+      "path": "analysis/maintenance/sample_annotations.py",
+      "original_sha256": "596b383a928bc43c5b29067669c899522ecee9f4e1cd4f3c2be97d498ffdf929",
+      "sha256": "489c1a0cb549140b9d7aef314869635a9ec9243a874b0473dd2d810b52076422",
+      "disposition": "reusable_maintenance"
+    },
+    {
+      "original_path": "analysis/repair_inventory_formulas.py",
+      "path": "analysis/maintenance/repair_inventory_formulas.py",
+      "original_sha256": "961ddd238b12ccd079a43e7226eb1741dcc6133766cf21d1599034d6ab81cc42",
+      "sha256": "ab6bf9850a4988e2687ceaf15191adb5a690df983d6ea1157fddc173a023c524",
+      "disposition": "reusable_maintenance"
+    },
+    {
+      "original_path": "tests/maintenance/test_extraction_status.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/maintenance/test_extraction_status.py",
+      "original_sha256": "3f669a2f971b982027eb7d2e062124521dd36b36d727572b1879af3a32dd836a",
+      "sha256": "f57cb7e2ebe3d517b7ddd72582190856a1d1332db6e6d022c21560e88d554a95",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/maintenance/test_historical_workbooks.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/maintenance/test_historical_workbooks.py",
+      "original_sha256": "f403fb44de5e1e19d30ac4d41ec6db1d7956bcfe91b0fcd513b0c642a5f270ce",
+      "sha256": "d2125dee09c82b6a0152183bde027a2f642df2f70a4caa0442481f5adbf48d7c",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/maintenance/test_migrate_retrospective_blasts.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/maintenance/test_migrate_retrospective_blasts.py",
+      "original_sha256": "445e66250b71a226071d787d75e9d476654576fe61e24720b2b4e251d283cef0",
+      "sha256": "a5414c2e84b3c137e0e4132c3be2ceac727fa7ba692087a9efd0663302c420bf",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/maintenance/test_patient_ids.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/maintenance/test_patient_ids.py",
+      "original_sha256": "582904bbed666201161b077bf5f14ac5af765e4fead2c4edb0b51efe046cb2db",
+      "sha256": "6b6d0a58673b01a83038a920c2d85ae51350ad5a301bd155474e46c14ba339fb",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/maintenance/test_workbook_harmonization.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/maintenance/test_workbook_harmonization.py",
+      "original_sha256": "26c5a6961242e3733700e0ee291fc510e6798df55635b96fff3e175a9a54a50d",
+      "sha256": "42751804baea078bd72bf72dfac8de0e3750cbd8fd33742fa3fcf0b6c6ec1733",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "analysis/validation/validate_retirement.py",
+      "path": "archive/retired/completed_migrations_20261116/analysis/validation/validate_retirement.py",
+      "original_sha256": "d9d788dc416e41b259cfb325cbfd746db230d24d3b7d62601e6aab1083fd6189",
+      "sha256": "d9d788dc416e41b259cfb325cbfd746db230d24d3b7d62601e6aab1083fd6189",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/validation/test_retirement.py",
+      "path": "archive/retired/completed_migrations_20261116/tests/validation/test_retirement.py",
+      "original_sha256": "0dc86b3de900ab0b3f99a79d55bc68040ee31299fe526b4de57eb27ea1fc75db",
+      "sha256": "e69f864392833e444f6beec9df51fa5b2056858641295ee958c22e0eb89cefa6",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "configs/maintenance/workbook_harmonization.json",
+      "path": "archive/retired/completed_migrations_20261116/configs/maintenance/workbook_harmonization.json",
+      "original_sha256": "4f5759bd686e293810567bda2f43dadb930d7a2e4d1a7b8ee4648d79340821d9",
+      "sha256": "4f5759bd686e293810567bda2f43dadb930d7a2e4d1a7b8ee4648d79340821d9",
+      "disposition": "archived"
+    },
+    {
+      "original_path": "tests/test_deidentification.py",
+      "path": "tests/maintenance/test_deidentification.py",
+      "original_sha256": "34bc10510abb6649666469875197fd96099e4102b9b85bbcf0d5156ec29b4ffe",
+      "sha256": "5c7d5ed5f8da3a85eb6ccbed08f0a1e7b73a57180ed86d6ffc715322868bf04a",
+      "disposition": "reusable_maintenance"
+    }
+  ],
+  "shared_xml_primitives": {
+    "original_path": "analysis/extraction_status.py",
+    "path": "analysis/maintenance/xlsx_patch.py",
+    "symbols": [
+      "CELL",
+      "ROW",
+      "cell_xml"
+    ],
+    "equivalence": "Identical AST; shared by reusable maintenance and archived migrations"
+  }
+}

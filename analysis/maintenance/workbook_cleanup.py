@@ -1,6 +1,6 @@
 """Trim approved label fields into new XLSX copies; report ambiguous cells.
 
-Usage: conda run -n pre_analysis python -m analysis.workbook_cleanup
+Usage: conda run -n pre_analysis python -m analysis.maintenance.workbook_cleanup
     --input input/one.xlsx input/two.xlsx --output-dir output/<fresh-folder>
 
 Identifiers, measurements, dates and formulas are never rewritten. Worksheet XML

@@ -6,12 +6,12 @@ import unittest
 
 from openpyxl import Workbook, load_workbook
 
-from analysis.workbook_harmonization import ROOT, harmonize, replacements
+from archive.retired.completed_migrations_20261116.analysis.workbook_harmonization import ROOT, DEFAULT_CONFIG, harmonize, replacements
 
 
 class HarmonizationTests(unittest.TestCase):
     def setUp(self):
-        self.config=json.loads((ROOT/'configs/maintenance/workbook_harmonization.json').read_text())
+        self.config=json.loads(DEFAULT_CONFIG.read_text())
 
     def test_contextual_specimen_mapping_and_identifiers(self):
         with TemporaryDirectory() as tmp:

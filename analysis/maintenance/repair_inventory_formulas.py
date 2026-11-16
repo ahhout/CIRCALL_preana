@@ -12,8 +12,8 @@ from zipfile import ZipFile
 
 from analysis.provenance import ROOT, digest, envelope, utc_now, write_json
 from analysis.sample_io import read_sheet
-from analysis.workbook_cleanup import NS, REL
-from analysis.extraction_status import CELL, cell_xml
+from analysis.maintenance.workbook_cleanup import NS, REL
+from analysis.maintenance.xlsx_patch import CELL, cell_xml
 
 
 def plan(source, sheets=None, *, audit=None, clear_invalid_assay_formulas=False):
@@ -124,9 +124,9 @@ def run(source,destination,adopt=False,*,sheets=None,audit=None,clear_invalid_as
     if audit is not None:inputs['equation_audit']=Path(audit)
     provenance=envelope('inventory_formula_repair',{'sheets':list(changes),'adopt':adopt,'clear_invalid_assay_formulas':clear_invalid_assay_formulas},
                         inputs,
-                        [Path(__file__),ROOT/'analysis/sample_io.py',ROOT/'analysis/extraction_status.py',
+                        [Path(__file__),ROOT/'analysis/sample_io.py',Path(__file__).with_name('xlsx_patch.py'),
                          ROOT/'analysis/data_integrity/checks.py',ROOT/'analysis/sample_definitions.py',
-                         ROOT/'analysis/workbook_cleanup.py',ROOT/'analysis/provenance.py'],
+                         Path(__file__).with_name('workbook_cleanup.py'),ROOT/'analysis/provenance.py'],
                         ROOT/'environments/conda-linux-64.lock')
     original_sheets={name:read_sheet(source,name) for name in changes}
     materialized={}

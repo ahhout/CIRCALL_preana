@@ -9,7 +9,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 from openpyxl import Workbook, load_workbook
 
-from analysis.migrate_retrospective_blasts import migrate, remap_formula, NS
+from archive.retired.completed_migrations_20261116.analysis.migrate_retrospective_blasts import migrate, remap_formula, NS
 
 
 class MigrationTests(unittest.TestCase):

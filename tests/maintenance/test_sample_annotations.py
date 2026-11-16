@@ -11,7 +11,7 @@ from openpyxl import Workbook, load_workbook
 
 from analysis.data_integrity.checks import inspect_cohort, load_rules
 from analysis.provenance import ROOT, digest
-from analysis.sample_annotations import main, migrate, plan
+from analysis.maintenance.sample_annotations import main, migrate, plan
 from analysis.sample_definitions import extraction_state
 from analysis.sample_io import read_sheet
 from tests.fixtures.data_integrity import fixture

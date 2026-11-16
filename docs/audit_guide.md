@@ -143,37 +143,11 @@ results, checks literal workbook strings and PNG/PDF structure, and rechecks sou
 It does not establish equivalence to older clinical preparation. Structural Excel/
 PDF checks do not substitute for visual rendering; record which checks actually ran.
 
-Rebuild explicitly selected historical CSV reports without rerunning statistics:
-
-```bash
-conda run -n pre_analysis python -m analysis.historical_workbooks --run-dir output/<historical-run> --output-dir output/<fresh-workbooks>
-```
-
-The maintained retrospective blast workbook helper is
-`python -m analysis.migrate_retrospective_blasts --help`; it retains its explicit
-source/output/report interface and refuses existing outputs. Maintenance is never
-an automatic preflight repair. Older scientific validators and commands are in the
-[code-only archive](../archive/retired/older_workflows_20261008/README.md), with the
-implementation snapshot needed to reproduce their original imports.
-
-Retirement equivalence compares explicitly named fresh runs against the dirty
-pre-retirement snapshot, including the latest plotting changes:
-
-```bash
-conda run -n pre_analysis python -B -m analysis.validation.validate_retirement \
-  --baseline outputs/workflow_retirement_20261008/baseline/<case> \
-  --candidate outputs/workflow_retirement_20261008/verified/<case> \
-  --snapshot archive/migrations/workflow_retirement_before_20261008/implementation \
-  --report outputs/<fresh-comparison>.json
-```
-
-Cases are `synthetic_success`, `synthetic_blocked` and `clinical_current`.
-The validator checks settings, populations, exact numerical evidence, workbook
-cells/styles, PNG pixels, PDF content, source/environment/code hashes, privacy,
-completion and publication. It permits only documented execution/provenance changes.
-Workbook visual rendering and independent PDF rasterization are unavailable;
-PNG comparison is pixel-exact. The [acceptance record](history/workflow_retirement_20261008.md)
-records the commands, holds, counts and limitations actually verified.
+Completed workbook migrations, historical CSV packaging and the one-time retirement
+comparison live in the [code-only archive](../archive/retired/completed_migrations_20261116/README.md).
+Their source, configurations, tests and relocation hashes are preserved. They are
+not part of current execution or default test discovery. Current reusable workbook
+tools are described in [maintenance](maintenance.md).
 
 ## Layered acceptance evidence
 
@@ -200,7 +174,7 @@ Earlier integration and source-relocation evidence is in [the historical record]
 
 ## Container provenance
 
-The optional [Apptainer commands](../README.md#container-build-linux-x86-64) keep
+The optional [Apptainer commands](container.md) keep
 all four workflows and the shared Conda lock. `Apptainer.def` pins the Miniforge
 base by OCI digest. The helper requires Linux x86-64, matching the lock; its
 Git-visible code allowlist excludes clinical inputs, outputs and local state.

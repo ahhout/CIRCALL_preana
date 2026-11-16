@@ -6,6 +6,10 @@ They do not define today's run settings. Use [README](../../README.md),
 
 | Record | Scope |
 | --- | --- |
+| [Repository interface cleanup](repository_cleanup_20261116.md) | November 16 completed-tool archive, reusable maintenance namespace and concise documentation |
+| [Private image and default inputs](private_image_20261116.md) | November 16 default adoption, private build, runtime parity and sharing boundary |
+| [Working-input deidentification](deidentification_20261116.md) | November 16 package preservation and original/copy equivalence |
+| [Apptainer setup](apptainer_20261112.md) | November 12 synthetic image build and full-pipeline parity |
 | [Figure module extraction](figure_modules_20261103.md) | November 3 rendering organization, provenance coverage, parity checks and smoke run |
 | [Single Conda-aware launcher](conda_launcher_20261020.md) | October 20 automatic environment selection and shell-wrapper retirement |
 | [All-layer execution and audit fixes](all_layers_only_20261020.md) | October 20 public interface retirement, regression fixes, acceptance and rollback |

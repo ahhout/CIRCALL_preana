@@ -2,7 +2,7 @@
 from pathlib import Path
 import pytest
 
-from analysis.historical_workbooks import build, engine_directory
+from archive.retired.completed_migrations_20261116.analysis.historical_workbooks import build, engine_directory
 
 
 def test_rebuild_reads_old_and_new_layouts_without_overwriting(tmp_path):

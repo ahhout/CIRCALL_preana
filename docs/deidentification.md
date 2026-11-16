@@ -57,7 +57,7 @@ is private data; reusing it preserves aliases across later copies without editin
 the existing mapping. Omitting `--group-map` creates a new alias set.
 
 ```bash
-conda run --no-capture-output -n pre_analysis python -B -m analysis.deidentify_workbooks \
+conda run --no-capture-output -n pre_analysis python -B -m analysis.maintenance.deidentify_workbooks \
   --config input/private/deidentification_20261116_ready/original_master.json \
   --output-dir input/deidentified_next \
   --private-dir input/private/deidentification_next \
@@ -76,5 +76,5 @@ The helper prints counts and safe failure classes, never names or mapping values
 Its focused synthetic checks are:
 
 ```bash
-conda run --no-capture-output -n pre_analysis python -B -m pytest -q -p no:cacheprovider tests/test_deidentification.py
+conda run --no-capture-output -n pre_analysis python -B -m pytest -q -p no:cacheprovider tests/maintenance/test_deidentification.py
 ```

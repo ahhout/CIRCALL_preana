@@ -20,8 +20,8 @@ from openpyxl.utils.cell import coordinate_to_tuple
 
 from analysis.provenance import digest, write_json
 from analysis.sample_io import read_sheet
-from analysis.extraction_status import CELL, ROW, cell_xml
-from analysis.workbook_cleanup import NS, REL
+from analysis.maintenance.xlsx_patch import CELL, ROW, cell_xml
+from analysis.maintenance.workbook_cleanup import NS, REL
 
 
 def missing(value):

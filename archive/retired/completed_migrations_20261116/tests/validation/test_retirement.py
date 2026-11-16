@@ -6,7 +6,7 @@ from openpyxl import Workbook
 from PIL import Image
 import pytest
 
-from analysis.validation import validate_retirement as validator
+from archive.retired.completed_migrations_20261116.analysis.validation import validate_retirement as validator
 
 
 def runs(tmp_path):

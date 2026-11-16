@@ -7,7 +7,7 @@ import unittest
 from zipfile import ZipFile
 
 from openpyxl import Workbook,load_workbook
-from analysis.patient_ids import plan,run
+from archive.retired.completed_migrations_20261116.analysis.patient_ids import plan,run
 from analysis.provenance import digest
 
 

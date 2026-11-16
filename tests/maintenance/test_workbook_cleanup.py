@@ -7,7 +7,7 @@ from zipfile import ZipFile
 
 from openpyxl import Workbook, load_workbook
 
-from analysis.workbook_cleanup import clean, digest
+from analysis.maintenance.workbook_cleanup import clean, digest
 
 
 class WorkbookCleanupTests(unittest.TestCase):

@@ -16,7 +16,7 @@ htmlcov/
 .maintenance/
 /codex-clean-cache
 
-# Clinical workbooks stay local pending reviewed deidentification (see README To do).
+# Clinical workbooks/private mappings stay local; see the README sharing review.
 # Data & outputs (often large / potentially sensitive)
 raw_data/
 runs/
@@ -115,6 +115,15 @@ archive/retired/conda_launcher_20261020/**
 !archive/retired/conda_launcher_20261020/*.sh
 !archive/retired/conda_launcher_20261020/*.md
 !archive/retired/conda_launcher_20261020/*.json
+
+# Reviewed completed migration code/configuration/tests only.
+!archive/README.md
+!archive/retired/completed_migrations_20261116/
+archive/retired/completed_migrations_20261116/**
+!archive/retired/completed_migrations_20261116/**/
+!archive/retired/completed_migrations_20261116/**/*.py
+!archive/retired/completed_migrations_20261116/**/*.md
+!archive/retired/completed_migrations_20261116/**/*.json
 
 # Apply local-state and credential exclusions after archive exceptions.
 .aws/

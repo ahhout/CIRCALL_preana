@@ -12,9 +12,11 @@ from zipfile import ZipFile
 
 from openpyxl import load_workbook
 
-from analysis.workbook_cleanup import clean, digest, MISSING
+from analysis.maintenance.workbook_cleanup import clean, digest, MISSING
 
-ROOT = Path(__file__).resolve().parents[1]
+from analysis.provenance import ROOT
+
+DEFAULT_CONFIG = Path(__file__).resolve().parents[1]/'configs/maintenance/workbook_harmonization.json'
 
 
 def replacements(path, cohort, config):
@@ -102,7 +104,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--retrospective',type=Path,required=True)
     parser.add_argument('--circall',type=Path,required=True)
-    parser.add_argument('--config',type=Path,default=ROOT/'configs/maintenance/workbook_harmonization.json')
+    parser.add_argument('--config',type=Path,default=DEFAULT_CONFIG)
     parser.add_argument('--output-dir',type=Path,required=True)
     args=parser.parse_args()
     if args.output_dir.exists():
@@ -120,7 +122,7 @@ def main():
     args.output_dir.mkdir(parents=True)
     report={'started_utc':started,'command':[sys.executable,*sys.argv],
             'config_path':str(args.config),'config_sha256':digest(args.config),
-            'code_sha256':{str(p.relative_to(ROOT)):digest(p) for p in [Path(__file__),ROOT/'analysis/workbook_cleanup.py']},
+            'code_sha256':{str(p.relative_to(ROOT)):digest(p) for p in [Path(__file__),ROOT/'analysis/maintenance/workbook_cleanup.py']},
             'environment_lock_sha256':digest(ROOT/'environments/conda-linux-64.lock'),
             'packages':{'openpyxl':version('openpyxl')},'workbooks':[]}
     for cohort in ['retrospective','circall']:

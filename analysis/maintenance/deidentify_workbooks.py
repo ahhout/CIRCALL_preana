@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 from analysis.configuration import unique_object
-from analysis.deidentification_package import CLEAR, group_values, scan_names, transform
+from analysis.maintenance.deidentification_package import CLEAR, group_values, scan_names, transform
 from analysis.layer_configuration import LAYERS, SOURCES
 from analysis.provenance import ROOT, digest
 
@@ -71,7 +71,7 @@ def run(config, output, private, group_map=None):
                   study_id_caution='Existing protocol IDs may contain initials; they remain approved pseudonyms, not proof of anonymity',
                   command=[sys.executable, *sys.argv], config_sha256=digest(config),
                   code_sha256={str(p.relative_to(ROOT)): digest(p) for p in
-                               (Path(__file__), ROOT/'analysis/deidentification_package.py')},
+                               (Path(__file__), Path(__file__).with_name('deidentification_package.py'))},
                   environment_lock_sha256=digest(ROOT/'environments/conda-linux-64.lock'),
                   workbooks={})
     names = set()

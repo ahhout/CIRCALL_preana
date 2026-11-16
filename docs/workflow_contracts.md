@@ -34,6 +34,11 @@ cross-workflow prepared-table exchange or patient linkage is performed.
 | Controls/pooling | Adult/pediatric controls descriptive only; exploratory plasma pooling enabled in full/longitudinal profiles by investigator request; direct CLI pooling remains opt-in | No canonical control/table exchange | No control reference or cohort exchange |
 | Models/correction | One patient-only categorical-time random-intercept ML MixedLM per cohort; planned diagnosis contrasts and BH per cohort; descriptive Pearson/Spearman only | Peripheral-blast OLS with HC3 by default; other predictors descriptive unless selected; BH across selected predictor tests | Random-intercept linear-time model; configured response transform; baseline-anchored displayed predictions; deterministic bootstrap/jitter seeds 42 |
 
+Maintenance commands in dated amendments below preserve their historical names.
+Current reusable tools are in [maintenance](maintenance.md); completed migrations
+and their relocated commands are in the [archive index](../archive/README.md).
+No scientific rule is changed by this file organization.
+
 ## Diagnosis associations across cohorts — October 1, 2026
 
 The investigator clarified that diagnosis associations and longitudinal analyses
@@ -455,7 +460,7 @@ still requires confirmation before changing their analytical treatment.
 
 The investigator approved harmonizing the cleaned workbook copies. The exact
 header aliases and specimen mappings are versioned in
-[`configs/maintenance/workbook_harmonization.json`](../configs/maintenance/workbook_harmonization.json).
+[`configs/maintenance/workbook_harmonization.json`](../archive/retired/completed_migrations_20261116/configs/maintenance/workbook_harmonization.json).
 
 | Rule | Decision and rationale | Source |
 | --- | --- | --- |

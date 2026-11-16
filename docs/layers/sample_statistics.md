@@ -71,24 +71,12 @@ exported. Hidden audit folders remain sensitive local evidence, not access contr
 
 ## Identity preparation
 
-The October 6 investigator revision supersedes the earlier RETRO-code proposal.
-Use existing inclusion identifiers as `patient_id`. Preserve recorded IDs and
-fill gaps by exact lastname–firstname–DOB tuples, using `unk-NNN-L-F` where no ID
-exists. The correction helper accepts either the renamed header or `inclusion_id`
-and renames the latter explicitly. It refuses open workbooks, existing destinations,
-ambiguous mappings and incomplete identities; unaffected rows remain unchanged.
-
-```bash
-conda run -n pre_analysis python -m analysis.patient_ids \
-  --inventory input/cfDNA_inventaire_retrospective_05102026.xlsx \
-  --output-dir archive/migrations/<fresh-patient-id-update> --adopt
-```
-
-Without `--adopt`, this produces a verified copy and backup without replacing the
-input. Review `patient_id_report.json` for unfilled cells and pre-existing identity
-variations. No name removal occurs in this correction or during statistics.
-Existing inclusion IDs can identify the same patient across inconsistent demographic
-annotations; Layer 2 preserves those recorded IDs rather than splitting them.
+Retrospective analysis uses recorded `patient_id` values, with no name fallback.
+The original name/DOB-based ID backfill was a completed migration and is now
+[archived](../../archive/retired/completed_migrations_20261116/README.md).
+It is not a preparation step for the current pseudonymised copies; see
+[working-input guidance](../deidentification.md). Recorded IDs remain unchanged and define groups even when historical demographic
+annotations differ.
 
 ## Validation and limitations
 

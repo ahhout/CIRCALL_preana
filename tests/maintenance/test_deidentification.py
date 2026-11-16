@@ -9,7 +9,7 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.comments import Comment
 import pytest
 
-from analysis.deidentification_package import group_values, scan_names, signatures, transform
+from analysis.maintenance.deidentification_package import group_values, scan_names, signatures, transform
 from analysis.provenance import digest
 
 
@@ -117,7 +117,7 @@ def test_prefixed_worksheet_namespaces_preserve_caches(tmp_path):
 
 
 def test_unapproved_measurement_change_is_rejected_before_publication(tmp_path, monkeypatch):
-    import analysis.deidentification_package as package
+    import analysis.maintenance.deidentification_package as package
     source, target = tmp_path/'source.xlsx', tmp_path/'must_not_exist.xlsx'
     fixture(source)
     original = package.patch_sheet

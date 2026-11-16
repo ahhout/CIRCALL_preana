@@ -62,6 +62,8 @@
   Do not restore archived entrypoints or migrate older-only methods without a separate decision.
 - Keep active code in analysis/, configuration in configs/, environment
   definitions in environments/, and documentation in docs/.
+- Reusable workbook tools live in analysis/maintenance/. Completed migration tools,
+  their configurations and tests live in archive/retired/completed_migrations_20261116/.
 - Treat archive/ and earlier outputs as retained evidence.
   configs/pipeline_layers.json owns active input paths, now selecting validated
   pseudonymised working copies. input/retrospective_blast_count_01102026.xlsx

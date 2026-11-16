@@ -21,10 +21,9 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 
 from analysis.provenance import ROOT, digest
-from analysis.workbook_cleanup import NS, REL, numeric
+from analysis.maintenance.xlsx_patch import CELL, ROW, cell_xml
+from analysis.maintenance.workbook_cleanup import NS, REL, numeric
 
-CELL = re.compile(rb'<c\b[^>]*?\br="([A-Z]+[0-9]+)"[^>]*?(?:/>|>.*?</c>)',re.S)
-ROW = re.compile(rb'(<row\b[^>]*\br="([0-9]+)"[^>]*>)(.*?)(</row>)',re.S)
 DIMENSION = re.compile(rb'<dimension\b[^>]*\bref="([^"]+)"[^>]*/>')
 
 
@@ -75,16 +74,6 @@ def plan_changes(path, selected, dependent):
     return changes,conflicts
 
 
-def cell_xml(coordinate,value,old=None,style=None):
-    if old is None:
-        opening=f'<c r="{coordinate}"'+(f' s="{style}"' if style is not None else '')+'>'
-        opening=opening.encode()
-    else:
-        opening=old[:old.index(b'>')+1].replace(b'/>',b'>')
-        opening=re.sub(rb'\s+t="[^"]*"',b'',opening)
-    if value is None:
-        return opening[:-1]+b'/>'
-    return opening[:-1]+b' t="inlineStr"><is><t xml:space="preserve">'+escape(value,quote=False).encode()+b'</t></is></c>'
 
 
 def normalize(path,destination,selected,dependent):

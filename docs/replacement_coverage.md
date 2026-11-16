@@ -18,10 +18,9 @@ supersedes earlier compatibility-retention and migration plans.
 | `association_methods.py`, `advanced_analysis/` | Shared approved fits/diagnostics and Layer 3 preparation/reporting; frozen synthetic numerical references remain active |
 | `sample_statistics/`, `disease_modeling/` | Layer 2 statistics and Layer 4 descriptive tracking; identities, populations, correction rules and privacy remain unchanged |
 | Shared plotting and scientific definitions | Current presentation, seeds and approved settings; no migration or new scientific default |
-| `analysis/validation/` | Layer 3/4 validation and explicit retirement equivalence; older-only validators are archived |
-| Shared workbook tools and `configs/maintenance/` | Explicit read-only audits and approved maintenance; no automatic repairs |
-| `analysis/migrate_retrospective_blasts.py` | Maintained migration helper moved unchanged from sample_analysis, with retained maintenance tests |
-| `analysis/historical_workbooks.py` | Packages explicit historical CSV results without rerunning statistics; historical layout resolution is local to this tool |
+| `analysis/validation/` | Current Layer 3/4 validation; completed retirement equivalence is archived |
+| `analysis/maintenance/`, `configs/maintenance/` | Reusable explicit workbook preparation/deidentification; never automatic repair |
+| Completed migrations and historical report packaging | [Archived with tests/configuration](../archive/retired/completed_migrations_20261116/README.md); no runtime imports |
 | Shared Conda YAML/Linux lock | Unchanged pre_analysis environment; no dependency removal or lock regeneration |
 
 ## Historical functionality and paths
