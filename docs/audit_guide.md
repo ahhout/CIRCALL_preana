@@ -244,3 +244,11 @@ records the original/copy full-run comparison, package/source preservation and
 privacy scope. Source path/hash changes are expected; scientific selections,
 measurements and results must remain equivalent. The private mapping and clinical
 copies are Git-ignored and excluded from code-only evidence snapshots.
+
+
+The [November 16 default/private-image acceptance](history/private_image_20261116.md)
+records default-source adoption, the clean build checkpoint, embedded data/code
+hashes, current-default host execution and the private-image smoke comparison.
+The validation run mounted a read-only profile override to replay the host's
+recorded assessment time. The SIF's normal profile still uses current assessment
+time; its default preflight passed without a configuration or input mount.

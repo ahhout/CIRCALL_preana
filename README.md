@@ -38,8 +38,8 @@ are local and Git-ignored; a code-only clone does not include them.
 - [ ] Review retained dates, protocol IDs/initials and rare clinical combinations
   before sharing a clinical-data image. These working copies are not certified
   anonymous; workbooks, private mappings and data-bearing images stay outside Git.
-- [x] Adapt packaging to Apptainer and validate a complete four-layer run with
-  synthetic inputs. Clinical-data acceptance remains pending the review above.
+- [x] Adopt the working copies as defaults and validate a private Apptainer image
+  through all four layers. Sharing review remains open above.
 
 ## Container build (Linux x86-64)
 
@@ -54,16 +54,24 @@ see [configuration](docs/configuration.md). The helper copies selected bytes
 unchanged and does not anonymise them. Deidentification of the current clinical
 workbooks has produced validated pseudonymised working copies, with remaining
 sharing review in the [to-do list](#to-do). Use synthetic sources for shared images
-until that review is complete. No clinical data image has been built or published.
+until that review is complete. A private local image has been built and validated;
+no clinical image has been published. The [acceptance record](docs/history/private_image_20261116.md)
+identifies its clean code checkpoint and test results.
 
 ```bash
+umask 077
+mkdir -p .maintenance
+mkdir -m 700 .maintenance/container_build_next
 python3 environments/container/build.py \
-  --config /absolute/path/to/reviewed_master.json \
+  --config configs/pipeline_layers.json \
   --arial-dir /usr/share/fonts/truetype/msttcorefonts \
-  --context .maintenance/container_builds/reviewed_build \
-  --image .maintenance/container_builds/circall-preana.sif
+  --context .maintenance/container_build_next/context \
+  --image .maintenance/container_build_next/circall-preana-private.sif \
+  --root-mapped-build
+chmod 600 .maintenance/container_build_next/circall-preana-private.sif
 ```
 
+The example creates a fresh owner-only parent and protects the SIF itself.
 Each context and image destination must be fresh; existing files are preserved.
 Contexts and SIF images are Git-ignored and can contain selected data and fonts.
 `--prepare-only` prepares a context without building. On this WSL installation,
@@ -77,14 +85,18 @@ Use fonts covered by the applicable licence for installation and sharing;
 see [Microsoft's redistribution guidance](https://learn.microsoft.com/en-us/typography/fonts/font-faq).
 The Conda definition and lock are unchanged; Arial is an image-level asset.
 
-Run from WSL/Linux. Without pipeline arguments the image performs preflight:
+The tested private image below exists only in this workspace and is Git-ignored.
+For a newly built image, set `pipeline_image` to its path. Run from WSL/Linux;
+without pipeline arguments the image performs preflight:
 
 ```bash
-apptainer run --cleanenv --containall .maintenance/container_builds/circall-preana.sif
+umask 077
+pipeline_image=.maintenance/private_clinical_image_20261116/circall-preana-private.sif
+apptainer run --cleanenv --containall "$pipeline_image"
 mkdir -p outputs/container
 apptainer run --cleanenv --containall \
   --bind "$PWD/outputs/container:/app/outputs" \
-  .maintenance/container_builds/circall-preana.sif --output-dir outputs/smoke
+  "$pipeline_image" --output-dir outputs/run_next
 ```
 
 Execution uses your host UID/GID and a read-only image. The output parent must be
