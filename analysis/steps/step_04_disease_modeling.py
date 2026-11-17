@@ -82,7 +82,7 @@ def code_files():
     return [ROOT/p for p in shared]+sorted((ROOT/'analysis/disease_modeling').rglob('*.py'))
 
 
-def preflight(args):
+def evaluated_preflight(args):
     d = load_definitions(args.definitions)
     rules = load_rules(args.rules)
     states, inputs = {}, {}
@@ -102,18 +102,22 @@ def preflight(args):
                   validation_quality='errors_found' if any(r['status'] != 'complete' for r in previews.values()) else 'review_needed' if any(r['summary'].get('integrity_reviews') or r['summary'].get('clinical_cache_unavailable') for r in previews.values()) else 'no_issues_detected')
     verify_inputs(record['inputs'])
     verify_source_states(states)
+    return record, evaluated
+
+
+def preflight(args):
+    record, _ = evaluated_preflight(args)
     return record
 
 
 def run(args):
-    record = preflight(args)
+    started = utc_now()
+    record, evaluated = evaluated_preflight(args)
     output = Path(args.output_dir)
     output.mkdir(parents=True, exist_ok=False)
-    record.update(status='running', started_utc=utc_now(), finished_utc=None, cohorts=[], artifacts=[], analysis_status=[])
+    record.update(status='running', started_utc=started, finished_utc=None, cohorts=[], artifacts=[], analysis_status=[])
     write_json(output/'run_manifest.json', record)
     d = record['resolved_settings']['disease_definition']
-    rules = record['resolved_settings']['rules_definition']
-    evaluated = {c: evaluate(c, args, d, rules) for c in selected_cohorts(args)}
 
     def publish_scope(scope, result, prepared, integrity=None):
         native = output/scope
