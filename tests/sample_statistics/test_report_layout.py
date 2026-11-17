@@ -243,3 +243,17 @@ def test_tissue_subtotals_show_all_centers_rdb_and_trs_with_distinct_patients(tm
     assert [r['Taux de réception'] for r in plasma]==[pytest.approx(2/3),.5,1.]
     assert [r['Hors délai'] for r in plasma]==[2,1,1]
     book.close()
+
+
+def test_formula_cannot_replace_literal_pseudonym(tmp_path):
+    result = saved_result()
+    definitions = load_definitions(ROOT/'configs/definitions/sample_statistics.json')
+    path = tmp_path/'statistics.xlsx'
+    workbook(path, result, definitions)
+    book = load_workbook(path)
+    cell = book['Retards']['A6']
+    cell.data_type = 'f'
+    book.save(path)
+    book.close()
+    with pytest.raises(ValueError, match='formula'):
+        validate_workbook(path, result, definitions)

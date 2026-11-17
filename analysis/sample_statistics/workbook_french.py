@@ -71,6 +71,13 @@ def translate_label(value):
     return value
 
 
+def translate_status(status):
+    status = status.replace('Status: ', 'Statut : ').replace(' | Assessment: ', ' | Évaluation : ')
+    for source, target in [('complete','terminé'),('blocked','bloqué'),('Unavailable','Indisponible')]:
+        status = status.replace(source, target)
+    return status
+
+
 def localize_workbook(book):
     """Translate only presentation cells; keep Reference and pseudonyms verbatim."""
     from openpyxl.utils.cell import range_boundaries
@@ -90,9 +97,7 @@ def localize_workbook(book):
         sheet.title = SHEETS[name]
         sheet.cell(1, 1, f'CIRCALL · {sheet.title}')
         status = sheet.cell(2, 1).value
-        status = status.replace('Status: ', 'Statut : ').replace(' | Assessment: ', ' | Évaluation : ')
-        for source, target in [('complete','terminé'),('blocked','bloqué'),('Unavailable','Indisponible')]:
-            status = status.replace(source, target)
+        status = translate_status(status)
         sheet.cell(2, 1, status)
         sheet.cell(3, 1, NOTES[name])
         for row in sheet.iter_rows(min_row=4):
