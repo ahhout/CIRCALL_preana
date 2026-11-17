@@ -91,6 +91,7 @@ def run(args):
     d = record['resolved_settings']['association_definition']
     rules = record['resolved_settings']['rules_definition']
     successful = {}
+    standardized_by_model = {}
 
     def publish_scope(scope, frame, result, models, evidence, residuals):
         native = output/scope
@@ -107,7 +108,8 @@ def run(args):
                     diagnostics = native/'diagnostics'/variable
                     diagnostics.mkdir(parents=True)
                     outcome = variable.split('/')[0]
-                    engine.plot_assumptions(model, diagnostics, outcome_label=d['outcomes'][outcome]['label'], cohort=scope)
+                    engine.plot_assumptions(model, diagnostics, outcome_label=d['outcomes'][outcome]['label'], cohort=scope,
+                                            standardized=standardized_by_model.pop(model))
             figures(native/'figures', frame, result, models, args, d)
         workbook(native/'associations.xlsx', result, d)
         validate_workbook(native/'associations.xlsx', result, d)
@@ -132,7 +134,8 @@ def run(args):
                 frame, preparation_counts, evidence, issues = prepare(path, cohort, d, sample_selection_seed=args.sample_selection_seed)
                 counts.update(preparation_counts)
             status = 'blocked' if issues else 'complete'
-            result, models, residuals = analyze(frame, cohort, args, d, status=status, counts=counts, blocking=issues)
+            result, models, residuals = analyze(frame, cohort, args, d, status=status, counts=counts, blocking=issues,
+                                                standardized_by_model=standardized_by_model)
             publish_scope(cohort, frame, result, models, evidence, residuals)
             if status == 'complete':
                 successful[cohort] = frame

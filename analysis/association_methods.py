@@ -217,9 +217,9 @@ def influence_diagnostics(model):
     return leverage, standardized, cooks
 
 
-def model_diagnostics(model):
+def model_diagnostics(model, *, influence=None):
     """Aggregate residual/influence checks; no additional hypothesis tests."""
-    leverage, standardized, cooks = influence_diagnostics(model)
+    leverage, standardized, cooks = influence if influence is not None else influence_diagnostics(model)
     result = dict(status='review', n=int(model.nobs), df_resid=float(model.df_resid),
         max_leverage=float(np.max(leverage)),
         max_cooks_distance=float(np.max(cooks[np.isfinite(cooks)])) if np.isfinite(cooks).any() else np.nan,
@@ -238,7 +238,7 @@ def _save_figure(figure: plt.Figure, output_path: Path) -> None:
     save_figure(figure, output_path)
     plt.close(figure)
 
-def plot_assumptions(model: object, output_dir: Path, *, outcome_label: str = 'cfDNA', cohort: str | None = None) -> None:
+def plot_assumptions(model: object, output_dir: Path, *, outcome_label: str = 'cfDNA', cohort: str | None = None, standardized=None) -> None:
     from analysis.utils.plot_style import COHORT_COLORS, COHORT_MARKERS, INK, style_axes, save_figure
     color = COHORT_COLORS[cohort] if cohort else '#2864a5'
     marker = COHORT_MARKERS[cohort] if cohort else 'o'
@@ -264,7 +264,8 @@ def plot_assumptions(model: object, output_dir: Path, *, outcome_label: str = 'c
             _save_figure(figure,path)
     fitted = np.asarray(model.fittedvalues)
     residuals = np.asarray(model.resid)
-    _, standardized, _ = influence_diagnostics(model)
+    if standardized is None:
+        _, standardized, _ = influence_diagnostics(model)
 
     figure, axis = plt.subplots(figsize=(6.8, 5.0))
     scatter(axis, fitted, residuals, edgecolor="white", alpha=0.8)

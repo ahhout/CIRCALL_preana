@@ -37,7 +37,7 @@ def unit(variable, scope, args, definitions):
 
 
 def analyze_outcome(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None,
-                    selected_predictors=None):
+                    selected_predictors=None, standardized_by_model=None):
     result = dict(scope=scope, status=status, summary=counts or {}, blocking=blocking or [],
                   tables={k: [] for k in ('Coverage', 'Associations', 'Descriptions', 'Diagnostics')})
     models, residuals = {}, []
@@ -105,10 +105,13 @@ def analyze_outcome(frame, scope, args, definitions, *, status='complete', count
         model, table = engine.fit_regression(data, p)
         models[p.variable] = model
         if model is not None:
-            diag = engine.model_diagnostics(model).iloc[0].to_dict()
+            influence = engine.influence_diagnostics(model)
+            leverage, standardized, cooks = influence
+            if standardized_by_model is not None:
+                standardized_by_model[model] = standardized
+            diag = engine.model_diagnostics(model, influence=influence).iloc[0].to_dict()
             diag['predictor'] = p.variable
             result['tables']['Diagnostics'].append(diag)
-            leverage, _, cooks = engine.influence_diagnostics(model)
             for i, (_, observation) in enumerate(data.iterrows()):
                 residuals.append(dict(subject_hash=observation.subject_hash, predictor=p.variable,
                                       fitted_log10=float(model.fittedvalues.iloc[i]), residual=float(model.resid.iloc[i]),
@@ -138,7 +141,8 @@ def analyze_outcome(frame, scope, args, definitions, *, status='complete', count
     return clean(result), models, clean(residuals)
 
 
-def analyze(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None):
+def analyze(frame, scope, args, definitions, *, status='complete', counts=None, blocking=None, cohorts=None,
+            standardized_by_model=None):
     """Fit only requested outcome/predictor pairs using one shared sample selection."""
     result = dict(scope=scope, status=status, summary=dict(counts or {}), blocking=blocking or [],
                   tables={k: [] for k in ('Coverage', 'Associations', 'Descriptions', 'Diagnostics')})
@@ -156,7 +160,8 @@ def analyze(frame, scope, args, definitions, *, status='complete', counts=None, 
         data = outcome_frame(frame, outcome) if status == 'complete' else frame
         cohort_data = {c: outcome_frame(f, outcome) for c, f in cohorts.items()} if cohorts else None
         part, fits, diagnostic_rows = analyze_outcome(data, scope, args, definitions, status=status,
-                                                     cohorts=cohort_data, selected_predictors=selected)
+                                                     cohorts=cohort_data, selected_predictors=selected,
+                                                     standardized_by_model=standardized_by_model)
         for name, rows in part['tables'].items():
             for row in rows:
                 row = {k.replace('_cfdna_ng_per_ml', '_outcome'): v for k, v in row.items()}
