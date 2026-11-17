@@ -83,23 +83,11 @@ def test_single_launcher_bootstrapped_and_activated_without_older_packages(tmp_p
         assert scopes['retrospective'] == 'complete' and scopes['circall'] == 'blocked'
         assert (master/'04_disease_modeling/circall/disease_modeling.xlsx').exists()
         assert not (master/'04_disease_modeling/circall/figures').exists()
-    directories = {'data_integrity':'01_data_integrity', 'sample_statistics':'02_sample_statistics',
-                   'advanced_analysis':'03_advanced_analysis', 'disease_modeling':'04_disease_modeling'}
-    for entry in entries:
-        standalone = reference
-        directory = directories[entry['name']]
-        # Compare report contents and PNGs, not ZIP timestamps in Excel containers.
-        for p in (standalone/'.audit/workflows'/directory).rglob('*.json'):
-            if p.name == 'run_manifest.json':
-                continue
-            relative = p.relative_to(standalone)
-            assert json.loads(p.read_text()) == json.loads((master/relative).read_text())
-        for p in (standalone/directory).rglob('*.png'):
-            assert digest(p) == digest(master/p.relative_to(standalone))
-        index = json.loads((standalone/'.audit/artifact_index.json').read_text())
-        assert all(digest(standalone/a['path']) == a['sha256'] for a in index['artifacts'])
-    index = json.loads((master/'.audit/artifact_index.json').read_text())
-    assert all(digest(master/a['path']) == a['sha256'] for a in index['artifacts'])
+    from analysis.validation.compare_layered_runs import compare
+    assert compare(reference, master, isolated, isolated)['status'] == 'passed'
+    (master/'unexpected.txt').write_text('synthetic')
+    with pytest.raises(ValueError, match='population'):
+        compare(reference, master, isolated, isolated)
 
 
 def test_helper_compatibility_exports_and_duplicate_key_rejection():

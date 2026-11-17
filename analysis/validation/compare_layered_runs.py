@@ -14,9 +14,13 @@ from analysis.provenance import ROOT, digest, verify_inputs, settings_digest
 from analysis.validation.artifact_checks import checked_index
 
 
+class ParityMismatch(ValueError):
+    """Fixed comparison reason suitable for an aggregate report."""
+
+
 def require(condition, reason):
     if not condition:
-        raise ValueError(reason)
+        raise ParityMismatch(reason)
 
 
 def workbook_equal(left, right):
@@ -53,7 +57,7 @@ def same_artifact(left, right):
         pattern = rb'/(CreationDate|ModDate) \(D:\d{14}[^)]*\)'
         return re.sub(pattern, rb'/\1', left.read_bytes()) == re.sub(pattern, rb'/\1', right.read_bytes())
     if left.suffix == '.json':
-        return json.loads(left.read_bytes()) == json.loads(right.read_bytes())
+        return settings_digest(json.loads(left.read_bytes())) == settings_digest(json.loads(right.read_bytes()))
     return False
 
 
@@ -78,7 +82,10 @@ def inspect(root, code):
     require(manifest['pipeline_kind'] == 'layered' and manifest['output_layout_version'] == 2
             and tuple(w['name'] for w in manifest['workflows']) == LAYERS, 'Incomplete layer selection')
     check_provenance(manifest, code)
+    require(json.loads((root/'.audit/resolved_config.json').read_bytes()) == manifest['resolved_settings'],
+            'Resolved configuration differs from the root manifest')
     states, evidence, publications = [], set(), []
+    metadata = {'.audit/run_manifest.json', '.audit/resolved_config.json'}
     for worker in manifest['workflows']:
         name = worker['name']
         folder = Path('.audit/workflows')/DIRECTORIES[name]
@@ -89,6 +96,7 @@ def inspect(root, code):
                 and worker['quality_status'] == record['quality_status'], 'Incomplete workflow')
         require(all(c.get(key) != 'execution_failed' for c in record['cohorts']
                     for key in ('statistics_status','association_status','disease_status')), 'Worker execution failed')
+        metadata.add(str(folder/'run_manifest.json'))
         check_provenance(record, code)
         preflight = worker['preflight']
         check_provenance(preflight, code)
@@ -110,7 +118,10 @@ def inspect(root, code):
     held = any(w['quality_status'] == 'errors_found' for w in manifest['workflows'])
     require(manifest['status'] == ('failed' if held else 'complete') and not manifest.get('error'),
             'Unexpected root completion state')
-    return states, evidence, set(files), [(p['source'], p['path']) for p in publications]
+    reports = {p['path'] for p in publications}
+    logs = {f'.audit/logs/{name}.log' for name in LAYERS}
+    require(set(files) == evidence | metadata | reports | logs, 'Unexpected or missing indexed file')
+    return states, evidence | logs, set(files), [(p['source'], p['path']) for p in publications]
 
 
 def compare(baseline, candidate, baseline_code, candidate_code):
@@ -119,7 +130,7 @@ def compare(baseline, candidate, baseline_code, candidate_code):
     require(left == right, 'Scope, settings, inputs or inventory differs')
     for rel in sorted(left[1]):
         require(same_artifact(baseline/rel, candidate/rel), 'Native artifact content differs')
-    return dict(status='passed', native_artifacts=len(left[1]), indexed=len(left[2]), published=len(left[3]))
+    return dict(status='passed', native_artifacts=len(left[1])-len(LAYERS), indexed=len(left[2]), published=len(left[3]))
 
 
 def main(argv=None):
@@ -136,6 +147,8 @@ def main(argv=None):
         parser.error('Select a fresh report outside both runs')
     try:
         result = compare(*roots, args.baseline_code_root.resolve(), args.candidate_code_root.resolve())
+    except ParityMismatch as error:
+        result = dict(status='failed', reason=str(error))
     except Exception as error:
         result = dict(status='failed', error_code=type(error).__name__)
     report.parent.mkdir(parents=True, exist_ok=True)
