@@ -16,7 +16,7 @@ class OutputTests(unittest.TestCase):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         self.root = Path(temp.name) / 'run'
-        self.details = dict(inputs={}, quality_status='no_issues_detected', report_generation_status='complete',
+        self.details = dict(inputs={}, artifacts=[], quality_status='no_issues_detected', report_generation_status='complete',
                             cohorts=[dict(cohort='circall', report_status='complete')])
 
     def initialized(self):
@@ -29,6 +29,7 @@ class OutputTests(unittest.TestCase):
         path = source / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content)
+        self.details['artifacts'].append(dict(path=relative, sha256=provenance.digest(path)))
         return path
 
     def test_single_layer_integrity_publishes_cohorts_directly(self):
@@ -69,6 +70,38 @@ class OutputTests(unittest.TestCase):
         self.assertFalse((self.root/'circall').exists())
         self.assertEqual(list((self.root/'.audit/publication').iterdir()), [])
         self.assertTrue((source/'circall/integrity_report.xlsx').is_file())
+
+    def test_selected_file_disappears_while_another_remains(self):
+        _, source = self.initialized()
+        self.write(source, 'circall/integrity_report.xlsx')
+        lost = self.write(source, 'retrospective/integrity_report.xlsx')
+        self.details['cohorts'].append(dict(cohort='retrospective', report_status='complete'))
+        lost.unlink()
+        with self.assertRaises(ValueError):
+            outputs.publish(self.root, 'data_integrity', source, self.details)
+        self.assertFalse((self.root/'circall').exists())
+
+    def test_source_replaced_before_staging(self):
+        _, source = self.initialized()
+        path = self.write(source, 'circall/integrity_report.xlsx')
+        path.write_text('replacement')
+        with self.assertRaises(ValueError):
+            outputs.publish(self.root, 'data_integrity', source, self.details)
+        self.assertFalse((self.root/'circall').exists())
+
+    def test_source_changed_during_copy(self):
+        _, source = self.initialized()
+        path = self.write(source, 'circall/integrity_report.xlsx')
+        original_copy = outputs.shutil.copyfile
+
+        def changing_copy(origin, destination):
+            original_copy(origin, destination)
+            path.write_text('replacement')
+
+        with patch.object(outputs.shutil, 'copyfile', side_effect=changing_copy):
+            with self.assertRaises(ValueError):
+                outputs.publish(self.root, 'data_integrity', source, self.details)
+        self.assertFalse((self.root/'circall').exists())
 
     def test_index_includes_audit_evidence_and_excludes_cache(self):
         record, source = self.initialized()

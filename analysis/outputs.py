@@ -61,7 +61,7 @@ def deliverables(workflow, source, record):
                     for c in record['cohorts'] if c['report_status']=='complete'}
     else:
         raise ValueError('Unknown registered workflow')
-    return {old: new for old, new in sorted(selected.items()) if (source / old).is_file()}
+    return dict(sorted(selected.items()))
 
 
 def publication_directory(root, workflow):
@@ -89,6 +89,9 @@ def publish(root, workflow, source, record):
         raise ValueError('Completed workflow has no reviewed deliverables')
     temporary = root / '.audit' / 'publication'
     temporary.mkdir(exist_ok=True)
+    approved = {item['path']: item['sha256'] for item in record['artifacts']}
+    if len(approved) != len(record['artifacts']):
+        raise ValueError('Duplicate native artifact')
     mappings = []
     with tempfile.TemporaryDirectory(prefix=workflow + '-', dir=temporary) as name:
         stage = Path(name) / 'results'
@@ -100,12 +103,14 @@ def publish(root, workflow, source, record):
             if any(p.is_symlink() for p in (origin, *origin.parents) if p.is_relative_to(source)):
                 raise ValueError('Symlinks cannot be published')
             destination.parent.mkdir(parents=True, exist_ok=True)
-            before = digest(origin)
+            expected = approved.get(old)
+            if expected is None or not origin.is_file():
+                raise ValueError('Selected native artifact is missing')
             shutil.copyfile(origin, destination)
-            if digest(destination) != before or digest(origin) != before:
+            if digest(destination) != expected or digest(origin) != expected:
                 raise ValueError('Artifact changed during publication')
             mappings.append({'workflow': workflow, 'source': str(origin.relative_to(root)),
-                             'path': str((target / new).relative_to(root)), 'sha256': before})
+                             'path': str((target / new).relative_to(root)), 'sha256': expected})
         if flat:
             children = sorted(stage.iterdir())
             if any((root / child.name).exists() or (root / child.name).is_symlink() for child in children):
