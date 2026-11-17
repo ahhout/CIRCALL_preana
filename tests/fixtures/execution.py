@@ -74,10 +74,10 @@ def run_standalone(workflow, root, settings, execute, complete):
 
 def layer_main(name, argv):
     """Exercise an internal engine and build historical artifacts for reader tests."""
-    import importlib
+    from analysis.steps import stage
     from copy import copy
     from analysis.worker import completion
-    module = importlib.import_module('analysis.' + name + '.runner')
+    module = stage(name)
     args = module.arguments(argv)
     try:
         if args.output_dir is not None and (args.output_dir.exists() or any(p.is_symlink() for p in (args.output_dir, *args.output_dir.parents))):

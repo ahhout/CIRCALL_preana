@@ -1,7 +1,7 @@
 """Receipt-status counts using the established cohort display."""
 from collections import Counter
 
-from analysis.plot_style import COHORT_COLORS, COHORT_LABELS, style_axes
+from analysis.utils.plot_style import COHORT_COLORS, COHORT_LABELS, style_axes
 from ..labels import RECEIPT_LABELS
 
 

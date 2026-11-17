@@ -76,7 +76,7 @@ def prepare(path, cohort, d, *, duplicate_policy):
         key = identity(row[config['identity']], cohort, 'mrd', d)
         if key is None:
             raise ClinicalError('invalid_mrd_participant_id', sheet=config['sheet'], cell=row[config['identity']].coordinate)
-        from analysis.plot_style import center_from_id
+        from analysis.utils.plot_style import center_from_id
         centers[key] = center_from_id(row[config['identity']].value, cohort)
         represented.add(key)
         counters['selected_source_rows'] += 1

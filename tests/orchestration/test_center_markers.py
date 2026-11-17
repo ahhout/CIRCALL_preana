@@ -10,7 +10,7 @@ import pandas as pd
 import pytest
 import statsmodels.formula.api as smf
 
-from analysis.plot_style import COHORT_COLORS, scatter_points, center_from_id
+from analysis.utils.plot_style import COHORT_COLORS, scatter_points, center_from_id
 from analysis.provenance import ROOT
 
 
@@ -41,7 +41,7 @@ def test_scope_keeps_coordinates_and_retrospective_shape(cohort,solo,markers):
 
 def test_diagnostic_qq_centers_follow_sorted_residuals(tmp_path,monkeypatch):
     from analysis import association_methods as methods
-    from analysis import plot_style
+    from analysis.utils import plot_style
     frame=pd.DataFrame(dict(x=[1,2,3,4,5,6],y=[2,6,3,8,4,10],
                             center=['TRS','RDB','RDB','TRS','TRS','RDB']))
     model=smf.ols('y ~ x',data=frame).fit()
@@ -62,7 +62,7 @@ def test_diagnostic_qq_centers_follow_sorted_residuals(tmp_path,monkeypatch):
 
 
 def test_layer4_center_shapes_and_retrospective_circle_are_preserved():
-    from analysis.disease_modeling.reporting import count_figure,mrd_figure
+    from analysis.disease_modeling.step_03_report import count_figure, mrd_figure
     d=json.loads((ROOT/'configs/definitions/disease_modeling.json').read_text())
     args=SimpleNamespace(jitter_seed=42,mrd_negative_level=1e-8,mrd_unknown_level=1e-6,
                          mrd_positive_nq_level=1e-6,overlay_max_day=8,kinetics_y_scale='linear',
@@ -88,7 +88,7 @@ def test_layer4_center_shapes_and_retrospective_circle_are_preserved():
 
 
 def test_circall_layer2_shared_retro_controls_do_not_hide_center_shapes():
-    from analysis.sample_statistics.reporting import grant_figure
+    from analysis.sample_statistics.step_04_report import grant_figure
     d=json.loads((ROOT/'configs/definitions/sample_statistics.json').read_text())
     field='dna_ng_per_ml_plasma'
     rows=[dict(cohort=cohort,center=center,control=control,specimen='plasma',

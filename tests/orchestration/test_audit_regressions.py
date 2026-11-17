@@ -15,7 +15,7 @@ from tests.fixtures.execution import layer_main
 
 def test_layer2_review_is_not_reported_as_clean(tmp_path, monkeypatch):
     from tests.fixtures.sample_statistics import fixture, ASOF
-    from analysis.sample_statistics import runner
+    from analysis.steps import step_02_sample_statistics as runner
     source=tmp_path/'review.xlsx'
     fixture(source)
     book=load_workbook(source)
@@ -42,7 +42,7 @@ def comparison_pair(request,tmp_path,monkeypatch):
     name=request.param
     if name=='advanced_analysis':
         from tests.fixtures.advanced_analysis import sources
-        from analysis.advanced_analysis.runner import load_definitions
+        from analysis.steps.step_03_advanced_analysis import load_definitions
         from analysis.provenance import ROOT
         retro,circ,donors=sources(tmp_path)
         definition=load_definitions(ROOT/'configs/definitions/advanced_analysis.json')
@@ -56,7 +56,7 @@ def comparison_pair(request,tmp_path,monkeypatch):
         paths=sources(tmp_path)
         args=['--inventory',str(paths['inventory']),'--cohort','retrospective',
               '--no-include-controls','--analysis','mrd']
-        monkeypatch.setattr('analysis.disease_modeling.reporting.figures',lambda *a,**kw:None)
+        monkeypatch.setattr('analysis.disease_modeling.step_03_report.figures',lambda *a,**kw:None)
         directory='04_disease_modeling'
     left,right=tmp_path/'left',tmp_path/'right'
     for root in (left,right):
@@ -117,7 +117,7 @@ def test_comparator_rejects_scope_state_mismatch(comparison_pair):
 
 
 def test_count_unit_exponent_exports_without_missing_glyph(tmp_path):
-    from analysis.plot_style import save_figure
+    from analysis.utils.plot_style import save_figure
     fig,ax=plt.subplots()
     ax.plot([1,2],[3,4])
     ax.set_ylabel('WBC count (×10⁹/L)')

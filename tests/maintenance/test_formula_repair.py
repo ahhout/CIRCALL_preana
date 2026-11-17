@@ -9,7 +9,7 @@ from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from analysis.maintenance.repair_inventory_formulas import run,plan
 from analysis.provenance import digest
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 from tests.fixtures.sample_statistics import fixture
 
 class FormulaRepairTests(unittest.TestCase):

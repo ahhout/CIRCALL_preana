@@ -4,7 +4,7 @@ import textwrap
 import numpy as np
 from matplotlib.cbook import boxplot_stats
 
-from analysis.plot_style import COHORT_LABELS, BOX_STYLE, scatter_points, point_handles
+from analysis.utils.plot_style import COHORT_LABELS, BOX_STYLE, scatter_points, point_handles
 
 
 def draw_categorical(ax, data, predictor, scope, definitions):

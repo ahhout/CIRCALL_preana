@@ -11,10 +11,10 @@ from openpyxl import load_workbook
 from PIL import Image
 
 from analysis.validation.artifact_checks import checked_index, matching_figures, scope_states, workflow_files
-from analysis.advanced_analysis.runner import validate_results
+from analysis.steps.step_03_advanced_analysis import validate_results
 from analysis.outputs import engine_directory
 from analysis.provenance import ROOT, digest, utc_now, write_json
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 
 
 def identifying_values(record):

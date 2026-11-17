@@ -9,8 +9,8 @@ from openpyxl import load_workbook
 import pytest
 
 from analysis.provenance import ROOT
-from analysis.sample_io import SourceCell
-from analysis.sample_statistics.core import load_definitions, prepare, assessment
+from analysis.utils.sample_io import SourceCell
+from analysis.sample_statistics.step_01_prepare import load_definitions, prepare, assessment
 from analysis.sample_statistics.calendar_volumes import (
     FIELD, collection_date, calendar_coverage, calendar_groups,
     calendar_points, calendar_figure, validate_calendar_dates)
@@ -124,7 +124,7 @@ def test_prepare_retains_actual_date_and_never_uses_sampling_plan(tmp_path):
 
 @pytest.mark.parametrize('pooled,controls',[(False,False),(True,False),(False,True)])
 def test_only_requested_circall_patient_scope_exports_calendar_plots(tmp_path,pooled,controls):
-    from analysis.sample_statistics.reporting import figures
+    from analysis.sample_statistics.step_04_report import figures
     rows=[row(control=controls),row(specimen='CSF',control=controls)]
     selected={**D,'metrics':{FIELD:D['metrics'][FIELD]}}
     paths=figures(tmp_path,rows,selected,pooled=pooled,controls=controls,pdf_output=False)
@@ -136,7 +136,7 @@ def test_only_requested_circall_patient_scope_exports_calendar_plots(tmp_path,po
 
 
 def test_exclusions_stay_below_center_legend_after_repeated_exports(tmp_path):
-    from analysis.plot_style import save_figure
+    from analysis.utils.plot_style import save_figure
     rows=[row(value=2,center='TRS'),row(value=3,center='RDB'),row(day=None)]
     fig=calendar_figure(rows,calendar_coverage(rows,D)[0])
     legend=fig.legends[0]

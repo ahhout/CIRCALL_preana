@@ -62,7 +62,7 @@ def write_workbook(path, result, rules, source_hash):
           ['Source workbook',result['source']],['Source SHA-256',source_hash or 'Unavailable'],
           ['Rows inspected',sum(s['rows'] for s in result['sheets'])],[],
           ['Sheet','Rows inspected','Error occurrences','Review occurrences','Affected rows','Inspection status']]
-    from .checks import summarize
+    from analysis.data_integrity.step_01_inspect import summarize
     for sheet in result['sheets']:
         counts=summarize([i for i in result['findings'] if i['sheet']==sheet['sheet']])
         rows.append([sheet['sheet'],sheet['rows'],counts['errors'],counts['reviews'],counts['affected_rows'],sheet['status']])
@@ -106,7 +106,7 @@ def write_workbook(path, result, rules, source_hash):
           [22,38,30,14,25,65])
     definitions=[['Field',name,d['unit'],d['description']] for name,d in rules['fields'].items()]
     if result.get('additional_sources'):
-        from analysis.retrospective_controls import NUMERIC
+        from analysis.utils.retrospective_controls import NUMERIC
         definitions += [['Control field',name,unit,'Recorded donor field; fixed-volume formula assumptions are not independently validated.'] for name,unit in NUMERIC.items()]
         definitions += [['Control mapping','Conc ng/mL  plasma','ng/mL','Retrospective control plasma DNA endpoint; existing workflow maps this to dna_ng_per_ml_plasma. Other extraction metadata are not inferred.']]
     definitions += [['Rule',name,values[0],values[1]+'. '+values[2]] for name,values in rules['rules'].items()]

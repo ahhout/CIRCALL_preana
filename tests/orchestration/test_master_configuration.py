@@ -84,7 +84,7 @@ def test_comparison_switches_reach_engine_without_changing_rules(tmp_path):
     entry = pipeline.load_config(write(tmp_path/'master.json', config))['workflows'][2]
     args = pipeline.workflow_args(entry)
     assert args.comparison_switches == switches
-    from analysis.advanced_analysis.preparation import load_definitions
+    from analysis.advanced_analysis.step_01_prepare import load_definitions
     from analysis.advanced_analysis.schema import with_comparison_switches, comparisons
     original = load_definitions(args.definitions)
     resolved = with_comparison_switches(original, args.comparison_switches)

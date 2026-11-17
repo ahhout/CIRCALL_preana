@@ -6,9 +6,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
-from analysis.figure_layout import remove_plot_text, legends_below
-from analysis.plot_style import INK, style_axes
-from ..statistics import pairs
+from analysis.utils.figure_layout import remove_plot_text, legends_below
+from analysis.utils.plot_style import INK, style_axes
+from analysis.advanced_analysis.step_02_analyze import pairs
 from .continuous import draw_continuous
 from .categorical import draw_categorical
 

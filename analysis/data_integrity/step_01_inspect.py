@@ -1,4 +1,5 @@
 """Configured integrity rules; findings contain locations, never source values."""
+from analysis.data_integrity.formula_checks import formula_findings
 from collections import Counter, defaultdict
 from datetime import date, datetime
 import json
@@ -6,12 +7,11 @@ import math
 from pathlib import Path
 import re
 
-from openpyxl.formula import Tokenizer
-from openpyxl.utils.cell import coordinate_to_tuple, range_boundaries
+from openpyxl.utils.cell import coordinate_to_tuple
 
 from analysis.configuration import unique_object
-from analysis.sample_io import read_sheet, SourceReadError
-from analysis.sample_definitions import extraction_state
+from analysis.utils.sample_io import read_sheet, SourceReadError
+from analysis.utils.sample_definitions import extraction_state
 
 RULE_IDS = frozenset('file_unavailable file_unreadable sheet_missing header_missing header_duplicate unheaded_data whitespace category number_text numeric_text number_invalid date_text excel_error broken_reference self_reference identifier_reference cross_row_reference formula_unassessed cache_missing arithmetic denominator missing_operands false_zero missing_result extraction_state_conflict workflow_annotation aliquot_annotation unit_annotation'.split())
 
@@ -113,44 +113,6 @@ def summarize(findings):
             'affected_cells':len(cells()),'error_cells':len(cells('error')),'review_cells':len(cells('review')),
             'error_rows':len(rows('error')),'review_rows':len(rows('review')),
             'quality_status':'errors_found' if errors else 'review_needed' if reviews else 'no_issues_detected'}
-
-
-def formula_findings(cell, sheet_name, headers, identifiers):
-    formula = cell.formula
-    found = set()
-    if '#REF!' in formula.upper():
-        found.add('broken_reference')
-    try:
-        tokens = Tokenizer(formula).items
-    except Exception:
-        return found | {'formula_unassessed'}
-    if any(t.type=='FUNC' and t.value.upper().startswith(('INDIRECT(', 'OFFSET(')) for t in tokens):
-        found.add('formula_unassessed')
-    for token in tokens:
-        if token.type!='OPERAND' or token.subtype!='RANGE':
-            continue
-        ref = token.value
-        if '!' in ref:
-            owner, ref = ref.rsplit('!',1)
-            if owner.strip("'").replace("''", "'") != sheet_name:
-                found.add('cross_row_reference')
-                continue
-        ref = ref.replace('$','')
-        if not re.fullmatch(r'[A-Za-z]+[1-9][0-9]*(?::[A-Za-z]+[1-9][0-9]*)?',ref):
-            found.add('formula_unassessed')
-            continue
-        try:
-            c1,r1,c2,r2 = range_boundaries(ref.upper())
-        except ValueError:
-            found.add('formula_unassessed')
-            continue
-        if c1 <= cell.column <= c2 and r1 <= cell.row <= r2:
-            found.add('self_reference')
-        if r1 != cell.row or r2 != cell.row:
-            found.add('cross_row_reference')
-        if any(headers.get(col) in identifiers for col in range(c1,min(c2,len(headers))+1)):
-            found.add('identifier_reference')
-    return found
 
 
 def inspect_cohort(path, cohort, include_controls, rules, sheets_override=None):

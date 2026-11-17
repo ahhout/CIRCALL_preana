@@ -1,7 +1,7 @@
 """Shared Layer 2/3 presentation; no observation selection or transformations."""
 from functools import lru_cache
 
-from analysis.figure_layout import FONT_FAMILY, FONT_SIZE, prepare_figure
+from analysis.utils.figure_layout import FONT_FAMILY, FONT_SIZE, prepare_figure
 
 COHORT_COLORS = {'circall': '#D55E00', 'retrospective': '#0072B2'}
 COHORT_MARKERS = {'circall': 'o', 'retrospective': '^'}
@@ -54,7 +54,7 @@ def center_from_id(value, cohort):
 def _center_mapping():
     import json
     from pathlib import Path
-    return json.loads((Path(__file__).resolve().parents[1] /
+    return json.loads((Path(__file__).resolve().parents[2] /
                        'configs/definitions/sample_statistics.json').read_text())['centers']
 
 

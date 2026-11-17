@@ -3,7 +3,6 @@ import argparse
 from contextlib import redirect_stderr
 from datetime import datetime, timezone
 import io
-import importlib
 import json
 import math
 import os
@@ -14,6 +13,7 @@ import sys
 from uuid import uuid4
 
 from analysis.configuration import unique_object as _unique_object
+from analysis.steps import stage
 from analysis.layer_configuration import LAYERS, read_profile, expand_layers, select_layers
 from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
 
@@ -64,7 +64,7 @@ def option_argv(options):
 
 
 def workflow_args(entry, output=None):
-    arguments = importlib.import_module('analysis.' + entry['name'] + '.runner').arguments
+    arguments = stage(entry['name']).arguments
     argv = ['--workflow', entry['name'], *option_argv(entry['options'])]
     if output is not None:
         argv.extend(['--output-dir', str(output)])
@@ -178,10 +178,10 @@ def run_worker(command, entry, destination, log):
 def verify_preflight(record):
     verify_inputs(record['inputs'])
     if record.get('workflow') == 'disease_modeling':
-        from analysis.disease_modeling.runner import verify_source_states
+        from analysis.steps.step_04_disease_modeling import verify_source_states
         verify_source_states(record['source_states'])
     if record.get('workflow') in ('data_integrity', 'sample_statistics', 'advanced_analysis'):
-        from analysis.source_state import verify_source_states
+        from analysis.utils.source_state import verify_source_states
         verify_source_states(record['source_states'])
 
 

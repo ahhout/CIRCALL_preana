@@ -10,7 +10,7 @@ import numpy as np
 
 from analysis.configuration import unique_object
 from analysis.provenance import ROOT
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 
 
 def load_definitions(path):

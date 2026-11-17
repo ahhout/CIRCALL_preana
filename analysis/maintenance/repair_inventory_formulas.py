@@ -11,13 +11,13 @@ from xml.etree import ElementTree as ET
 from zipfile import ZipFile
 
 from analysis.provenance import ROOT, digest, envelope, utc_now, write_json
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 from analysis.maintenance.workbook_cleanup import NS, REL
 from analysis.maintenance.xlsx_patch import CELL, cell_xml
 
 
 def plan(source, sheets=None, *, audit=None, clear_invalid_assay_formulas=False):
-    from analysis.data_integrity.checks import inspect_cohort, load_rules
+    from analysis.data_integrity.step_01_inspect import inspect_cohort, load_rules
     from analysis.provenance import ROOT
     findings=inspect_cohort(source,'circall',True,load_rules(ROOT/'configs/definitions/data_integrity.json'))
     error_rows={(f['sheet'],int(re.search(r'\d+$',f['cell'])[0])) for f in findings['findings'] if f['severity']=='error' and f.get('cell')}
@@ -124,8 +124,8 @@ def run(source,destination,adopt=False,*,sheets=None,audit=None,clear_invalid_as
     if audit is not None:inputs['equation_audit']=Path(audit)
     provenance=envelope('inventory_formula_repair',{'sheets':list(changes),'adopt':adopt,'clear_invalid_assay_formulas':clear_invalid_assay_formulas},
                         inputs,
-                        [Path(__file__),ROOT/'analysis/sample_io.py',Path(__file__).with_name('xlsx_patch.py'),
-                         ROOT/'analysis/data_integrity/checks.py',ROOT/'analysis/sample_definitions.py',
+                        [Path(__file__),ROOT/'analysis/utils/sample_io.py',Path(__file__).with_name('xlsx_patch.py'),
+                         ROOT/'analysis/data_integrity/step_01_inspect.py',ROOT/'analysis/data_integrity/formula_checks.py',ROOT/'analysis/utils/sample_definitions.py',
                          Path(__file__).with_name('workbook_cleanup.py'),ROOT/'analysis/provenance.py'],
                         ROOT/'environments/conda-linux-64.lock')
     original_sheets={name:read_sheet(source,name) for name in changes}

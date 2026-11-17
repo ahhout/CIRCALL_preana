@@ -106,8 +106,8 @@ def test_helper_compatibility_exports_and_duplicate_key_rejection():
     import pytest
     from analysis.configuration import unique_object
     from analysis.pipeline import _unique_object
-    from analysis import source_state
-    from analysis.data_integrity import runner
+    from analysis.utils import source_state
+    from analysis.steps import step_01_data_integrity as runner
     assert _unique_object is unique_object
     with pytest.raises(ValueError, match='duplicate keys'):
         json.loads('{"cohort": "all", "cohort": "circall"}', object_pairs_hook=unique_object)

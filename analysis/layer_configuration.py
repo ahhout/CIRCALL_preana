@@ -4,7 +4,9 @@ from pathlib import Path
 
 from analysis.configuration import unique_object
 
-LAYERS = ('data_integrity', 'sample_statistics', 'advanced_analysis', 'disease_modeling')
+from analysis.steps import MODULES
+
+LAYERS = tuple(MODULES)
 SOURCES = {'inventory', 'circall', 'donors', 'blood-counts', 'retrospective-blasts'}
 DEFAULTS = {'cohort', 'include-controls', 'rules', 'pdf-output'}
 

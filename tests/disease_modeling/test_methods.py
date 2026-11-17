@@ -3,10 +3,10 @@ import json
 import matplotlib.pyplot as plt
 import pytest
 
-from analysis.disease_modeling import mrd, counts, reporting
+from analysis.disease_modeling import mrd, counts, step_03_report as reporting
 from analysis.disease_modeling.common import ClinicalError, load_definitions
-from analysis.disease_modeling.runner import arguments, evaluate, combined_results
-from analysis.data_integrity.checks import load_rules
+from analysis.steps.step_04_disease_modeling import arguments, evaluate, combined_results
+from analysis.data_integrity.step_01_inspect import load_rules
 from analysis.provenance import ROOT
 from .fixtures import inventory, count_source, sources, cli
 

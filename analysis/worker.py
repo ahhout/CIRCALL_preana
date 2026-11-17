@@ -7,24 +7,12 @@ from pathlib import Path
 import sys
 import warnings
 
+from analysis.steps import stage
 from analysis.pipeline import workflow_args, REGISTRY
 
 
 def validate_entry(entry):
-    name = entry['name']
-    if name == 'disease_modeling':
-        from analysis.disease_modeling.runner import preflight
-        return preflight(workflow_args(entry))
-    if name == 'advanced_analysis':
-        from analysis.advanced_analysis.runner import preflight
-        return preflight(workflow_args(entry))
-    if name == 'sample_statistics':
-        from analysis.sample_statistics.runner import preflight
-        return preflight(workflow_args(entry))
-    if name == 'data_integrity':
-        from analysis.data_integrity.runner import preflight
-        return preflight(workflow_args(entry))
-    raise ValueError('Unknown or retired workflow')
+    return stage(entry['name']).preflight(workflow_args(entry))
 
 
 def completion(entry, output):
@@ -39,39 +27,12 @@ def completion(entry, output):
     for key in ('inputs', 'code_sha256', 'resolved_settings', 'packages', 'scientific_contract'):
         if not isinstance(record.get(key), dict):
             raise ValueError('Incomplete worker provenance')
-    if name == 'disease_modeling':
-        from analysis.disease_modeling.runner import validate_results
-        validate_results(output, record)
-    elif name == 'advanced_analysis':
-        from analysis.advanced_analysis.runner import validate_results
-        validate_results(output, record)
-    elif name == 'sample_statistics':
-        from analysis.sample_statistics.runner import validate_results
-        validate_results(output,record)
-    elif name == 'data_integrity':
-        from analysis.data_integrity.runner import validate_results
-        validate_results(output,record)
-    else:
-        raise ValueError('Unknown registered workflow')
+    stage(name).validate_results(output, record)
     return record
 
 
 def execute(entry, output):
-    name = entry['name']
-    args = workflow_args(entry, output)
-    if name == 'disease_modeling':
-        from analysis.disease_modeling.runner import run
-        return run(args)
-    if name == 'advanced_analysis':
-        from analysis.advanced_analysis.runner import run
-        return run(args)
-    if name == 'sample_statistics':
-        from analysis.sample_statistics.runner import run
-        return run(args)
-    if name == 'data_integrity':
-        from analysis.data_integrity.runner import run
-        return run(args)
-    raise ValueError('Unknown registered workflow')
+    return stage(entry['name']).run(workflow_args(entry, output))
 
 
 def main(argv=None):

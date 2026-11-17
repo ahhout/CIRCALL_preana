@@ -9,7 +9,7 @@ from zipfile import ZipFile
 
 import pytest
 
-from analysis.disease_modeling import runner
+from analysis.steps import step_04_disease_modeling as runner
 from analysis.pipeline import main as master
 from analysis.provenance import ROOT, digest
 from .fixtures import sources, cli, inventory, count_source

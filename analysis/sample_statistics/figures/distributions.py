@@ -1,6 +1,6 @@
 """Sample distributions with established scales, control references and jitter."""
-from analysis.figure_layout import remove_plot_text
-from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS, BOX_STYLE, style_axes
+from analysis.utils.figure_layout import remove_plot_text
+from analysis.utils.plot_style import COHORT_COLORS, COHORT_MARKERS, BOX_STYLE, style_axes
 from ..labels import MEASUREMENT_LABELS
 
 
@@ -12,7 +12,7 @@ def grant_figure(group, field, definition, visits, pooled, controls, jitter_seed
     import numpy as np
     import textwrap
 
-    from analysis.plot_style import scatter_points, point_handles
+    from analysis.utils.plot_style import scatter_points, point_handles
     patient_cohorts = {r['cohort'] for r in group if not r.get('control', False)}
     inferred = patient_cohorts or {r['cohort'] for r in group}
     circall_only = not pooled and (scope == 'circall' if scope is not None else inferred == {'circall'})

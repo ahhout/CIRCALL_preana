@@ -9,9 +9,9 @@ def calendar_figure(rows, coverage):
     import matplotlib.pyplot as plt
     from matplotlib.dates import AutoDateLocator, ConciseDateFormatter
     from matplotlib.lines import Line2D
-    from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS, COHORT_LABELS, style_axes
+    from analysis.utils.plot_style import COHORT_COLORS, COHORT_MARKERS, COHORT_LABELS, style_axes
 
-    from analysis.plot_style import scatter_points, point_handles
+    from analysis.utils.plot_style import scatter_points, point_handles
     fig, ax = plt.subplots(figsize=(10, 5.8))
     points = calendar_points(rows)
     cohort = coverage['cohort']
@@ -44,7 +44,7 @@ def calendar_figure(rows, coverage):
                f"numeric volume without collection date={coverage['numeric_volume_without_date']}")
     handles = point_handles(cohort, [r.get('center','unknown') for r in rows],
                             circall_only=cohort=='circall', label=label)
-    from analysis.figure_layout import legend_footer
+    from analysis.utils.figure_layout import legend_footer
     legend = fig.legend(handles=handles, title=label if cohort=='circall' else None,
                         loc='lower center', frameon=False)
     legend_footer(fig, legend, missing)

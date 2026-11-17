@@ -2,12 +2,12 @@
 from datetime import datetime
 from openpyxl import Workbook
 from analysis.provenance import ROOT
-from analysis.sample_statistics import core
+from analysis.sample_statistics import step_01_prepare as core
 D = core.load_definitions(ROOT/"configs/definitions/sample_statistics.json")
 ASOF = "2026-10-05T12:00:00+02:00"
 
 def fixture(path,cohort='circall',controls=True,bad=False,names=False):
-    from analysis.data_integrity.checks import load_rules
+    from analysis.data_integrity.step_01_inspect import load_rules
     rules=load_rules(ROOT/'configs/definitions/data_integrity.json')
     headers=list(dict.fromkeys(rules['required']+['timepoint','sampling_plan','extraction_status','dna_id','patient_id','circall_id','nucleic_acid','row']))
     if names:

@@ -143,6 +143,21 @@ results, checks literal workbook strings and PNG/PDF structure, and rechecks sou
 It does not establish equivalence to older clinical preparation. Structural Excel/
 PDF checks do not substitute for visual rendering; record which checks actually ran.
 
+Compare a complete four-layer run or quality hold against its own replay with the
+same source files, effective scientific settings and recorded assessment time:
+
+```bash
+conda run -n pre_analysis python -m analysis.validation.compare_layered_runs \
+  --baseline outputs/layered/<reference> --candidate outputs/layered/<replay> \
+  --baseline-code-root <preserved-code-tree> --report outputs/<fresh-report>.json
+```
+
+Each code root defaults to the current checkout. The report must be outside both
+runs. Exit 0 records matching evidence including equivalent quality holds. The
+comparison checks file inventories, native reports, publication mappings, workbook
+package parts and PNG pixels. Workbook document dates and PDF creation/modification
+metadata may vary. The layer-specific privacy checks remain separate.
+
 Completed workbook migrations, historical CSV packaging and the one-time retirement
 comparison live in the [code-only archive](../archive/retired/completed_migrations_20261116/README.md).
 Their source, configurations, tests and relocation hashes are preserved. They are

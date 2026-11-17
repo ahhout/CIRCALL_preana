@@ -16,8 +16,9 @@ from zipfile import ZipFile
 from openpyxl import Workbook, load_workbook
 
 from analysis.provenance import ROOT, digest
-from analysis.sample_io import SourceCell
-from analysis.sample_statistics import core, runner
+from analysis.utils.sample_io import SourceCell
+from analysis.sample_statistics import step_01_prepare as core
+from analysis.steps import step_02_sample_statistics as runner
 
 
 
@@ -167,7 +168,7 @@ class WorkflowTests(unittest.TestCase):
     def test_independent_gate_and_controls(self):
         fixture(self.retro,'retrospective',bad=True)
         destination=self.root/'blocked'
-        with patch('analysis.sample_statistics.runner.figures',return_value=[]):self.assertEqual(runner.run(self.args(destination)),0)
+        with patch('analysis.steps.step_02_sample_statistics.figures',return_value=[]):self.assertEqual(runner.run(self.args(destination)),0)
         record=json.loads((destination/'run_manifest.json').read_text());runner.validate_results(destination,record)
         self.assertEqual({c['cohort']:c['statistics_status'] for c in record['cohorts']},{'retrospective':'blocked','circall':'complete','pooled':'blocked'})
         self.assertEqual(record['quality_status'],'errors_found')
@@ -177,7 +178,7 @@ class WorkflowTests(unittest.TestCase):
         wb=load_workbook(self.circall);del wb['cohorte_control'];wb.save(self.circall);wb.close()
         for include,expected in [(True,'errors_found'),(False,'no_issues_detected')]:
             out=self.root/str(include)
-            with patch('analysis.sample_statistics.runner.figures',return_value=[]):runner.run(self.args(out,'circall',include))
+            with patch('analysis.steps.step_02_sample_statistics.figures',return_value=[]):runner.run(self.args(out,'circall',include))
             self.assertEqual(json.loads((out/'run_manifest.json').read_text())['quality_status'],expected)
 
     def test_reference_controls_reach_all_scopes_without_entering_patient_rows(self):
@@ -188,7 +189,7 @@ class WorkflowTests(unittest.TestCase):
         for include in (True,False):
             destination=self.root/f'reference-{include}'
             args=self.args(destination,controls=include);args.donors=donors
-            with patch('analysis.sample_statistics.runner.figures',return_value=[]) as plots:
+            with patch('analysis.steps.step_02_sample_statistics.figures',return_value=[]) as plots:
                 runner.run(args)
             patient_calls=[call for call in plots.call_args_list if not call.kwargs.get('controls')]
             self.assertEqual(len(patient_calls),3)
@@ -202,7 +203,7 @@ class WorkflowTests(unittest.TestCase):
     def test_missing_source_and_standalone_nonzero(self):
         self.retro.unlink()
         out=self.root/'standalone'
-        with patch('analysis.sample_statistics.runner.figures',return_value=[]),redirect_stdout(StringIO()),redirect_stderr(StringIO()):
+        with patch('analysis.steps.step_02_sample_statistics.figures',return_value=[]),redirect_stdout(StringIO()),redirect_stderr(StringIO()):
             result=layer_main('sample_statistics', ['--inventory',str(self.retro),'--circall',str(self.circall),'--assessment-time',ASOF,'--output-dir',str(out)])
         self.assertEqual(result,1)
         self.assertTrue((out/'circall/statistics.xlsx').is_file())

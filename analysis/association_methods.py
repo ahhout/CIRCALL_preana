@@ -1,6 +1,6 @@
 """Shared diagnosis association methods; no workbook preparation or row exports."""
 from __future__ import annotations
-from analysis.figure_layout import remove_plot_text
+from analysis.utils.figure_layout import remove_plot_text
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -232,17 +232,17 @@ def model_diagnostics(model):
     return pd.DataFrame([result])
 
 def _save_figure(figure: plt.Figure, output_path: Path) -> None:
-    from analysis.plot_style import save_figure
+    from analysis.utils.plot_style import save_figure
     remove_plot_text(figure)
     figure.tight_layout()
     save_figure(figure, output_path)
     plt.close(figure)
 
 def plot_assumptions(model: object, output_dir: Path, *, outcome_label: str = 'cfDNA', cohort: str | None = None) -> None:
-    from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS, INK, style_axes, save_figure
+    from analysis.utils.plot_style import COHORT_COLORS, COHORT_MARKERS, INK, style_axes, save_figure
     color = COHORT_COLORS[cohort] if cohort else '#2864a5'
     marker = COHORT_MARKERS[cohort] if cohort else 'o'
-    from analysis.plot_style import scatter_points, point_handles
+    from analysis.utils.plot_style import scatter_points, point_handles
     frame = model.model.data.frame
     centers = (frame.loc[model.model.data.row_labels, 'center'].fillna('unknown').to_numpy()
                if cohort == 'circall' and 'center' in frame else None)

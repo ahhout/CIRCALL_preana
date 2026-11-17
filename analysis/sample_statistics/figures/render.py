@@ -1,7 +1,7 @@
 """Select and export the established Layer 2 figure families."""
 from collections import defaultdict
 
-from analysis.plot_style import save_figure
+from analysis.utils.plot_style import save_figure
 from ..calendar_volumes import calendar_groups, calendar_coverage
 from .calendar_volumes import calendar_figure
 from .distributions import grant_figure

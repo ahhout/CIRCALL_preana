@@ -11,8 +11,8 @@ import numpy as np
 import pandas as pd
 
 from analysis.configuration import unique_object
-from analysis.data_integrity.checks import number
-from analysis.sample_io import read_sheet
+from analysis.data_integrity.step_01_inspect import number
+from analysis.utils.sample_io import read_sheet
 from analysis.provenance import ROOT
 from .schema import comparison_shape, observation_columns, predictors
 
@@ -138,7 +138,7 @@ def prepare(path, cohort, d, *, sample_selection_seed=None):
             counts['excluded_outcome_specimen_or_tube'] += 1
         elif not received:
             counts['excluded_outcome_missing_sample_id'] += 1
-        from analysis.plot_style import center_from_id
+        from analysis.utils.plot_style import center_from_id
         row = dict(subject_hash=hashed, cohort=cohort, center=center_from_id(key, cohort),
                    sheet=sheet.name, row=cells[0].row,
                    eligible_outcome=eligible, measurements={})

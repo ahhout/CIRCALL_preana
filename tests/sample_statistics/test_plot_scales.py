@@ -6,8 +6,8 @@ import unittest
 from unittest.mock import patch
 import pytest
 
-from analysis.sample_statistics.core import aggregate,assessment,prepare
-from analysis.sample_statistics.reporting import figures
+from analysis.sample_statistics.step_01_prepare import aggregate, assessment, prepare
+from analysis.sample_statistics.step_04_report import figures
 from tests.fixtures.sample_statistics import fixture,D,ASOF
 
 class PlotScaleTests(unittest.TestCase):
@@ -185,7 +185,7 @@ class PlotScaleTests(unittest.TestCase):
 def test_per_ml_timepoint_style_preserves_existing_populations(tmp_path, field, scope, controls):
     from matplotlib.figure import Figure
     from matplotlib.text import Text
-    from analysis.figure_layout import FONT_FAMILY, FONT_SIZE, LEGEND_GAP_POINTS
+    from analysis.utils.figure_layout import FONT_FAMILY, FONT_SIZE, LEGEND_GAP_POINTS
     d={**D,'metrics':{field:D['metrics'][field]}}
     visits=['control'] if controls else ['diag','d4','d8','d15','tp1','tp2','relapse']
     cohorts=['circall','retrospective'] if scope=='pooled' else [scope]

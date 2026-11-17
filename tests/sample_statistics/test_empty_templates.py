@@ -4,7 +4,7 @@ from datetime import datetime
 from openpyxl import Workbook
 import pytest
 
-from analysis.sample_statistics.core import prepare, assessment
+from analysis.sample_statistics.step_01_prepare import prepare, assessment
 from tests.fixtures.sample_statistics import D, ASOF
 
 

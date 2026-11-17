@@ -9,7 +9,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from analysis.provenance import digest
-from analysis.sample_statistics import runner
+from analysis.steps import step_02_sample_statistics as runner
 from analysis.pipeline import main as integrated
 from tests.fixtures.sample_statistics import fixture,ASOF
 

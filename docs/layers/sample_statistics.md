@@ -180,7 +180,7 @@ retrospective blue triangles, pale boxes with dark medians, light horizontal
 gridlines and legends below the plotting area. Receipt bars use the cohort colour.
 Sample points use deterministic horizontal jitter (`plot_jitter_seed`); values,
 box summaries and eligibility are unchanged. Exports are 300-dpi PNGs and vector
-PDFs with embedded fonts. The shared implementation is `analysis/plot_style.py`.
+PDFs with embedded fonts. The shared implementation is `analysis/utils/plot_style.py`.
 
 DNA per mL plasma figures use a grant layout in every cohort and control view:
 300-dpi PNGs and optional vector PDFs, readable timepoint labels, lightly shaded boxes, and

@@ -5,15 +5,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from analysis.figure_layout import legends_below
+from analysis.utils.figure_layout import legends_below
 
 
 @pytest.mark.parametrize('exporter', ['shared', 'diagnostics', 'disease'])
 def test_all_exporters_use_arial_and_clear_axis_labels(tmp_path, exporter):
     from matplotlib.font_manager import findfont
     from matplotlib.text import Text
-    from analysis.figure_layout import FONT_FAMILY, FONT_SIZE, LEGEND_GAP_POINTS
-    from analysis.plot_style import save_figure
+    from analysis.utils.figure_layout import FONT_FAMILY, FONT_SIZE, LEGEND_GAP_POINTS
+    from analysis.utils.plot_style import save_figure
     fig, axes = plt.subplots(1, 2, figsize=(10, 5))
     for ax in axes:
         ax.plot([1, 2], [10, 100], label='Recorded samples')
@@ -30,7 +30,7 @@ def test_all_exporters_use_arial_and_clear_axis_labels(tmp_path, exporter):
         from analysis.association_methods import _save_figure
         _save_figure(fig, tmp_path/f'{exporter}.png')
     else:
-        from analysis.disease_modeling.reporting import save
+        from analysis.disease_modeling.step_03_report import save
         save(fig, tmp_path/exporter)
     for text in fig.findobj(Text):
         assert text.get_fontfamily() == [FONT_FAMILY]
@@ -49,8 +49,8 @@ def test_all_exporters_use_arial_and_clear_axis_labels(tmp_path, exporter):
 
 
 def test_clean_export_preserves_observations_labels_legend_and_annotations(tmp_path):
-    from analysis.figure_layout import remove_plot_text
-    from analysis.plot_style import save_figure
+    from analysis.utils.figure_layout import remove_plot_text
+    from analysis.utils.plot_style import save_figure
     fig, ax = plt.subplots()
     ax.plot([1, 2], [3, 4], label='CIRCALL')
     ax.set(xlabel='Visit', ylabel='DNA (ng/mL)', title='Remove title')

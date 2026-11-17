@@ -1,13 +1,13 @@
 """Internal data-integrity engine with quality-aware reports."""
+from analysis.data_integrity.step_03_validate import validate_results
 import argparse
-import json
 from pathlib import Path
 
-from analysis.source_state import sources, capture_sources, verify_source_states
-from analysis.retrospective_controls import inspect_with_controls
+from analysis.utils.source_state import sources, capture_sources, verify_source_states
+from analysis.utils.retrospective_controls import inspect_with_controls
 from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
-from .checks import load_rules, inspect_cohort, group_findings, summarize
-from .reporting import write_workbook, validate_workbook
+from analysis.data_integrity.step_01_inspect import load_rules
+from analysis.data_integrity.step_02_report import write_workbook
 
 
 def arguments(argv=None):
@@ -84,18 +84,3 @@ def run(args):
     if not any(c['report_status']=='complete' for c in record['cohorts']):record['status']='failed'
     write_json(output/'run_manifest.json',record)
     return 0 if record['status']=='complete' else 1
-
-
-def validate_results(output,record):
-    output=Path(output)
-    for item in record['artifacts']:
-        path=Path(item['path'])
-        if path.is_absolute() or '..' in path.parts or digest(output/path)!=item['sha256']:
-            raise ValueError('Integrity report artifact mismatch')
-    for cohort in record['cohorts']:
-        if cohort['report_status']!='complete':continue
-        result=json.loads((output/cohort['cohort']/'findings.json').read_text())
-        if result['groups']!=group_findings(result['findings']) or result['summary']!=summarize(result['findings']):
-            raise ValueError('Integrity audit groups do not reconcile')
-        validate_workbook(output/cohort['cohort']/'integrity_report.xlsx',result)
-    verify_source_states(record['source_states'])

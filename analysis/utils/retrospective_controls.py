@@ -2,7 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 
 SHEET='Feuil1'
 ENDPOINT='Conc ng/mL  plasma'
@@ -11,7 +11,7 @@ NUMERIC={'Conc ng/mL  plasma':'ng/mL plasma','Conc ng':'ng','Conc ng / ul':'ng/Â
 
 
 def inspect_with_controls(path,cohort,include_controls,rules,donors=None):
-    from analysis.data_integrity.checks import inspect_cohort, group_findings, summarize
+    from analysis.data_integrity.step_01_inspect import inspect_cohort, group_findings, summarize
     result=inspect_cohort(path,cohort,include_controls,rules)
     if cohort!='retrospective' or not include_controls or donors is None:return result
     configured=deepcopy(rules)
@@ -29,7 +29,7 @@ def inspect_with_controls(path,cohort,include_controls,rules,donors=None):
 
 
 def observations(path,d):
-    from analysis.sample_statistics.core import measurement, token
+    from analysis.sample_statistics.step_01_prepare import measurement, token
     sheet=read_sheet(path,SHEET)
     headers=[str(c.value).strip() if c.value is not None else '' for c in sheet.headers]
     if any(headers.count(f)!=1 for f in ('Donor',ENDPOINT)):raise ValueError('Donor headers unavailable or duplicated')

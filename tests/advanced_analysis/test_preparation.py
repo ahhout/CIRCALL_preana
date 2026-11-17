@@ -7,9 +7,9 @@ import numpy as np
 from openpyxl import Workbook
 import pytest
 
-from analysis.advanced_analysis import preparation as prep
+from analysis.advanced_analysis import step_01_prepare as prep
 from analysis.provenance import ROOT
-from analysis.sample_io import SourceCell
+from analysis.utils.sample_io import SourceCell
 
 
 

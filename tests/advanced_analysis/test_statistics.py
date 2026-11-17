@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from analysis.advanced_analysis.statistics import analyze_outcome as analyze, pairs
-from analysis.advanced_analysis.reporting import figure, workbook, validate_workbook, COLORS
+from analysis.advanced_analysis.step_02_analyze import analyze_outcome as analyze, pairs
+from analysis.advanced_analysis.step_03_report import figure, workbook, validate_workbook, COLORS
 from analysis import association_methods as engine
 from tests.fixtures.associations import toy_cohort
 from tests.fixtures.advanced_analysis import D
@@ -119,7 +119,7 @@ def test_pooling_units_colors_and_no_inference():
     assert len(fig.axes[0].collections) == 2
     assert all(c in COLORS for c in ('retrospective', 'circall'))
     from matplotlib.colors import to_rgba
-    from analysis.plot_style import COHORT_COLORS
+    from analysis.utils.plot_style import COHORT_COLORS
     for collection, cohort in zip(fig.axes[0].collections, ['circall', 'retrospective'], strict=True):
         assert np.allclose(collection.get_facecolors()[0][:3], to_rgba(COHORT_COLORS[cohort])[:3])
     assert fig.axes[0].get_ylabel() == 'cfDNA concentration (ng/mL plasma)'

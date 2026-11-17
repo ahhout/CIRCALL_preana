@@ -81,7 +81,7 @@ def calendar_figure(rows, coverage):
 
 def validate_calendar_dates(rows, definitions, source):
     """Reconcile plotted/local date metadata against the selected source in memory."""
-    from analysis.sample_io import read_sheet
+    from analysis.utils.sample_io import read_sheet
     metric = definitions['metrics'].get(FIELD, {})
     config = metric.get('calendar_plot')
     if not config:

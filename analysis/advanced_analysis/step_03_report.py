@@ -9,7 +9,7 @@ import numpy as np
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 
-from analysis.plot_style import COHORT_COLORS, save_figure
+from analysis.utils.plot_style import COHORT_COLORS, save_figure
 from .figures import figure
 from .schema import outcome_frame, predictors
 

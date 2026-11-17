@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from analysis.figure_layout import remove_plot_text
+from analysis.utils.figure_layout import remove_plot_text
 
 
 def mrd_status_figure(rows, d):

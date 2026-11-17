@@ -3,7 +3,7 @@ import re
 from zipfile import ZipFile
 from openpyxl import Workbook
 from analysis.provenance import ROOT
-from analysis.data_integrity.checks import load_rules
+from analysis.data_integrity.step_01_inspect import load_rules
 
 def fixture(path, overrides=None, sheets=('Inventaire',), caches=None):
     rules=load_rules(ROOT/'configs/definitions/data_integrity.json')

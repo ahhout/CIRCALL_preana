@@ -8,8 +8,8 @@ import pytest
 from openpyxl import load_workbook
 
 from analysis.provenance import ROOT
-from analysis.sample_statistics.core import load_definitions
-from analysis.sample_statistics.reporting import inventory_records, workbook, validate_workbook
+from analysis.sample_statistics.step_01_prepare import load_definitions
+from analysis.sample_statistics.step_04_report import inventory_records, workbook, validate_workbook
 
 
 
@@ -119,8 +119,8 @@ def test_mismatched_denominators_are_rejected():
 
 def test_centers_and_late_checklist_reconcile_without_changing_receipt_rates(tmp_path):
     from datetime import date
-    from analysis.sample_statistics.core import receipt, aggregate, assessment
-    from analysis.sample_statistics.reporting import display_order
+    from analysis.sample_statistics.step_01_prepare import receipt, aggregate, assessment
+    from analysis.sample_statistics.step_04_report import display_order
     d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
     observations=[]
     for i,(center,pid,sample) in enumerate([('RDB','P1','RECEIVED'),('RDB','P1','na'),
@@ -215,7 +215,7 @@ def test_circall_inventory_adds_tissue_totals_without_summing_patient_counts(tmp
 
 def test_tissue_subtotals_show_all_centers_rdb_and_trs_with_distinct_patients(tmp_path):
     from datetime import date
-    from analysis.sample_statistics.core import receipt, aggregate, assessment
+    from analysis.sample_statistics.step_01_prepare import receipt, aggregate, assessment
     d=load_definitions(ROOT/'configs/definitions/sample_statistics.json')
     observations=[]
     for center,pid,specimen,visit,sample in [

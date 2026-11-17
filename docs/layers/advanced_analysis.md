@@ -97,7 +97,7 @@ blue triangles, pale categorical boxes, dark fitted curves and neutral confidenc
 bands. Legends sit below the plotting area. Titles and descriptive footers are omitted;
 pooled count labels show total analysis n without cohort-specific counts. Main exports
 are 300-dpi PNGs and, when enabled, vector PDFs with embedded fonts; audit diagnostic plots use
-the same cohort colours and axes. The shared `analysis/plot_style.py` controls the
+the same cohort colours and axes. The shared `analysis/utils/plot_style.py` controls the
 palette and export settings. These presentation changes preserve model fits,
 confidence intervals, p-values, observation selection and categorical jitter seeds.
 

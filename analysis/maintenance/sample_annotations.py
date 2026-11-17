@@ -16,8 +16,8 @@ from openpyxl.utils.cell import coordinate_to_tuple
 from analysis.configuration import unique_object
 from analysis.maintenance.xlsx_patch import CELL, ROW, cell_xml
 from analysis.provenance import ROOT, digest, envelope, write_json
-from analysis.sample_definitions import extraction_state
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_definitions import extraction_state
+from analysis.utils.sample_io import read_sheet
 from analysis.maintenance.workbook_cleanup import NS, REL
 
 
@@ -164,8 +164,8 @@ def main(argv=None):
         plan(source, config['selected_sheets'][name], config)
     args.output_dir.mkdir(parents=True)
     record = envelope('sample_annotations', config, {**sources, 'definitions': args.config},
-                      [Path(__file__), ROOT/'analysis/sample_definitions.py', Path(__file__).with_name('xlsx_patch.py'),
-                       ROOT/'analysis/sample_io.py', Path(__file__).with_name('workbook_cleanup.py'), ROOT/'analysis/provenance.py',
+                      [Path(__file__), ROOT/'analysis/utils/sample_definitions.py', Path(__file__).with_name('xlsx_patch.py'),
+                       ROOT/'analysis/utils/sample_io.py', Path(__file__).with_name('workbook_cleanup.py'), ROOT/'analysis/provenance.py',
                        ROOT/'analysis/configuration.py'], ROOT/'environments/conda-linux-64.lock',
                       command=[sys.executable, '-m', 'analysis.maintenance.sample_annotations', *(argv if argv is not None else sys.argv[1:])])
     record.update(adopted=[], workbooks=[])

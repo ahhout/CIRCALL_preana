@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import json
 from openpyxl import Workbook
 from analysis.provenance import ROOT
-from analysis.advanced_analysis import preparation as prep
+from analysis.advanced_analysis import step_01_prepare as prep
 D = prep.load_definitions(ROOT/"configs/definitions/advanced_analysis.json")
 
 def row(pid='P1', outcome=10, **changes):

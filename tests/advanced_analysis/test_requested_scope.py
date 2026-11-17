@@ -5,9 +5,9 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from analysis.advanced_analysis.preparation import prepare
+from analysis.advanced_analysis.step_01_prepare import prepare
 from analysis.advanced_analysis.schema import comparisons, outcome_frame, predictors
-from analysis.advanced_analysis.statistics import analyze, pairs
+from analysis.advanced_analysis.step_02_analyze import analyze, pairs
 from analysis import association_methods as engine
 from tests.fixtures.advanced_analysis import D, fixture, row, sample, settings
 

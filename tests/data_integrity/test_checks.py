@@ -19,11 +19,11 @@ from zipfile import ZipFile
 
 from openpyxl import Workbook, load_workbook
 
-from analysis.data_integrity.checks import load_rules, inspect_cohort, group_findings, summarize
-from analysis.data_integrity.reporting import write_workbook, validate_workbook
-from analysis.data_integrity.runner import arguments, preflight, run
+from analysis.data_integrity.step_01_inspect import load_rules, inspect_cohort, group_findings, summarize
+from analysis.data_integrity.step_02_report import write_workbook, validate_workbook
+from analysis.steps.step_01_data_integrity import arguments, preflight, run
 from analysis.provenance import ROOT, digest
-from analysis.sample_io import read_sheet
+from analysis.utils.sample_io import read_sheet
 
 
 
@@ -162,7 +162,7 @@ class IntegrityTests(unittest.TestCase):
     def test_independent_report_generation_failure(self):
         fixture(self.source,sheets=('Inventaire','cohorte_lal','cohorte_control'))
         args=arguments(['--inventory',str(self.source),'--circall',str(self.source),'--output-dir',str(self.root/'native')])
-        from analysis.data_integrity import runner
+        from analysis.steps import step_01_data_integrity as runner
         original=runner.write_workbook
         def fail_one(path,result,*rest):
             if result['cohort']=='retrospective':raise ValueError('PRIVATE_SENTINEL')
@@ -227,7 +227,7 @@ class IntegrityTests(unittest.TestCase):
         args=arguments(['--inventory',str(self.source),'--cohort','retrospective'])
         evidence=preflight(args)
         self.source.write_bytes(b'changed source')
-        from analysis.data_integrity.runner import verify_source_states
+        from analysis.steps.step_01_data_integrity import verify_source_states
         with self.assertRaises(ValueError):verify_source_states(evidence['source_states'])
 
     def test_explicit_unknown_and_not_extracted_conflicts(self):

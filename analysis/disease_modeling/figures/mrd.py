@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import numpy as np
 
-from analysis.figure_layout import remove_plot_text
+from analysis.utils.figure_layout import remove_plot_text
 
 
 def mrd_figure(records, scope, args, d):
     if not any(r['status'] not in ('missing', 'normalized_baseline') for r in records):
         return None
-    from analysis.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
+    from analysis.utils.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
     pooled = scope == 'pooled'
     colors = d['colors'] if pooled else {**d['colors'], **COHORT_COLORS}
     visits = d['pooled_visits'] if pooled or scope == 'circall' else d['visits']

@@ -4,7 +4,7 @@ import hashlib
 import numpy as np
 import pytest
 
-from analysis.sample_statistics.comparisons import compare, significance
+from analysis.sample_statistics.step_03_compare import compare, significance
 from tests.fixtures.sample_statistics import D
 
 FIELD='dna_ng_per_ml_plasma'
@@ -99,7 +99,7 @@ def test_star_thresholds_and_holm_family():
 @pytest.mark.parametrize('differences', [[0,1,-1,2,2,-3],[0,0,1],[1,2,3,4],[-2,-2,1,1]])
 def test_vectorized_signed_rank_matches_scipy_with_ties_and_zeros(differences):
     from scipy.stats import wilcoxon, PermutationMethod
-    from analysis.sample_statistics.comparisons import signed_rank_permutation
+    from analysis.sample_statistics.step_03_compare import signed_rank_permutation
     expected=wilcoxon(differences,zero_method='wilcox',method=PermutationMethod(n_resamples=9999),alternative='two-sided')
     actual,_=signed_rank_permutation(differences,D['inference'],42)
     assert actual.statistic==expected.statistic
@@ -107,7 +107,7 @@ def test_vectorized_signed_rank_matches_scipy_with_ties_and_zeros(differences):
 
 
 def test_annotations_show_only_two_control_star_brackets():
-    from analysis.sample_statistics.reporting import grant_figure
+    from analysis.sample_statistics.step_04_report import grant_figure
     import matplotlib.pyplot as plt
     definition=D['metrics'][FIELD]
     rows=[row('C','control',1),row('R','control',2,'retrospective'),row('P','diag',20),row('P','tp1',5)]
@@ -129,7 +129,7 @@ def test_annotations_show_only_two_control_star_brackets():
 
 def test_comparison_workbook_preserves_numeric_p_values_and_hides_no_tests(tmp_path):
     from openpyxl import load_workbook
-    from analysis.sample_statistics.reporting import workbook,validate_workbook
+    from analysis.sample_statistics.step_04_report import workbook, validate_workbook
     from tests.fixtures.sample_statistics import saved_result
     result=saved_result()
     rows=[row(f'C{i}','control',i) for i in (1,2,3)]

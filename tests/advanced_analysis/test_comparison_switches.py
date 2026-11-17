@@ -6,10 +6,10 @@ import json
 import pandas as pd
 import pytest
 
-from analysis.advanced_analysis.preparation import load_definitions, prepare
-from analysis.advanced_analysis.reporting import figures, report_tables, workbook, validate_workbook
+from analysis.advanced_analysis.step_01_prepare import load_definitions, prepare
+from analysis.advanced_analysis.step_03_report import figures, report_tables, workbook, validate_workbook
 from analysis.advanced_analysis.schema import comparisons
-from analysis.advanced_analysis.statistics import analyze
+from analysis.advanced_analysis.step_02_analyze import analyze
 from analysis.pipeline import main as integrated
 from tests.fixtures.advanced_analysis import sources
 from tests.fixtures.advanced_analysis import D, fixture

@@ -31,12 +31,12 @@ def test_cli_override_reaches_preflight(monkeypatch, enabled):
 @pytest.mark.parametrize('layer', ['sample_statistics', 'advanced_analysis', 'disease_modeling'])
 def test_rendered_formats(tmp_path, monkeypatch, enabled, layer):
     if layer == 'disease_modeling':
-        from analysis.disease_modeling import reporting
+        from analysis.disease_modeling import step_03_report as reporting
         fig, ax = plt.subplots()
         ax.plot([1, 2], [2, 3])
         reporting.save(fig, tmp_path/'example', pdf_output=enabled)
     elif layer == 'sample_statistics':
-        from analysis.sample_statistics import reporting
+        from analysis.sample_statistics import step_04_report as reporting
         from tests.fixtures.sample_statistics import D
         field = 'dna_ng_per_ml_plasma'
         row = dict(cohort='circall', control=False, specimen='plasma', assay='cfdna',
@@ -45,7 +45,7 @@ def test_rendered_formats(tmp_path, monkeypatch, enabled, layer):
         reporting.figures(tmp_path, [row], {**D, 'metrics': {field: D['metrics'][field]}},
                           pooled=True, pdf_output=enabled)
     else:
-        from analysis.advanced_analysis import reporting
+        from analysis.advanced_analysis import step_03_report as reporting
         monkeypatch.setattr(reporting, 'predictors', lambda _: [SimpleNamespace(variable='x', output_name='x')])
         monkeypatch.setattr(reporting, 'outcome_frame', lambda *a: None)
         monkeypatch.setattr(reporting, 'figure', lambda *a, **kw: plt.subplots()[0])

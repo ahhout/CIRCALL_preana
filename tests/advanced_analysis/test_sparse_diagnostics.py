@@ -21,7 +21,7 @@ def test_singleton_category_preserves_fit_and_reports_undefined_diagnostics(tmp_
         labels.extend(t.get_text() for ax in figure.axes for t in ax.texts)
         if cohort:
             from matplotlib.colors import to_rgba
-            from analysis.plot_style import COHORT_COLORS, COHORT_MARKERS
+            from analysis.utils.plot_style import COHORT_COLORS, COHORT_MARKERS
             axis = figure.axes[0]
             assert not axis.spines['top'].get_visible()
             if path.name == 'qq_plot.png':
@@ -31,7 +31,7 @@ def test_singleton_category_preserves_fit_and_reports_undefined_diagnostics(tmp_
                 assert np.allclose(axis.collections[0].get_facecolors()[0][:3], to_rgba(COHORT_COLORS[cohort])[:3])
         plt.close(figure)
     monkeypatch.setattr(methods, '_save_figure', inspect)
-    from analysis import plot_style
+    from analysis.utils import plot_style
     monkeypatch.setattr(plot_style, 'save_figure', inspect)
     with warnings.catch_warnings():
         warnings.simplefilter('error', RuntimeWarning)

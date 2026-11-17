@@ -1,19 +1,19 @@
 """Internal Layer 2 engine with an explicit per-cohort integrity gate."""
+from analysis.sample_statistics.step_05_validate import validate_results
 import argparse
 from copy import copy
-import json
 import hashlib
 import os
 from pathlib import Path
 
-from analysis.retrospective_controls import inspect_with_controls
+from analysis.utils.retrospective_controls import inspect_with_controls
 from analysis.provenance import ROOT, digest, envelope, utc_now, verify_inputs, write_json
-from analysis.data_integrity.checks import inspect_cohort, load_rules
-from analysis.source_state import capture_sources, sources, verify_source_states
-from .core import load_definitions, assessment, prepare, aggregate
-from .reporting import workbook, validate_workbook, figures
-from .comparisons import compare
-from .calendar_volumes import calendar_coverage, validate_calendar_dates
+from analysis.data_integrity.step_01_inspect import load_rules
+from analysis.utils.source_state import capture_sources, sources, verify_source_states
+from analysis.sample_statistics.step_01_prepare import load_definitions, assessment, prepare, aggregate
+from analysis.sample_statistics.step_04_report import workbook, validate_workbook, figures
+from analysis.sample_statistics.step_03_compare import compare
+from analysis.sample_statistics.calendar_volumes import calendar_coverage
 
 
 def arguments(argv=None):
@@ -114,7 +114,7 @@ def run(args):
             else:
                 rows,issues,skipped=prepare(path,cohort,args.include_controls,assessment(args.assessment_time),d)
                 if cohort=='retrospective' and args.include_controls and args.donors is not None:
-                    from analysis.retrospective_controls import observations
+                    from analysis.utils.retrospective_controls import observations
                     donor_rows,donor_issues=observations(args.donors,d)
                     rows.extend(donor_rows);issues.extend(donor_issues)
                 result['metadata']['non_sample_rows_skipped']=skipped
@@ -163,38 +163,3 @@ def run(args):
                   report_generation_status='complete' if all(c['report_status']=='complete' for c in record['cohorts']) else 'partial',finished_utc=utc_now())
     write_json(output/'run_manifest.json',record)
     return 0 if record['status']=='complete' else 1
-
-
-def validate_results(output,record):
-    output=Path(output)
-    d=record['resolved_settings']['statistics_definition']
-    for item in record['artifacts']:
-        path=Path(item['path'])
-        if path.is_absolute() or '..' in path.parts or digest(output/path)!=item['sha256']:raise ValueError('Statistics artifact mismatch')
-        if path.suffix=='.png':
-            from PIL import Image
-            with Image.open(output/path) as im:im.verify()
-        if path.suffix=='.pdf' and not (output/path).read_bytes().startswith(b'%PDF-'):raise ValueError('Invalid PDF')
-    for cohort in record['cohorts']:
-        if cohort['report_status']=='complete':
-            native=output/cohort['cohort']
-            result=json.loads((native/'statistics.json').read_text())
-            validate_workbook(native/'statistics.xlsx',result,d)
-            if result['status']=='complete':
-                rows=json.loads((native/'observations.json').read_text())
-                if cohort['cohort'] == 'circall':
-                    validate_calendar_dates(rows, d, record['source_states']['circall']['path'])
-                expected_calendar = calendar_coverage(rows, d) if cohort['cohort'] != 'pooled' else []
-                if result.get('calendar_volume_coverage', []) != expected_calendar:
-                    raise ValueError('Calendar volume coverage does not reconcile with audit observations')
-                if aggregate([r for r in rows if not r['control']],d,pooled=cohort['cohort']=='pooled') != result['tables']:
-                    raise ValueError('Statistics tables do not reconcile with audit observations')
-                if 'controls' in result and aggregate([r for r in rows if r['control']],d)!=result['controls']:
-                    raise ValueError('Control tables do not reconcile')
-                comparison_rows=rows
-                if cohort['cohort']=='pooled':
-                    comparison_rows=[r for name in ('circall','retrospective')
-                                     for r in json.loads((output/name/'observations.json').read_text())]
-                if compare(comparison_rows,d,cohort['cohort'])!=result.get('comparisons'):
-                    raise ValueError('Comparison results do not reconcile')
-    verify_inputs(record['inputs']);verify_source_states(record['source_states'])

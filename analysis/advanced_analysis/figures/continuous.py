@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 
-from analysis.plot_style import COHORT_LABELS, INK, scatter_points
+from analysis.utils.plot_style import COHORT_LABELS, INK, scatter_points
 
 
 def draw_continuous(ax, data, predictor, model, displayed, log_x, scope):

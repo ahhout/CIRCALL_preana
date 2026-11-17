@@ -4,10 +4,10 @@ from tempfile import TemporaryDirectory
 import unittest
 from openpyxl import Workbook
 from analysis.provenance import ROOT
-from analysis.data_integrity.checks import load_rules
-from analysis.retrospective_controls import inspect_with_controls,observations
-from analysis.sample_statistics.core import load_definitions,aggregate
-from analysis.sample_statistics.runner import arguments,run,validate_results
+from analysis.data_integrity.step_01_inspect import load_rules
+from analysis.utils.retrospective_controls import inspect_with_controls, observations
+from analysis.sample_statistics.step_01_prepare import load_definitions, aggregate
+from analysis.steps.step_02_sample_statistics import arguments, run, validate_results
 from tests.fixtures.sample_statistics import fixture,ASOF
 import json
 

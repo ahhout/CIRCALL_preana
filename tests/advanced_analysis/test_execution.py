@@ -9,7 +9,7 @@ from zipfile import ZipFile
 from openpyxl import Workbook
 import pytest
 
-from analysis.advanced_analysis import runner
+from analysis.steps import step_03_advanced_analysis as runner
 from analysis.pipeline import main as integrated, load_config, workflow_args
 from analysis.outputs import deliverables, publication_directory
 from analysis.provenance import digest

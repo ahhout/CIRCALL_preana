@@ -4,7 +4,7 @@ from matplotlib.lines import Line2D
 from matplotlib.ticker import FuncFormatter
 import numpy as np
 
-from analysis.figure_layout import remove_plot_text
+from analysis.utils.figure_layout import remove_plot_text
 
 
 def count_figure(records, measurement, args, d, *, early=False, comparison=False):
@@ -13,7 +13,7 @@ def count_figure(records, measurement, args, d, *, early=False, comparison=False
     if not data:
         return None
     fig, ax = plt.subplots(figsize=(10, 6))
-    from analysis.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
+    from analysis.utils.plot_style import CENTER_MARKERS, COHORT_COLORS, point_handles
     circall_only = not comparison and {r['cohort'] for r in data} == {'circall'}
     colors = d['colors'] if comparison else {**d['colors'], **COHORT_COLORS}
     handles = []
